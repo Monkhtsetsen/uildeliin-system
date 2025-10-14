@@ -522,7 +522,7 @@ input[type="range"]::-moz-range-thumb{
       <div><label>Блокын хэмжээ (K/нэгж)</label><input id="blockSizeB" type="number" value="1" min="1"></div>
     </div>
     <div class="row">
-      <div><label>Процессууд (нэр:K — дарааллаар)</label><input id="procListB" type="text" value="A:6,B:4,C:5,A:6,B:4,C:5"></div>
+      <div><label>Процессууд (нэр:K — дарааллаар)</label><input id="procListB" type="text" value="A:6,B:4,C:5,D:6,E:4,A:5"></div>
       <div>
         <label>Хурдасгал</label>
         <div class="segmented" id="speedGroup">
@@ -769,14 +769,19 @@ input[type="range"]::-moz-range-thumb{
         </div>
         <div class="mem-info-body">
           <ul>
-            <li><b>EMAT</b> = h·t<sub>cache</sub> + (1 − h)·(t<sub>cache</sub> + t<sub>mem</sub>)</li>
-            <li>Ажиллах зарчим: <i>Hit</i> үед зөвхөн кэш (<code>t_cache</code>), <i>Miss</i> үед кэш + үндсэн ой (<code>t_cache + t_mem</code>).</li>
-            <li>Жишээ (h = 70%, t<sub>cache</sub> = 10&nbsp;ns, t<sub>mem</sub> = 200&nbsp;ns): EMAT = 0.7&nbsp;·&nbsp;10 + 0.3&nbsp;·&nbsp;(10 + 200) = <b>70&nbsp;ns</b>.</li>
-            <li><b>Speedup</b> (vs. t<sub>mem</sub>) = t<sub>mem</sub> / EMAT — кэшгүй (main memory (RAM/DRAM)) хувилбартай харьцуулсан хурд.</li>
-            <li>Кэш бодитоор ашигтай байх доод нөхцөл: h &gt; t<sub>cache</sub> / t<sub>mem</sub>. Манай жишээнд 10/200 = <b>5%</b> ⇒ h &gt; 5% байхад л ашигтай.</li>
+            <li><b>EMAT</b> (Effective Memory Access Time) = h·t<sub>cache</sub> + (1 − h)·t<sub>mem</sub></li>
+            <li>Ажиллах зарчим: 
+              <i>Hit</i> үед зөвхөн кэш рүү хандана (<code>t<sub>cache</sub></code>), 
+              <i>Miss</i> үед кэш алгасагдаж шууд үндсэн ой руу хандана (<code>t<sub>mem</sub></code>).
+            </li>
+            <li>Жишээ (h = 70%, t<sub>cache</sub> = 10&nbsp;ns, t<sub>mem</sub> = 200&nbsp;ns): 
+              EMAT = 0.7&nbsp;·&nbsp;10 + 0.3&nbsp;·&nbsp;200 = <b>67&nbsp;ns</b>.
+            </li>
+            <li><b>Speedup</b> (харьцуулахад): t<sub>mem</sub> / EMAT — кэшгүй (зөвхөн үндсэн санах ой) хувилбартай харьцуулсан дундаж хурдасалт.</li>
+            <li>Кэш ашигтай байх доод нөхцөл: h &gt; t<sub>cache</sub> / t<sub>mem</sub>. Манай жишээнд 10/200 = <b>5%</b> ⇒ h &gt; 5% байхад л кэш ашигтай гэж үзнэ.</li>
             <li><b>1 second</b> = 1,000,000,000 nanoseconds (ns) = 10<sup>9</sup>&nbsp;ns = 1,000,000,000,000 picoseconds (ps) = 10<sup>12</sup>&nbsp;ps.</li>
-            <li><b>1 ns</b> = 10<sup>&minus;9</sup>&nbsp;seconds (s) = 0.001&nbsp;microseconds (&micro;s) = 1,000&nbsp;ps.</li>
-            <li><b>1 ps</b> = 10<sup>&minus;12</sup>&nbsp;seconds (s) = 0.001&nbsp;ns = 1,000&nbsp;femtoseconds (fs).</li>
+            <li><b>1 ns</b> = 10<sup>−9</sup>&nbsp;seconds (s) = 0.001&nbsp;microseconds (&micro;s) = 1,000&nbsp;ps.</li>
+            <li><b>1 ps</b> = 10<sup>−12</sup>&nbsp;seconds (s) = 0.001&nbsp;ns = 1,000&nbsp;femtoseconds (fs).</li>
           </ul>
         </div>
       </div>
@@ -798,13 +803,13 @@ const memData = {
     <p>CPU ба RAM хооронд түр зуур хадгалдаг жижиг, маш хурдан санах ой.
        Ойрын үед дахин хэрэглэх магадлалтай өгөгдлийг барьж,
        <strong>hit</strong> өсгөж, дундаж хандалтын хугацааг бууруулдаг.</p>
-    <ul><li>L1/L2/L3 шаталсан</li><li>LRU, FIFO гэх дүрмүүд</li><li>Зүйрлэл: “халаасны дурсамж”</li></ul>` },
+    <ul><li>L1/L2/L3 шаталсан</li><li>LRU, FIFO гэх дүрмүүд</li><li>“халаасны дурсамж”</li></ul>` },
   sec: { head:['Secondary (SSD/HDD)','Latency: μs–ms','Persistent'], body: `
     <p>SSD/HDD нь байнгын хадгалалт бөгөөд багтаамж ихтэй ч RAM-аас удаан.
        Файлын системээр дамжин RAM руу ачаалсны дараа CPU ашиглана.</p>
     <ul><li>Дараалсан/санамсаргүй хандалт</li>
     <li>RAM хүрэлцэхгүй үед paging, swapping</li>
-    <li>Зүйрлэл: “архив”</li></ul>` }
+    <li>“архивын агуулах”</li></ul>` }
 };
 document.querySelectorAll('#mem-intro .mem-chip').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -892,34 +897,66 @@ function attachTags(start,len){
 }
 function previewNextB(){
   const my=runStamp;
-  if(!stateB||stateB.idx>=stateB.procs.length){ hideTags(); logTo('Дууслаа.','ok'); if(my!==runStamp) return; stateB.halted=true; return; }
+  if(!stateB || stateB.idx>=stateB.procs.length){
+    hideTags(); logTo('Дууслаа.','ok'); if(my!==runStamp) return; stateB.halted=true; return;
+  }
   const cur=stateB.procs[stateB.idx];
   const len=Math.ceil(cur.k/stateB.allocQ)*stateB.allocQ;
+
+  // already resident? just show where it lives
+  const res=stateB.resident.get(cur.name);
+  if(res){
+    attachTags(res.start, res.lenCells);
+    logTo(`Preview: ${cur.name} RAM дээр байна (Base=${res.start}, Limit=${res.lenCells}).`,'ok');
+    return;
+  }
+
   const start=findContiguous(len);
   if(my!==runStamp) return;
   if(start===-1){ hideTags(); logTo(`Preview ${cur.name}: зай алга — FIFO шаардлагатай.`,'warn'); return; }
   attachTags(start,len); logTo(`Preview: ${cur.name} (Base=${start}, Limit=${len})`,'ok');
 }
+
 async function placeCurrentB(){
   if(busy) return; busy=true; const my=runStamp;
   try{
     const cur=stateB.procs[stateB.idx];
     const len=Math.ceil(cur.k/stateB.allocQ)*stateB.allocQ;
+
+    // if already resident → just "run" and move on
+    const already=stateB.resident.get(cur.name);
+    if(already){
+      attachTags(already.start, already.lenCells);
+      await sleep(SPEED[speedMode].preview);
+      hideTags();
+      logTo(`RUN: ${cur.name} (аль хэдийн RAM дээр)`, 'ok');
+      stateB.idx++; stateB.phase='previewNext';
+      return;
+    }
+
+    // need space to (re)load cur.name
     let start=findContiguous(len);
     const color=({A:'#2e7dff55',B:'#c58cff55',C:'#49e3b355',D:'#ffd16655',E:'#ff704355'}[cur.name]||'#66e3ff33');
 
-    if(my!==runStamp) return;
     if(start===-1){
       logTo('RAM хүрэлцэхгүй. FIFO swapping…','warn');
-      while(start===-1&&stateB.placed.length>0){
-        if(my!==runStamp) return;
-        const vic=stateB.placed.shift();
-        for(let i=vic.start;i<vic.start+vic.lenCells;i++){ const c=getCellB(i); if(c){ c.style.background=''; c.classList.remove('fill'); } }
+      // evict by FIFO order (loadedAt asc), never the same name (shouldn’t be resident anyway)
+      while(start===-1 && stateB.placed.length>0){
+        // FIFO victim = earliest loaded
+        const vic = stateB.placed.shift();
+        stateB.resident.delete(vic.name);
+        for(let i=vic.start;i<vic.start+vic.lenCells;i++){
+          const c=getCellB(i); if(c){ c.style.background=''; c.classList.remove('fill'); }
+        }
         start=findContiguous(len);
       }
     }
+
     if(my!==runStamp) return;
-    if(start===-1){ logTo('⚠️ Оруулах боломжгүй.','bad'); stateB.idx++; stateB.phase='previewNext'; hideTags(); return; }
+    if(start===-1){
+      logTo('⚠️ Оруулах боломжгүй.', 'bad');
+      stateB.idx++; stateB.phase='previewNext'; hideTags(); return;
+    }
 
     attachTags(start,len);
     await sleep(SPEED[speedMode].preview);
@@ -930,39 +967,80 @@ async function placeCurrentB(){
       if(((i+1)%stateB.allocQ)===0 || i===len-1){ await sleep(SPEED[speedMode].batch); }
     }
 
-    if(my!==runStamp) return;
     hideTags();
-    const pid=stateB.nextPid++; stateB.placed.push({pid,name:cur.name,start,lenCells:len});
+    const entry={name:cur.name,start,lenCells:len,loadedAt:++stateB.fifoCounter};
+    stateB.placed.push(entry);
+    stateB.resident.set(cur.name, entry);
     logTo(`Placed: ${cur.name} [${start}..${start+len-1}]`,'ok');
     stateB.idx++; stateB.phase='previewNext'; renderMatrixCalc();
   } finally { busy=false; }
 }
 
+
 function renderMatrixCalc(){
   const tbl=q('#matrixCalc'); if(!tbl) return;
   const L=parseInt(q('#logicalAll').value||'0',10);
+
+  // placed is unique per name now
   const placed=stateB?.placed||[];
-  if(!placed.length){ tbl.innerHTML=`<thead><tr><th>—</th></tr></thead><tbody><tr><td style="text-align:center;color:#9fb1d6">Процесс хараахан RAM дээр байрлаагүй.</td></tr></tbody>`; return; }
-  let thead='<thead><tr><th></th>'; for(const p of placed){ thead+=`<th>${p.name}#${p.pid}</th>`; } thead+='</tr></thead>';
-  let rowLimit='<tr><td><b>limit</b></td>'; for(const p of placed){ rowLimit+=`<td>${p.lenCells}</td>`; } rowLimit+='</tr>';
-  let rowBase='<tr><td><b>base</b></td>'; for(const p of placed){ rowBase+=`<td>${p.start}</td>`; } rowBase+='</tr>';
+  if(!placed.length){
+    tbl.innerHTML=`<thead><tr><th>—</th></tr></thead><tbody><tr><td style="text-align:center;color:#9fb1d6">Процесс хараахан RAM дээр байрлаагүй.</td></tr></tbody>`;
+    return;
+  }
+
+  let thead='<thead><tr><th></th>';
+  for(const p of placed){ thead+=`<th>${p.name}</th>`; }
+  thead+='</tr></thead>';
+
+  let rowLimit='<tr><td><b>limit</b></td>';
+  for(const p of placed){ rowLimit+=`<td>${p.lenCells}</td>`; }
+  rowLimit+='</tr>';
+
+  let rowBase='<tr><td><b>base</b></td>';
+  for(const p of placed){ rowBase+=`<td>${p.start}</td>`; }
+  rowBase+='</tr>';
+
   let rowPhys=`<tr><td><b>physical (L=${isNaN(L)?'—':L})</b></td>`;
-  for(const p of placed){ if(Number.isNaN(L)){ rowPhys+='<td>—</td>'; } else if(L<0||L>=p.lenCells){ rowPhys+='<td class="tag-trap">TRAP</td>'; } else { rowPhys+=`<td class="tag-ok">${p.start+L}</td>`; } }
+  for(const p of placed){
+    if(Number.isNaN(L)){ rowPhys+='<td>—</td>'; }
+    else if(L<0 || L>=p.lenCells){ rowPhys+='<td class="tag-trap">TRAP</td>'; }
+    else { rowPhys+=`<td class="tag-ok">${p.start+L}</td>`; }
+  }
   rowPhys+='</tr>';
+
   tbl.innerHTML=thead+`<tbody>${rowLimit}${rowBase}${rowPhys}</tbody>`;
 }
+
 q('#logicalAll')?.addEventListener('input',renderMatrixCalc);
 
 function buildB(){
   const ramK=+q('#ramSizeB').value||16;
   const allocQ=Math.max(1,+q('#blockSizeB').value||1);
   const cells=ramK; buildGrid(cells);
+
   const raw=(q('#procListB').value||'').split(',').map(s=>s.trim()).filter(Boolean);
-  const procs=[]; for(const it of raw){ const [n,sz]=it.split(':'); const name=(n||'P').toUpperCase(); const k=+sz||0; if(k>0) procs.push({name,k}); }
-  stateB={ramK,allocQ,cells,procs,idx:0,placed:[],nextPid:1,phase:'preview',halted:false};
-  q('#logB').innerHTML=''; logTo(`RAM(B)=${ramK}K — 1K=1 нүд, allocQ=${allocQ}K`,'ok');
-  q('#btnStepB').disabled=false; q('#btnPlayB').disabled=false; hideTags(); renderMatrixCalc();
+  const procs=[];
+  for(const it of raw){
+    const [n,sz]=it.split(':');
+    const name=(n||'P').toUpperCase();
+    const k=+sz||0;
+    if(k>0) procs.push({name,k});
+  }
+
+  stateB={
+    ramK, allocQ, cells,
+    procs, idx:0,
+    placed:[],                // [{name,start,lenCells,loadedAt}]
+    resident:new Map(),       // name -> placed object
+    fifoCounter:0,            // increases on load only
+    phase:'preview', halted:false
+  };
+  q('#logB').innerHTML='';
+  logTo(`RAM(B)=${ramK}K — 1K=1 нүд, allocQ=${allocQ}K`,'ok');
+  q('#btnStepB').disabled=false; q('#btnPlayB').disabled=false;
+  hideTags(); renderMatrixCalc();
 }
+
 async function stepB(){ if(!stateB||stateB.halted||busy) return; const my=runStamp; if(stateB.phase==='preview'){ previewNextB(); if(my!==runStamp) return; stateB.phase='place'; return; } if(stateB.phase==='place'){ await placeCurrentB(); return; } if(stateB.phase==='previewNext'){ previewNextB(); if(my!==runStamp) return; stateB.phase='place'; return; } }
 
 q('#btnBuildB').addEventListener('click',()=>{ bumpRun(); buildB(); });
@@ -979,7 +1057,7 @@ q('#btnPlayB').addEventListener('click', async ()=>{ if(!stateB) return; const m
 
 /* ===== 3.Б: Scenario auto-run (ONE RUN) ===== */
 function runScenarioOnce(){
-  const seq = ['A:4','B:2','C:3','A:4','B:2','C:3','A:4','B:2','B:2']; // A:3, B:4, C:2 A:4 B:2
+  const seq = ['A:4','B:2','C:3','A:4','B:2','C:3','A:4','B:2','B:2']; // A:3, B:4, C:2
   q('#ramSizeB').value = 7;
   q('#blockSizeB').value = 1;
   q('#procListB').value = seq.join(',');
@@ -998,7 +1076,7 @@ function updateEMAT(){
   const hPerc = toNum(q('#h').value,70);
   const h = hPerc/100;
 
-  const emat = h*tc + (1-h)*(tc+tm);          // ns
+  const emat = h*tc + (1-h)*tm;         // ns
   const hitPart  = h*tc;
   const missPart = (1-h)*(tc+tm);
 
@@ -1013,8 +1091,8 @@ function updateEMAT(){
   q('#barMiss').style.width = (missPart/total*100)+'%';
 
   q('#eqText').innerHTML =
-    `EMAT = h·t<sub>cache</sub> + (1−h)·(t<sub>cache</sub>+t<sub>mem</sub>) = ` +
-    `${h.toFixed(2)}·${tc} + ${(1-h).toFixed(2)}·(${tc}+${tm}) = <b>${emat.toFixed(2)} ns</b>`;
+  `EMAT = h·t<sub>cache</sub> + (1−h)·t<sub>mem</sub> = ` +
+  `${h.toFixed(2)}·${tc} + ${(1-h).toFixed(2)}·${tm} = <b>${emat.toFixed(2)} ns</b>`;
 }
 ['#tc','#tm','#h'].forEach(sel=>q(sel).addEventListener('input', updateEMAT));
 q('#btnSample').addEventListener('click',()=>{ q('#tc').value=10; q('#tm').value=200; q('#h').value=70; updateEMAT();});
