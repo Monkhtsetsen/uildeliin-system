@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Санах Ойн Хяналтын Тест - Монгол Ухаан</title>
+    <title>Санах Ойн Хаяглалтын Тест - Монгол Ухаан</title>
     <style>
         * {
             margin: 0;
@@ -297,6 +297,54 @@
             pointer-events: none;
             z-index: -1;
         }
+        
+        /* Шалгалтын тохиргооны хэсэг */
+        .config-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .config-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .config-option {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .config-option input {
+            margin-right: 10px;
+        }
+        
+        .category-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .category-btn {
+            background: var(--light);
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .category-btn.selected {
+            background: var(--secondary);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -305,15 +353,15 @@
         <!-- Үндсэн цэс -->
         <div id="mainMenu" class="card">
             <div class="header">
-                <h1 class="mongol-title">Санах ойн хяналт</h1>
-                <p class="subtitle">Санах ойн хяналтын аргуудын интерактив тест</p>
+                <h1 class="mongol-title">Санах ойн хаяглалт</h1>
+                <p class="subtitle">Санах ойн хаяглалтын 7 аргын интерактив тест</p>
             </div>
             
             <div class="menu-grid">
-                <div class="menu-item" onclick="startTest()">
+                <div class="menu-item" onclick="showTestConfig()">
                     <div class="icon">🎯</div>
                     <h3>Тест эхлүүлэх</h3>
-                    <p>7 асуултаас бүрдсэн тест</p>
+                    <p>28 асуултаас бүрдсэн тест</p>
                 </div>
                 <div class="menu-item" onclick="showAbout()">
                     <div class="icon">ℹ️</div>
@@ -322,18 +370,81 @@
                 </div>
                 <div class="menu-item" onclick="showMaterials()">
                     <div class="icon">📚</div>
-                    <h3>Шалгалтанд бэлдэх</h3>
+                    <h3>Сурах материал</h3>
                     <p>Нэмэлт унших материал</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- Тестийн тохиргооны хэсэг -->
+        <div id="testConfigSection" class="card" style="display: none;">
+            <div class="header">
+                <h2>Тестийн тохиргоо</h2>
+                <p class="subtitle">Тестийн параметрүүдийг тохируулна уу</p>
+            </div>
+            
+            <div class="config-section">
+                <div class="config-item">
+                    <h3>Асуултын тоо</h3>
+                    <div class="config-option">
+                        <input type="radio" id="allQuestions" name="questionCount" value="28" checked>
+                        <label for="allQuestions">Бүх асуулт (28)</label>
+                    </div>
+                    <div class="config-option">
+                        <input type="radio" id="halfQuestions" name="questionCount" value="14">
+                        <label for="halfQuestions">Хагас асуулт (14)</label>
+                    </div>
+                    <div class="config-option">
+                        <input type="radio" id="customQuestions" name="questionCount" value="custom">
+                        <label for="customQuestions">Өөрийн тоо: </label>
+                        <input type="number" id="customQuestionCount" min="1" max="28" value="7" style="margin-left: 10px; padding: 5px; width: 60px;">
+                    </div>
+                </div>
+                
+                <div class="config-item">
+                    <h3>Хугацааны хязгаарлалт</h3>
+                    <div class="config-option">
+                        <input type="radio" id="noTimeLimit" name="timeLimit" value="0" checked>
+                        <label for="noTimeLimit">Хугацааны хязгаарлалтгүй</label>
+                    </div>
+                    <div class="config-option">
+                        <input type="radio" id="timeLimit10" name="timeLimit" value="600">
+                        <label for="timeLimit10">10 минут</label>
+                    </div>
+                    <div class="config-option">
+                        <input type="radio" id="timeLimit20" name="timeLimit" value="1200">
+                        <label for="timeLimit20">20 минут</label>
+                    </div>
+                </div>
+                
+                <div class="config-item">
+                    <h3>Сэдвийн ангилал</h3>
+                    <p>Асуултын сэдвийг сонгоно уу:</p>
+                    <div class="category-selector">
+                        <div class="category-btn selected" data-category="all">Бүгд</div>
+                        <div class="category-btn" data-category="1">Түргэн хаяглалт</div>
+                        <div class="category-btn" data-category="2">Шууд хаяглалт</div>
+                        <div class="category-btn" data-category="3">Индексэн хаяглалт</div>
+                        <div class="category-btn" data-category="4">Регистрэн хаяглалт</div>
+                        <div class="category-btn" data-category="5">Үндсэн хаяглалт</div>
+                        <div class="category-btn" data-category="6">Харьцангуй хаяглалт</div>
+                        <div class="category-btn" data-category="7">Шууд бус хаяглалт</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-success" onclick="startTest()">Тест эхлүүлэх</button>
+                <button class="btn" onclick="showMainMenu()">Буцах</button>
             </div>
         </div>
 
         <!-- Тестийн хэсэг -->
         <div id="testSection" class="card" style="display: none;">
             <div class="header">
-                <h2>АСУУЛТ <span id="currentQuestion">1</span>/7</h2>
+                <h2>АСУУЛТ <span id="currentQuestion">1</span>/<span id="totalQuestions">28</span></h2>
                 <div class="timer">
-                    ⏰ Хугацаа: <span id="timer">10:00</span>
+                    ⏰ Хугацаа: <span id="timer">00:00</span>
                     <span id="timeWarning" style="display: none;" class="time-warning"> - Яараарай!</span>
                 </div>
             </div>
@@ -349,7 +460,9 @@
             </div>
             
             <div style="text-align: center;">
+                <button class="btn" onclick="previousQuestion()" id="prevBtn" style="display: none;">Өмнөх асуулт</button>
                 <button class="btn" onclick="nextQuestion()" id="nextBtn" disabled>Дараагийн асуулт</button>
+                <button class="btn btn-danger" onclick="finishTest()" id="finishBtn" style="display: none;">Тест дуусгах</button>
             </div>
         </div>
 
@@ -373,27 +486,11 @@
                 <!-- Дэлгэрэнгүй үр дүн энд динамикаар нэмэгдэнэ -->
             </div>
 
-            <!-- Нэмэлт материал -->
+            <!-- Сэдэв тус бүрийн дүнгийн хэсэг -->
             <div class="material-section">
-                <h3>📚 Сургалтын материал</h3>
-                <div class="material-item">
-                    <h4>Санах ойн хяналтын аргуудын тухай</h4>
-                    <p>Санах ойн хяналтын аргууд нь процессор санах ойгоос өгөгдөл авах, бичих үед ашиглагддаг хаягийн тодорхойлох аргууд юм. Үндсэн 7 арга байдаг:</p>
-                    <ul style="margin: 10px 0; padding-left: 20px;">
-                        <li><strong>Түргэн хяналтын арга</strong> - Хаяг нь зааврын хэсэгт шууд байрладаг</li>
-                        <li><strong>Шууд хяналтын арга</strong> - Хаяг нь зааврын бүрэлдэхүүн хэсэг болдог</li>
-                        <li><strong>Индексэн хяналтын арга</strong> - Хаягийг индекс регистрийн утгад нэмж тооцдог</li>
-                        <li><strong>Регистрэн хяналтын арга</strong> - Хаяг нь тусгайлан зориулсан регистр дотор байрладаг</li>
-                        <li><strong>Ундеэн хяналтын арга</strong> - Хаягийг тусгай заавраар дамжуулан тодорхойлдог</li>
-                        <li><strong>Харилцааны хяналтын арга</strong> - Харилцааны регистр ашиглан хаягийг тодорхойлдог</li>
-                        <li><strong>Шууд бус хяналтын арга</strong> - Хаяг нь регистр дотор байрладаг</li>
-                    </ul>
-                </div>
-                <div class="material-item">
-                    <h4>Чухал ойлголтууд</h4>
-                    <p><strong>Санах ойн хаяг</strong> - Өгөгдөл хадгалагдаж байгаа байршил</p>
-                    <p><strong>Регистр</strong> - Процессорын доторх жижиг, хурдан санах ой</p>
-                    <p><strong>Индекс регистр</strong> - Хаягийн тооцоонд ашиглагддаг тусгай регистр</p>
+                <h3>📊 Сэдэв тус бүрийн дүн</h3>
+                <div id="categoryResults">
+                    <!-- Сэдэв тус бүрийн дүн энд динамикаар нэмэгдэнэ -->
                 </div>
             </div>
             
@@ -412,13 +509,22 @@
             <div class="explanation">
                 <h3>📚 Шалгалтын сэдвүүд:</h3>
                 <ul style="list-style-position: inside; margin: 15px 0;">
-                    <li>Түргэн хяналтын арга</li>
-                    <li>Шууд хяналтын арга</li>
-                    <li>Индексэн хяналтын арга</li>
-                    <li>Регистрэн хяналтын арга</li>
-                    <li>Ундеэн хяналтын арга</li>
-                    <li>Харилцааны хяналтын арга</li>
-                    <li>Шууд бус хяналтын арга</li>
+                    <li>Түргэн хаяглалтын арга</li>
+                    <li>Шууд хаяглалтын арга</li>
+                    <li>Индексэн хаяглалтын арга</li>
+                    <li>Регистрэн хаяглалтын арга</li>
+                    <li>Үндсэн хаяглалтын арга</li>
+                    <li>Харьцангуй хаяглалтын арга</li>
+                    <li>Шууд бус хаяглалтын арга</li>
+                </ul>
+                
+                <h3 style="margin-top: 20px;">🎯 Онцлог шинж чанарууд:</h3>
+                <ul style="list-style-position: inside; margin: 15px 0;">
+                    <li>Асуултын дараалал санамсаргүй байдлаар солигддог</li>
+                    <li>Хариултын сонголтууд санамсаргүй байдлаар солигддог</li>
+                    <li>Хугацааны хязгаарлалттай/гүй тест</li>
+                    <li>Дэлгэрэнгүй үр дүнгийн шинжилгээ</li>
+                    <li>Сэдэв тус бүрийн дүнгийн тайлан</li>
                 </ul>
             </div>
             
@@ -428,25 +534,25 @@
         <!-- Сургалтын материал хэсэг -->
         <div id="materialsSection" class="card" style="display: none;">
             <div class="header">
-                <h2>📚 Шалгалтанд бэлдэх</h2>
+                <h2>📚 Сурах материал</h2>
             </div>
             
             <div class="material-section">
                 <div class="material-item">
-                    <h3>Санах ойн хяналтын аргууд</h3>
-                    <p><strong>Түргэн хяналтын арга:</strong> Энэ аргад санах ойн хаяг нь зааврын хэсэгт шууд байрладаг. Энэ нь хамгийн энгийн бөгөөд хурдан арга юм.</p>
+                    <h3>Санах ойн хаяглалтын аргууд</h3>
+                    <p><strong>Түргэн хаяглалтын арга:</strong> Энэ аргад санах ойн хаяг нь зааврын хэсэгт шууд байрладаг. Энэ нь хамгийн энгийн бөгөөд хурдан арга юм.</p>
                     
-                    <p><strong>Шууд хяналтын арга:</strong> Хаяг нь зааврын бүрэлдэхүүн хэсэг болдог. Энэ нь тогтмол хаяг ашиглахад тохиромжтой.</p>
+                    <p><strong>Шууд хаяглалтын арга:</strong> Хаяг нь зааврын бүрэлдэхүүн хэсэг болдог. Энэ нь тогтмол хаяг ашиглахад тохиромжтой.</p>
                     
-                    <p><strong>Индексэн хяналтын арга:</strong> Энэ аргад хаягийг индекс регистрийн утгад нэмж тооцдог. Энэ нь массив болон жагсаалттай ажиллахад тохиромжтой.</p>
+                    <p><strong>Индексэн хаяглалтын арга:</strong> Энэ аргад хаягийг индекс регистрийн утгад нэмж тооцдог. Энэ нь массив болон жагсаалттай ажиллахад тохиромжтой.</p>
                     
-                    <p><strong>Регистрэн хяналтын арга:</strong> Хаяг нь тусгайлан зориулсан регистр дотор байрладаг. Энэ нь маш хурдан боловч хязгаарлагдмал багтаамжтай.</p>
+                    <p><strong>Регистрэн хаяглалтын арга:</strong> Хаяг нь тусгайлан зориулсан регистр дотор байрладаг. Энэ нь маш хурдан боловч хязгаарлагдмал багтаамжтай.</p>
                     
-                    <p><strong>Ундеэн хяналтын арга:</strong> Хаягийг тусгай заавраар дамжуулан тодорхойлдог. Энэ нь нарийн төвөгтэй хаягийн тооцоонд ашиглагддаг.</p>
+                    <p><strong>Үндсэн хаяглалтын арга:</strong> Хаягийг тусгай заавраар дамжуулан тодорхойлдог. Энэ нь нарийн төвөгтэй хаягийн тооцоонд ашиглагддаг.</p>
                     
-                    <p><strong>Харилцааны хяналтын арга:</strong> Харилцааны регистр ашиглан хаягийг тодорхойлдог. Энэ нь харьцангуй хаяглалтад ашиглагддаг.</p>
+                    <p><strong>Харьцангуй хаяглалтын арга:</strong> Харьцангуй регистр ашиглан хаягийг тодорхойлдог. Энэ нь харьцангуй хаяглалтад ашиглагддаг.</p>
                     
-                    <p><strong>Шууд бус хяналтын арга:</strong> Хаяг нь регистр дотор байрладаг. Энэ нь зааврын уртыг багасгахад тусалдаг.</p>
+                    <p><strong>Шууд бус хаяглалтын арга:</strong> Хаяг нь регистр дотор байрладаг. Энэ нь зааврын уртыг багасгахад тусалдаг.</p>
                 </div>
                 
                 <div class="material-item">
@@ -463,10 +569,11 @@
     </div>
 
     <script>
-        // Тестийн өгөгдөл - 4 сонголттой асуултууд
-        const questions = [
+        // Тестийн өгөгдөл - 7 арга тус бүр 4 асуулт
+        const allQuestions = [
+            // Түргэн хаяглалтын арга (1-р ангилал)
             {
-                question: "Түргэн хяналтын аргад санах ойн хаягийг шууд тодорхойлдог хэсэг нь ______ дотор байдаг.",
+                question: "Түргэн хаяглалтын аргад санах ойн хаягийг шууд тодорхойлдог хэсэг нь ______ дотор байдаг.",
                 options: [
                     "а. регистрийн дугаарын",
                     "б. зааврын хэсэгт", 
@@ -475,10 +582,52 @@
                 ],
                 answer: "б",
                 fullAnswer: "зааврын хэсэгт",
-                explanation: "Түргэн хяналтын аргад хаяг нь зааврын хэсэгт шууд байрладаг"
+                explanation: "Түргэн хаяглалтын аргад хаяг нь зааврын хэсэгт шууд байрладаг",
+                category: 1
             },
             {
-                question: "Шууд хяналтын аргад санах ойн хаяг нь ______ хэсэгт байдаг.",
+                question: "Түргэн хаяглалтын аргын гол давуу тал нь юу вэ?",
+                options: [
+                    "а. Хаяг олох хурдны ашиг",
+                    "б. Заавар боловсруулах хурдны ашиг", 
+                    "в. Санах ойн хэмнэлтийн ашиг",
+                    "г. Нарийн төвөгтэй байдлын ашиг"
+                ],
+                answer: "б",
+                fullAnswer: "Заавар боловсруулах хурдны ашиг",
+                explanation: "Түргэн хаяглалтын арга нь заавар боловсруулах үйл явцыг хурдасгадаг",
+                category: 1
+            },
+            {
+                question: "Түргэн хаяглалтын арга нь ямар төрлийн зааварт хэрэглэгддэг вэ?",
+                options: [
+                    "а. Бүх төрлийн зааварт",
+                    "б. Зөвхөн шууд хаяглалтын зааварт", 
+                    "в. Зөвхөн энгийн, товч зааварт",
+                    "г. Зөвхөн нарийн төвөгтэй зааварт"
+                ],
+                answer: "в",
+                fullAnswer: "Зөвхөн энгийн, товч зааварт",
+                explanation: "Түргэн хаяглалтын арга нь зааврын хэсэгт багтах хэмжээний хаягтай энгийн зааварт хэрэглэгддэг",
+                category: 1
+            },
+            {
+                question: "Түргэн хаяглалтын аргын сул тал нь юу вэ?",
+                options: [
+                    "а. Хаяг олох удаан",
+                    "б. Зааврын хэсэгт багтах хаягийн хязгаарлалт", 
+                    "в. Санах ой их шаарддаг",
+                    "г. Процессорын ачаалал ихсэдэг"
+                ],
+                answer: "б",
+                fullAnswer: "Зааврын хэсэгт багтах хаягийн хязгаарлалт",
+                explanation: "Түргэн хаяглалтын арга нь зааврын хэсэгт багтах хязгаарлагдмал хэмжээний хаяг агуулж чаддаг",
+                category: 1
+            },
+            
+            // Шууд хаяглалтын арга (2-р ангилал)
+            {
+                question: "Шууд хаяглалтын аргад санах ойн хаяг нь ______ хэсэгт байдаг.",
                 options: [
                     "а. регистрийн дугаарын",
                     "б. зааврын хэсэгт",
@@ -487,10 +636,52 @@
                 ],
                 answer: "б",
                 fullAnswer: "зааврын хэсэгт",
-                explanation: "Шууд хяналтын аргад хаяг нь зааврын бүрэлдэхүүн хэсэг болдог"
+                explanation: "Шууд хаяглалтын аргад хаяг нь зааврын бүрэлдэхүүн хэсэг болдог",
+                category: 2
             },
             {
-                question: "Индексэн хяналтын аргад санах ойн хаягийг индекс регистрийн утгад ______ гаргаж авдаг.",
+                question: "Шууд хаяглалтын аргыг ихэвчлэн ямар тохиолдолд ашигладаг вэ?",
+                options: [
+                    "а. Тогтмол хаягтай үйлдлүүдэд",
+                    "б. Хувьсах хаягтай үйлдлүүдэд", 
+                    "в. Нарийн төвөгтэй хаягтай үйлдлүүдэд",
+                    "г. Бүх төрлийн үйлдлүүдэд"
+                ],
+                answer: "а",
+                fullAnswer: "Тогтмол хаягтай үйлдлүүдэд",
+                explanation: "Шууд хаяглалтын арга нь тогтмол, урьдчилан мэдэгдэх хаягтай үйлдлүүдэд тохиромжтой",
+                category: 2
+            },
+            {
+                question: "Шууд хаяглалтын арга нь процессорын архитектурт ямар нөлөөтэй вэ?",
+                options: [
+                    "а. Процессорын бүтэц ихээхэн нарийн төвөгтэй болдог",
+                    "б. Процессорын бүтэц энгийн хэвээр байдаг", 
+                    "в. Процессорын хурд ихээхэн буурдаг",
+                    "г. Процессорын хүчин чадал ихээхэн нэмэгддэг"
+                ],
+                answer: "б",
+                fullAnswer: "Процессорын бүтэц энгийн хэвээр байдаг",
+                explanation: "Шууд хаяглалтын арга нь процессорын бүтцийг хялбар байлгах давуу талтай",
+                category: 2
+            },
+            {
+                question: "Шууд хаяглалтын аргын гол сул тал нь юу вэ?",
+                options: [
+                    "а. Хаяг олох удаан",
+                    "б. Зааврын хэсэгт багтах хаягийн хязгаарлалт", 
+                    "в. Санах ой их шаарддаг",
+                    "г. Процессорын ачаалал ихсэдэг"
+                ],
+                answer: "б",
+                fullAnswer: "Зааврын хэсэгт багтах хаягийн хязгаарлалт",
+                explanation: "Шууд хаяглалтын арга нь зааврын хэсэгт багтах хязгаарлагдмал хэмжээний хаяг агуулж чаддаг",
+                category: 2
+            },
+            
+            // Индексэн хаяглалтын арга (3-р ангилал)
+            {
+                question: "Индексэн хаяглалтын аргад санах ойн хаягийг индекс регистрийн утгад ______ гаргаж авдаг.",
                 options: [
                     "а. үржүүлэх замаар",
                     "б. хуваах замаар", 
@@ -499,10 +690,52 @@
                 ],
                 answer: "в",
                 fullAnswer: "нэмэх замаар",
-                explanation: "Индексэн хяналтын аргад хаягийг индекс регистрийн утгад нэмж тооцдог"
+                explanation: "Индексэн хаяглалтын аргад хаягийг индекс регистрийн утгад нэмж тооцдог",
+                category: 3
             },
             {
-                question: "Регистрэн хяналтын аргад санах ойн хаяг нь ______ дотор байдаг.",
+                question: "Индексэн хаяглалтын аргыг ихэвчлэн ямар тохиолдолд ашигладаг вэ?",
+                options: [
+                    "а. Массив бүтэцтэй ажиллахад",
+                    "б. Тогтмол хаягтай ажиллахад", 
+                    "в. Энгийн үйлдлүүдэд",
+                    "г. Бүх төрлийн үйлдлүүдэд"
+                ],
+                answer: "а",
+                fullAnswer: "Массив бүтэцтэй ажиллахад",
+                explanation: "Индексэн хаяглалтын арга нь массив элементүүдэд хандахад маш тохиромжтой",
+                category: 3
+            },
+            {
+                question: "Индексэн хаяглалтын аргад индекс регистр нь юу хийх вэ?",
+                options: [
+                    "а. Суурь хаягийг хадгалдаг",
+                    "б. Хаягийн зөрүүг хадгалдаг", 
+                    "в. Зааврын хаягийг хадгалдаг",
+                    "г. Үр дүнгийн хаягийг хадгалдаг"
+                ],
+                answer: "б",
+                fullAnswer: "Хаягийн зөрүүг хадгалдаг",
+                explanation: "Индексэн хаяглалтын аргад индекс регистр нь суурь хаягаас харьцангуй зөрүүг хадгалдаг",
+                category: 3
+            },
+            {
+                question: "Индексэн хаяглалтын аргын гол давуу тал нь юу вэ?",
+                options: [
+                    "а. Заавар боловсруулах хурд",
+                    "б. Хаяг олох хурд", 
+                    "в. Массив элементүүдэд хандах үр ашиг",
+                    "г. Санах ойн хэмнэлт"
+                ],
+                answer: "в",
+                fullAnswer: "Массив элементүүдэд хандах үр ашиг",
+                explanation: "Индексэн хаяглалтын арга нь массив элементүүдэд хандах үед маш үр ашигтай",
+                category: 3
+            },
+            
+            // Регистрэн хаяглалтын арга (4-р ангилал)
+            {
+                question: "Регистрэн хаяглалтын аргад санах ойн хаяг нь ______ дотор байдаг.",
                 options: [
                     "а. регистр дотор",
                     "б. зааврын хэсэгт",
@@ -511,10 +744,52 @@
                 ],
                 answer: "а",
                 fullAnswer: "регистр дотор",
-                explanation: "Регистрэн хяналтын аргад хаяг нь тусгайлан зориулсан регистр дотор байрладаг"
+                explanation: "Регистрэн хаяглалтын аргад хаяг нь тусгайлан зориулсан регистр дотор байрладаг",
+                category: 4
             },
             {
-                question: "Үндсэн хяналтын аргад санах ойн хаягийг ______ ашиглан тодорхойлдог.",
+                question: "Регистрэн хаяглалтын аргын гол давуу тал нь юу вэ?",
+                options: [
+                    "а. Хаяг олох маш хурдан",
+                    "б. Зааврын урт богино", 
+                    "в. Санах ойн хэмнэлт ихтэй",
+                    "г. Бүх төрлийн хаягт тохиромжтой"
+                ],
+                answer: "а",
+                fullAnswer: "Хаяг олох маш хурдан",
+                explanation: "Регистрэн хаяглалтын арга нь регистрт шууд хандах боломжтой учраас хаяг олох маш хурдан",
+                category: 4
+            },
+            {
+                question: "Регистрэн хаяглалтын аргын гол сул тал нь юу вэ?",
+                options: [
+                    "а. Хаяг олох удаан",
+                    "б. Регистрийн тоо хязгаарлагдмал", 
+                    "в. Зааврын урт урт",
+                    "г. Процессорын ачаалал ихсэдэг"
+                ],
+                answer: "б",
+                fullAnswer: "Регистрийн тоо хязгаарлагдмал",
+                explanation: "Регистрэн хаяглалтын арга нь процессорт байх регистрийн тоо хязгаарлагдмал учраас сул талтай",
+                category: 4
+            },
+            {
+                question: "Регистрэн хаяглалтын аргыг ихэвчлэн ямар тохиолдолд ашигладаг вэ?",
+                options: [
+                    "а. Түр хугацааны өгөгдөл хадгалахдаа",
+                    "б. Тогтмол өгөгдөл хадгалахдаа", 
+                    "в. Их хэмжээний өгөгдөл хадгалахдаа",
+                    "г. Бүх төрлийн өгөгдөл хадгалахдаа"
+                ],
+                answer: "а",
+                fullAnswer: "Түр хугацааны өгөгдөл хадгалахдаа",
+                explanation: "Регистрэн хаяглалтын арга нь түр хугацааны, олон удаа ашиглагдах өгөгдөл хадгалахдаа үр ашигтай",
+                category: 4
+            },
+            
+            // Үндсэн хаяглалтын арга (5-р ангилал)
+            {
+                question: "Үндсэн хаяглалтын аргад санах ойн хаягийг ______ ашиглан тодорхойлдог.",
                 options: [
                     "а. регистр ашиглан",
                     "б. тусгай заавар ашиглан",
@@ -523,22 +798,106 @@
                 ],
                 answer: "б",
                 fullAnswer: "тусгай заавар ашиглан",
-                explanation: "Үндсэн хяналтын аргад хаягийг тусгай заавраар дамжуулан тодорхойлдог"
+                explanation: "Үндсэн хаяглалтын аргад хаягийг тусгай заавраар дамжуулан тодорхойлдог",
+                category: 5
             },
             {
-                question: "Харилцааны хяналтын аргад санах ойн хаягийг ______ ашиглан тодорхойлдог.",
+                question: "Үндсэн хаяглалтын аргыг ихэвчлэн ямар тохиолдолд ашигладаг вэ?",
+                options: [
+                    "а. Нарийн төвөгтэй хаягийн тооцоо хийхэд",
+                    "б. Энгийн хаягийн тооцоо хийхэд", 
+                    "в. Тогтмол хаяг ашиглахад",
+                    "г. Бүх төрлийн хаяг ашиглахад"
+                ],
+                answer: "а",
+                fullAnswer: "Нарийн төвөгтэй хаягийн тооцоо хийхэд",
+                explanation: "Үндсэн хаяглалтын арга нь нарийн төвөгтэй хаягийн тооцоонд ашиглагддаг",
+                category: 5
+            },
+            {
+                question: "Үндсэн хаяглалтын аргын гол сул тал нь юу вэ?",
+                options: [
+                    "а. Хаяг олох удаан",
+                    "б. Нэмэлт заавар шаарддаг", 
+                    "в. Санах ой их шаарддаг",
+                    "г. Процессорын ачаалал ихсэдэг"
+                ],
+                answer: "б",
+                fullAnswer: "Нэмэлт заавар шаарддаг",
+                explanation: "Үндсэн хаяглалтын арга нь хаягийг тодорхойлоход нэмэлт заавар шаарддаг сул талтай",
+                category: 5
+            },
+            {
+                question: "Үндсэн хаяглалтын арга нь процессорын гүйцэтгэлд ямар нөлөөтэй вэ?",
+                options: [
+                    "а. Гүйцэтгэлийг сайжруулдаг",
+                    "б. Гүйцэтгэлийг бууруулдаг", 
+                    "в. Гүйцэтгэлд нөлөөлдөггүй",
+                    "г. Гүйцэтгэлийг тогтворжуулдаг"
+                ],
+                answer: "б",
+                fullAnswer: "Гүйцэтгэлийг бууруулдаг",
+                explanation: "Үндсэн хаяглалтын арга нь нэмэлт заавар шаарддаг учраас процессорын гүйцэтгэлийг бага зэрэг бууруулдаг",
+                category: 5
+            },
+            
+            // Харьцангуй хаяглалтын арга (6-р ангилал)
+            {
+                question: "Харьцангуй хаяглалтын аргад санах ойн хаягийг ______ ашиглан тодорхойлдог.",
                 options: [
                     "а. зааврын хэсэг ашиглан",
                     "б. программын тоолуур ашиглан",
-                    "в. харилцааны регистр ашиглан",
+                    "в. харьцангуй регистр ашиглан",
                     "г. индекс регистр ашиглан"
                 ],
                 answer: "в",
-                fullAnswer: "харилцааны регистр ашиглан",
-                explanation: "Харилцааны хяналтын аргад харилцааны регистр ашиглан хаягийг тодорхойлдог"
+                fullAnswer: "харьцангуй регистр ашиглан",
+                explanation: "Харьцангуй хаяглалтын аргад харьцангуй регистр ашиглан хаягийг тодорхойлдог",
+                category: 6
             },
             {
-                question: "Шууд бус хяналтын аргад санах ойн хаяг нь ______ дотор байдаг.",
+                question: "Харьцангуй хаяглалтын аргыг ихэвчлэн ямар тохиолдолд ашигладаг вэ?",
+                options: [
+                    "а. Програм кодыг шилжүүлэхэд",
+                    "б. Тогтмол өгөгдөл хадгалахдаа", 
+                    "в. Их хэмжээний өгөгдөл хадгалахдаа",
+                    "г. Бүх төрлийн өгөгдөл хадгалахдаа"
+                ],
+                answer: "а",
+                fullAnswer: "Програм кодыг шилжүүлэхэд",
+                explanation: "Харьцангуй хаяглалтын арга нь програм кодыг санах ойн өөр байрлалд шилжүүлэхэд тохиромжтой",
+                category: 6
+            },
+            {
+                question: "Харьцангуй хаяглалтын аргын гол давуу тал нь юу вэ?",
+                options: [
+                    "а. Програм кодыг шилжүүлэхэд тохиромжтой",
+                    "б. Хаяг олох хурдны ашиг", 
+                    "в. Зааврын урт богино",
+                    "г. Санах ойн хэмнэлт"
+                ],
+                answer: "а",
+                fullAnswer: "Програм кодыг шилжүүлэхэд тохиромжтой",
+                explanation: "Харьцангуй хаяглалтын арга нь програм кодыг санах ойн өөр байрлалд шилжүүлэхэд маш тохиромжтой",
+                category: 6
+            },
+            {
+                question: "Харьцангуй хаяглалтын аргын гол сул тал нь юу вэ?",
+                options: [
+                    "а. Хаяг олох удаан",
+                    "б. Хязгаарлагдмал зайнд ажилладаг", 
+                    "в. Санах ой их шаарддаг",
+                    "г. Процессорын ачаалал ихсэдэг"
+                ],
+                answer: "б",
+                fullAnswer: "Хязгаарлагдмал зайнд ажилладаг",
+                explanation: "Харьцангуй хаяглалтын арга нь харьцангуй регистрт багтах хязгаарлагдмал зайнд ажилладаг",
+                category: 6
+            },
+            
+            // Шууд бус хаяглалтын арга (7-р ангилал)
+            {
+                question: "Шууд бус хаяглалтын аргад санах ойн хаяг нь ______ дотор байдаг.",
                 options: [
                     "а. регистр дотор",
                     "б. зааврын хэсэгт",
@@ -547,7 +906,47 @@
                 ],
                 answer: "а",
                 fullAnswer: "регистр дотор",
-                explanation: "Шууд бус хяналтын аргад хаяг нь регистр дотор байрладаг"
+                explanation: "Шууд бус хаяглалтын аргад хаяг нь регистр дотор байрладаг",
+                category: 7
+            },
+            {
+                question: "Шууд бус хаяглалтын аргыг ихэвчлэн ямар тохиолдолд ашигладаг вэ?",
+                options: [
+                    "а. Хаягийг динамикаар өөрчлөх шаардлагатай үед",
+                    "б. Тогтмол хаяг ашиглах шаардлагатай үед", 
+                    "в. Энгийн хаяг ашиглах шаардлагатай үед",
+                    "г. Бүх төрлийн хаяг ашиглах шаардлагатай үед"
+                ],
+                answer: "а",
+                fullAnswer: "Хаягийг динамикаар өөрчлөх шаардлагатай үед",
+                explanation: "Шууд бус хаяглалтын арга нь хаягийг динамикаар өөрчлөх шаардлагатай үед маш тохиромжтой",
+                category: 7
+            },
+            {
+                question: "Шууд бус хаяглалтын аргын гол давуу тал нь юу вэ?",
+                options: [
+                    "а. Зааврын урт богино",
+                    "б. Хаяг олох хурдны ашиг", 
+                    "в. Санах ойн хэмнэлт",
+                    "г. Хаягийг динамикаар өөрчлөх боломж"
+                ],
+                answer: "г",
+                fullAnswer: "Хаягийг динамикаар өөрчлөх боломж",
+                explanation: "Шууд бус хаяглалтын арга нь хаягийг динамикаар өөрчлөх боломжтой гол давуу талтай",
+                category: 7
+            },
+            {
+                question: "Шууд бус хаяглалтын аргын гол сул тал нь юу вэ?",
+                options: [
+                    "а. Хаяг олох удаан",
+                    "б. Регистрийн тоо хязгаарлагдмал", 
+                    "в. Зааврын урт урт",
+                    "г. Процессорын ачаалал ихсэдэг"
+                ],
+                answer: "б",
+                fullAnswer: "Регистрийн тоо хязгаарлагдмал",
+                explanation: "Шууд бус хаяглалтын арга нь процессорт байх регистрийн тоо хязгаарлагдмал учраас сул талтай",
+                category: 7
             }
         ];
 
@@ -556,12 +955,15 @@
         let userAnswers = [];
         let startTime;
         let timerInterval;
-        let timeLimit = 600; // 10 минут секундээр
-        let timeLeft = timeLimit;
+        let timeLimit = 0; // Хугацааны хязгаарлалт (секундээр)
+        let timeLeft = 0;
+        let selectedQuestions = [];
+        let selectedCategories = [1,2,3,4,5,6,7]; // Анхны утга: бүх ангилал
 
         // Цэсүүдийг харуулах/нуух
         function showSection(sectionId) {
             document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('testConfigSection').style.display = 'none';
             document.getElementById('testSection').style.display = 'none';
             document.getElementById('resultSection').style.display = 'none';
             document.getElementById('aboutSection').style.display = 'none';
@@ -573,6 +975,10 @@
             showSection('mainMenu');
         }
 
+        function showTestConfig() {
+            showSection('testConfigSection');
+        }
+
         function showAbout() {
             showSection('aboutSection');
         }
@@ -581,8 +987,79 @@
             showSection('materialsSection');
         }
 
+        // Тестийн тохиргоог бэлтгэх
+        function prepareTestConfig() {
+            // Ангилал сонгох товчнуудыг бэлтгэх
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    
+                    if (category === 'all') {
+                        // Бүгд сонгох
+                        categoryButtons.forEach(b => b.classList.remove('selected'));
+                        this.classList.add('selected');
+                        selectedCategories = [1,2,3,4,5,6,7];
+                    } else {
+                        // Тодорхой ангилал сонгох
+                        const allBtn = document.querySelector('.category-btn[data-category="all"]');
+                        allBtn.classList.remove('selected');
+                        
+                        this.classList.toggle('selected');
+                        
+                        // Сонгогдсон ангилалуудыг шинэчлэх
+                        selectedCategories = [];
+                        document.querySelectorAll('.category-btn.selected').forEach(selectedBtn => {
+                            if (selectedBtn.getAttribute('data-category') !== 'all') {
+                                selectedCategories.push(parseInt(selectedBtn.getAttribute('data-category')));
+                            }
+                        });
+                        
+                        // Хэрэв ямар ч ангилал сонгогдоогүй бол бүгдийг сонго
+                        if (selectedCategories.length === 0) {
+                            allBtn.classList.add('selected');
+                            selectedCategories = [1,2,3,4,5,6,7];
+                        }
+                    }
+                });
+            });
+            
+            // Асуултын тоог тохируулах
+            document.getElementById('customQuestions').addEventListener('change', function() {
+                document.getElementById('customQuestionCount').style.display = this.checked ? 'inline' : 'none';
+            });
+        }
+
         // Тест эхлүүлэх
         function startTest() {
+            // Асуултын тоог тодорхойлох
+            let questionCount = 28;
+            const selectedQuestionCount = document.querySelector('input[name="questionCount"]:checked').value;
+            
+            if (selectedQuestionCount === 'custom') {
+                questionCount = parseInt(document.getElementById('customQuestionCount').value);
+                if (questionCount < 1 || questionCount > 28) {
+                    alert('Асуултын тоо 1-ээс 28-ын хооронд байх ёстой');
+                    return;
+                }
+            } else {
+                questionCount = parseInt(selectedQuestionCount);
+            }
+            
+            // Хугацааны хязгаарлалтыг тодорхойлох
+            timeLimit = parseInt(document.querySelector('input[name="timeLimit"]:checked').value);
+            
+            // Сонгогдсон ангилалын асуултуудыг сонгох
+            const categoryQuestions = allQuestions.filter(q => selectedCategories.includes(q.category));
+            
+            if (categoryQuestions.length === 0) {
+                alert('Сонгогдсон ангилалд асуулт олдсонгүй. Бусад ангилалыг сонгоно уу.');
+                return;
+            }
+            
+            // Санамсаргүй асуултуудыг сонгох
+            selectedQuestions = getRandomQuestions(categoryQuestions, questionCount);
+            
             currentQuestionIndex = 0;
             score = 0;
             userAnswers = [];
@@ -590,7 +1067,21 @@
             startTime = new Date();
             showSection('testSection');
             loadQuestion();
-            startTimer();
+            
+            if (timeLimit > 0) {
+                startTimer();
+            } else {
+                document.getElementById('timer').textContent = 'Хязгааргүй';
+            }
+        }
+
+        // Санамсаргүй асуултуудыг сонгох
+        function getRandomQuestions(questions, count) {
+            // Асуултуудыг санамсаргүйгээр холих
+            const shuffled = [...questions].sort(() => 0.5 - Math.random());
+            
+            // Хүссэн тооны асуултыг сонгох
+            return shuffled.slice(0, Math.min(count, questions.length));
         }
 
         // Хугацааны тоолуур
@@ -620,19 +1111,22 @@
 
         // Асуулт ачаалах
         function loadQuestion() {
-            const question = questions[currentQuestionIndex];
+            const question = selectedQuestions[currentQuestionIndex];
             document.getElementById('questionText').textContent = question.question;
             document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('totalQuestions').textContent = selectedQuestions.length;
             
             // Прогресс барыг шинэчлэх
-            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            const progress = ((currentQuestionIndex) / selectedQuestions.length) * 100;
             document.getElementById('progressBar').style.width = `${progress}%`;
             
-            // Сонголтуудыг үүсгэх
+            // Сонголтуудыг үүсгэх (санамсаргүй дарааллаар)
             const optionsContainer = document.getElementById('optionsContainer');
             optionsContainer.innerHTML = '';
             
-            question.options.forEach((option, index) => {
+            const shuffledOptions = [...question.options].sort(() => 0.5 - Math.random());
+            
+            shuffledOptions.forEach((option, index) => {
                 const optionElement = document.createElement('div');
                 optionElement.className = 'option';
                 optionElement.textContent = option;
@@ -640,6 +1134,10 @@
                 optionsContainer.appendChild(optionElement);
             });
             
+            // Товчнуудыг тохируулах
+            document.getElementById('prevBtn').style.display = currentQuestionIndex > 0 ? 'inline' : 'none';
+            document.getElementById('nextBtn').style.display = currentQuestionIndex < selectedQuestions.length - 1 ? 'inline' : 'none';
+            document.getElementById('finishBtn').style.display = currentQuestionIndex === selectedQuestions.length - 1 ? 'inline' : 'none';
             document.getElementById('nextBtn').disabled = true;
         }
 
@@ -651,36 +1149,68 @@
             document.getElementById('nextBtn').disabled = false;
         }
 
+        // Өмнөх асуулт
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+                
+                // Өмнө нь сонгосон хариултыг харуулах
+                const previousAnswer = userAnswers[currentQuestionIndex];
+                if (previousAnswer) {
+                    const options = document.querySelectorAll('.option');
+                    options.forEach((option, index) => {
+                        if (option.textContent.charAt(0) === previousAnswer.selected) {
+                            option.classList.add('selected');
+                            document.getElementById('nextBtn').disabled = false;
+                        }
+                    });
+                }
+            }
+        }
+
         // Дараагийн асуулт
         function nextQuestion() {
-            const selectedOption = document.querySelector('.option.selected');
-            if (!selectedOption) return;
-            
-            const selectedAnswer = selectedOption.textContent.charAt(0);
-            const correctAnswer = questions[currentQuestionIndex].answer;
-            const selectedFullAnswer = selectedOption.textContent.substring(3); // "а. " гэх үсгийг хасах
-            
-            userAnswers.push({
-                question: questions[currentQuestionIndex].question,
-                selected: selectedAnswer,
-                selectedFull: selectedFullAnswer,
-                correct: correctAnswer,
-                correctFull: questions[currentQuestionIndex].fullAnswer,
-                explanation: questions[currentQuestionIndex].explanation,
-                isCorrect: selectedAnswer === correctAnswer
-            });
-            
-            if (selectedAnswer === correctAnswer) {
-                score++;
-            }
+            saveAnswer();
             
             currentQuestionIndex++;
             
-            if (currentQuestionIndex < questions.length) {
+            if (currentQuestionIndex < selectedQuestions.length) {
                 loadQuestion();
             } else {
                 showResults();
             }
+        }
+
+        // Хариултыг хадгалах
+        function saveAnswer() {
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) return;
+            
+            const selectedAnswer = selectedOption.textContent.charAt(0);
+            const correctAnswer = selectedQuestions[currentQuestionIndex].answer;
+            const selectedFullAnswer = selectedOption.textContent.substring(3); // "а. " гэх үсгийг хасах
+            
+            userAnswers[currentQuestionIndex] = {
+                question: selectedQuestions[currentQuestionIndex].question,
+                selected: selectedAnswer,
+                selectedFull: selectedFullAnswer,
+                correct: correctAnswer,
+                correctFull: selectedQuestions[currentQuestionIndex].fullAnswer,
+                explanation: selectedQuestions[currentQuestionIndex].explanation,
+                isCorrect: selectedAnswer === correctAnswer,
+                category: selectedQuestions[currentQuestionIndex].category
+            };
+            
+            if (selectedAnswer === correctAnswer) {
+                score++;
+            }
+        }
+
+        // Тест дуусгах
+        function finishTest() {
+            saveAnswer();
+            showResults();
         }
 
         // Үр дүнг харуулах
@@ -688,12 +1218,12 @@
             clearInterval(timerInterval);
             showSection('resultSection');
             
-            const percentage = Math.round((score / questions.length) * 100);
+            const percentage = Math.round((score / selectedQuestions.length) * 100);
             document.getElementById('finalScore').textContent = `${percentage}%`;
             
             let levelDescription = '';
             if (percentage >= 90) {
-                levelDescription = '🎉 МАШ САЙН! Та санах ойн хяналтын аргуудыг гүнзгий ойлгосон!';
+                levelDescription = '🎉 МАШ САЙН! Та санах ойн хаяглалтын аргуудыг гүнзгий ойлгосон!';
                 createFireworks();
             } else if (percentage >= 70) {
                 levelDescription = '👍 САЙН! Та үндсэн ойлголтуудыг сайн эзэмшсэн!';
@@ -706,14 +1236,17 @@
             document.getElementById('levelDescription').textContent = levelDescription;
             
             // Хугацааны үр дүнг харуулах
-            const timeUsed = timeLimit - timeLeft;
+            const endTime = new Date();
+            const timeUsed = Math.floor((endTime - startTime) / 1000);
             const minutesUsed = Math.floor(timeUsed / 60);
             const secondsUsed = timeUsed % 60;
-            document.getElementById('timeResult').textContent = 
-                `Тест өгөхөд ${minutesUsed} минут ${secondsUsed} секунд зарцуулсан`;
+            document.getElementById('timeResult').textContent = `Тест өгөхөд ${minutesUsed} минут ${secondsUsed} секунд зарцуулсан`;
             
             // Дэлгэрэнгүй үр дүнг харуулах
             showDetailedResults();
+            
+            // Сэдэв тус бүрийн дүнг харуулах
+            showCategoryResults();
         }
 
         // Дэлгэрэнгүй үр дүнг харуулах
@@ -723,7 +1256,7 @@
             
             userAnswers.forEach((answer, index) => {
                 const resultItem = document.createElement('div');
-                resultItem.className = `result-item ${answer.isCorrect ? 'correct' : 'incorrect'}`;
+                resultItem.className = 'result-item ' + (answer.isCorrect ? 'correct' : 'incorrect');
                 
                 const statusIcon = answer.isCorrect ? '✅' : '❌';
                 const statusText = answer.isCorrect ? 'ЗӨВ' : 'БУРУУ';
@@ -733,9 +1266,59 @@
                     <div class="result-answer"><strong>Таны хариулт:</strong> ${answer.selected} (${answer.selectedFull}) - ${statusText}</div>
                     <div class="result-answer"><strong>Зөв хариулт:</strong> ${answer.correct} (${answer.correctFull})</div>
                     <div class="result-answer"><strong>Тайлбар:</strong> ${answer.explanation}</div>
+                `;                
+                detailedResults.appendChild(resultItem);
+            });
+        }
+        // Сэдэв тус бүрийн дүнг харуулах
+        function showCategoryResults() {
+            const categoryResults = document.getElementById('categoryResults');
+            categoryResults.innerHTML = '';
+            
+            const categoryNames = {
+                1: 'Түргэн хаяглалт',
+                2: 'Шууд хаяглалт',
+                3: 'Индексэн хаяглалт',
+                4: 'Регистрэн хаяглалт',
+                5: 'Үндсэн хаяглалт',
+                6: 'Харьцангуй хаяглалт',
+                7: 'Шууд бус хаяглалт'
+            };
+            
+            // Сэдэв тус бүрийн дүнг тооцоолох
+            const categoryScores = {};
+            const categoryTotals = {};
+            
+            userAnswers.forEach(answer => {
+                const category = answer.category;
+                if (!categoryScores[category]) {
+                    categoryScores[category] = 0;
+                    categoryTotals[category] = 0;
+                }
+                
+                categoryTotals[category]++;
+                if (answer.isCorrect) {
+                    categoryScores[category]++;
+                }
+            });
+            
+            // Сэдэв тус бүрийн дүнг харуулах
+            Object.keys(categoryScores).forEach(category => {
+                const categoryScore = categoryScores[category];
+                const categoryTotal = categoryTotals[category];
+                const categoryPercentage = Math.round((categoryScore / categoryTotal) * 100);
+                
+                const categoryItem = document.createElement('div');
+                categoryItem.className = 'material-item';
+                categoryItem.innerHTML = `
+                    <h4>${categoryNames[category]}</h4>
+                    <p>${categoryScore} / ${categoryTotal} (${categoryPercentage}%)</p>
+                    <div class="progress-container" style="height: 10px; margin: 10px 0;">
+                        <div class="progress-bar" style="width: ${categoryPercentage}%;"></div>
+                    </div>
                 `;
                 
-                detailedResults.appendChild(resultItem);
+                categoryResults.appendChild(categoryItem);
             });
         }
 
@@ -766,11 +1349,14 @@
 
         // Тест дахин эхлүүлэх
         function restartTest() {
-            startTest();
+            showTestConfig();
         }
 
         // Эхлээд үндсэн цэсийг харуулах
-        showMainMenu();
+        document.addEventListener('DOMContentLoaded', function() {
+            showMainMenu();
+            prepareTestConfig();
+        });
     </script>
 </body>
 </html>
