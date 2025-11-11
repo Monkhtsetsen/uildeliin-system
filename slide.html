@@ -1,0 +1,1241 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OS Memory — Ultimate Visual Lesson (Hierarchy • Base/Limit • FIFO/Swapping • EMAT)</title>
+<style>
+/* ================= THEME TOKENS ================= */
+:root{
+  --bg:#0b1220;
+  --bg-2:#0b1426;
+  --card:#0f1b2f;
+  --panel:#0b162b;
+  --text:#eaf2ff;
+  --muted:#9fb1d6;
+  --line:#244472;
+  --border:#25406e;
+  --brand:#2e55a4;
+  --brand-2:#0f2957;
+  --good:#78ef97;
+  --bad:#ff8a7a;
+  --warn:#ffd166;
+  --focus:#5aa8ff;
+  --shadow:0 18px 46px #0006, 0 0 0 1px #182a4a inset;
+}
+
+/* ================= BASE ================= */
+*{box-sizing:border-box}
+html,body{
+  margin:0;height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+a{color:inherit}
+h1,h2{letter-spacing:.2px}
+h1{margin:0 0 10px;font-size:28px}
+h2{margin:0 0 10px}
+
+/* ================= TOP BAR ================= */
+#barTop{
+  position:fixed;left:0;right:0;top:0;height:56px;z-index:20;
+  display:flex;gap:10px;align-items:center;
+  padding:10px 14px;
+  background:linear-gradient(180deg,var(--panel),#0a1223);
+  border-bottom:1px solid #13213b;
+  backdrop-filter:saturate(140%) blur(4px);
+}
+#title{font-weight:800}
+.actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{
+  border:1px solid #2a4f90;
+  background:linear-gradient(180deg,var(--brand-2),#0a1a35);
+  color:#eaf6ff;
+  border-radius:12px;
+  padding:8px 14px;
+  cursor:pointer;
+  font-weight:700;
+  line-height:1;
+  transition:transform .15s ease, box-shadow .15s ease, background .2s ease, border-color .2s ease;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 10px 20px #0007}
+.btn:active{transform:translateY(0)}
+.btn:focus-visible{outline:none;box-shadow:0 0 0 3px #1b2d52, 0 0 0 5px var(--focus)}
+
+.small{font-size:12px;color:var(--muted)}
+#prog{position:fixed;left:0;right:0;top:56px;height:4px;background:var(--bg-2)}
+#prog>i{
+  display:block;height:100%;width:0;
+  background:linear-gradient(90deg,#4d7dff,#47ffa8);
+  box-shadow:0 0 12px #47ffa866 inset;
+  transition:width .35s cubic-bezier(.22,.7,.22,1);
+}
+
+/* ================= DECK / SLIDES ================= */
+#deck{position:fixed; inset:60px 0 0 0; overflow:hidden;}
+#track{height:100%; display:flex; will-change:transform; transition:transform .55s cubic-bezier(.22,.7,.22,1);}
+.slide{
+  flex:0 0 100%;
+  min-width:100%; height:100%;
+  padding:22px;
+  overflow:auto;
+  display:flex; align-items:center; justify-content:center;
+  scroll-behavior:smooth;
+}
+
+/* custom scrollbars */
+.slide::-webkit-scrollbar{height:12px;width:12px}
+.slide::-webkit-scrollbar-track{background:#0a1326}
+.slide::-webkit-scrollbar-thumb{background:#1e315a;border-radius:10px;border:2px solid #0a1326}
+.slide::-webkit-scrollbar-thumb:hover{background:#2b4784}
+
+/* ================= CARDS ================= */
+.card{
+  max-width:1180px;width:100%;
+  background:linear-gradient(180deg,var(--card),var(--panel));
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:18px;
+  transition:box-shadow .25s ease, border-color .25s ease, transform .25s ease;
+}
+.card:hover{border-color:#2f4f86; box-shadow:0 22px 50px #0008, 0 0 0 1px #1d3156 inset}
+
+/* grid */
+.grid{display:grid;gap:16px}
+.two{grid-template-columns:1.1fr .9fr}
+@media (max-width:980px){.two{grid-template-columns:1fr}}
+.section{
+  padding:10px;border-radius:12px;
+  border:1px dashed #25406e;
+  background:linear-gradient(180deg,rgba(15,27,47,.35),rgba(13,22,38,.2));
+}
+
+/* pills, code, kbd */
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin:.3rem 0 .6rem}
+.chip{
+  border:1px solid #2a4f90;
+  background:linear-gradient(180deg,#0b1730,#0a162e);
+  border-radius:999px;
+  padding:6px 12px;
+  font-weight:700;
+  transition:transform .12s ease, background .2s ease, border-color .2s ease;
+}
+.chip:hover{transform:translateY(-1px); background:#0c1b38; border-color:#3a66c1}
+.kbd{padding:.1em .5em;border:1px solid #33508a;border-radius:8px;background:#0c1a33}
+.code{
+  background:#0c1a33;border:1px solid #20355f;border-radius:8px;
+  padding:8px 10px;display:inline-block; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* ================= REVEAL (per slide) ================= */
+.reveal>[data-in]{opacity:0;transform:translateY(12px);transition:opacity .45s ease,transform .45s ease}
+.reveal.active>[data-in]{opacity:1;transform:none}
+.reveal.active>[data-in]:nth-child(2){transition-delay:.06s}
+.reveal.active>[data-in]:nth-child(3){transition-delay:.11s}
+.reveal.active>[data-in]:nth-child(4){transition-delay:.16s}
+.reveal.active>[data-in]:nth-child(5){transition-delay:.21s}
+
+/* ================= SVG HELPERS / ANIMS ================= */
+svg{max-width:100%;height:auto;display:block}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes dash{to{stroke-dashoffset:-240}}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 0 rgba(71,255,168,.0))}50%{filter:drop-shadow(0 0 10px rgba(71,255,168,.55))}}
+@keyframes barGrow{0%{width:0}100%{width:var(--w)}}
+.active .floatY{animation:floatY 3s ease-in-out infinite}
+.active .dash{animation:dash 4s linear infinite}
+.active .glow{animation:glow 2.2s ease-in-out infinite}
+.active .barGrow{animation:barGrow 1s .2s both}
+
+/* micro anim helpers */
+@keyframes blinkRed{0%,100%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 3px #ff8a7a55}}
+.blinkRed{animation:blinkRed 1.2s ease-in-out infinite}
+
+@keyframes queueShift{0%{transform:translateX(0)}100%{transform:translateX(-80px)}}
+.active .qmove{animation:queueShift 2.8s linear infinite}
+
+/* ================= FORM ELEMENTS ================= */
+.input{display:flex;gap:10px;align-items:center;margin:8px 0}
+.input label{min-width:110px;color:var(--muted)}
+.input input{
+  background:#0b1730;border:1px solid #294a84;border-radius:10px;
+  color:#eaf2ff;padding:8px 10px;min-width:90px;
+  transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.input input:focus-visible{
+  outline:none;border-color:#3a66c1;
+  box-shadow:0 0 0 3px #162646, 0 0 0 5px rgba(90,170,255,.35);
+  background:#0d1f3e;
+}
+
+/* remove number spinners (Chrome) */
+.input input[type=number]::-webkit-outer-spin-button,
+.input input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+
+/* range (EMAT h%) */
+input[type=range]{appearance:none; -webkit-appearance:none; width:100%; background:transparent}
+input[type=range]::-webkit-slider-runnable-track{
+  height:6px;border-radius:999px;background:linear-gradient(90deg,#2e7dff55,#47ffa855);
+  border:1px solid #294a84;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; margin-top:-6px;
+  height:18px;width:18px;border-radius:50%;
+  background:linear-gradient(180deg,#4d7dff,#47ffa8);
+  border:2px solid #0d1c34; box-shadow:0 2px 6px #0007;
+}
+input[type=range]:focus-visible::-webkit-slider-thumb{outline:none;box-shadow:0 0 0 3px #162646, 0 0 0 5px rgba(90,170,255,.35)}
+/* Firefox */
+input[type=range]::-moz-range-track{height:6px;border-radius:999px;background:#1a2b50;border:1px solid #294a84}
+input[type=range]::-moz-range-thumb{height:18px;width:18px;border-radius:50%;border:2px solid #0d1c34; background:linear-gradient(180deg,#4d7dff,#47ffa8)}
+
+/* semantic helpers */
+.bad{color:var(--bad)} .good{color:var(--good)} .warn{color:var(--warn)}
+
+/* ================= ACCESSIBILITY ================= */
+:focus-visible{outline:none; box-shadow:0 0 0 3px #162646, 0 0 0 5px rgba(90,170,255,.35)}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important; transition:none !important}
+}
+
+/* ================= RESPONSIVE TWEAKS ================= */
+@media (max-width:720px){
+  #title{font-size:16px}
+  .btn{padding:8px 10px}
+  .card{padding:14px}
+  .section{padding:8px}
+}
+
+</style>
+</head>
+<body>
+<div id="barTop">
+
+<a href="index.html" style="position:absolute;top:10px;right:238px;  
+  background:#0b1730;color:#cfe3ff;padding:8px 12px;border-radius:12px;
+  text-decoration:none;font-size:13px;box-shadow:0 2px 6px #0008">Index руу</a>
+<a href="point.html" style="position:absolute;top:10px;right:318px;  
+  background:#0b1730;color:#cfe3ff;padding:8px 12px;border-radius:12px;
+  text-decoration:none;font-size:13px;box-shadow:0 2px 6px #0008">Point руу</a>
+
+  <div id="title">OS Memory</div>
+  <div class="small">Space / ← → · Toggle fullscreen</div>
+  <div class="actions">
+    <button class="btn" id="prev">‹ Prev</button>
+    <button class="btn" id="next">Next ›</button>
+    <button class="btn" id="fs">⛶ Full</button>
+  </div>
+</div>
+<div id="prog"><i></i></div>
+
+<div id="deck"><div id="track">
+
+  <!-- 1. Title -->
+<section class="slide">
+  <div class="card reveal">
+    <div class="grid two">
+      <!-- Зүүн тал — текст -->
+      <div data-in>
+        <h1 style="display:flex;gap:10px;align-items:center">Санах ой</h1>
+        <div class="chips">
+          <span class="chip">Hierarchy</span><span class="chip">Base/Limit</span>
+          <span class="chip">Contiguous + FIFO/Swapping</span><span class="chip">EMAT</span>
+        </div>
+
+        <div class="section" style="margin-top:10px">
+          <b>Мета-зураг:</b> CPU-ийн ойролцоо байх тусам <i>хурдан</i> (бага latency) ч <i>жижиг</i>.  
+          Дараагийн слайдууд: шатлал → хамгаалалт (Base/Limit) → RAM-ын тасралтгүй хуваарилалт & Swapping → кэштэй EMAT.
+        </div>
+
+        <div class="small" style="margin-top:20px">
+          Tip: <span class="kbd">Space</span> / <span class="kbd">←</span> <span class="kbd">→</span>,  
+          <span class="kbd">⛶</span> товчоор бүрэн дэлгэц.
+        </div>
+      </div>
+
+      <!-- Баруун тал — хөдөлгөөнт SVG -->
+      <div data-in>
+        <svg viewBox="0 0 620 320" role="img" aria-label="Memory hierarchy animated">
+          <defs>
+            <linearGradient id="gCPU" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#66e3ff"/><stop offset="100%" stop-color="#47ffa8"/>
+            </linearGradient>
+            <linearGradient id="gCACHE" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#4d7dff"/><stop offset="100%" stop-color="#9c8cff"/>
+            </linearGradient>
+            <linearGradient id="gRAM" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#66e3ff"/><stop offset="100%" stop-color="#47ffa8"/>
+            </linearGradient>
+            <linearGradient id="gDISK" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#e3c770"/><stop offset="100%" stop-color="#cf8f4a"/>
+            </linearGradient>
+          </defs>
+
+          <!-- CPU -->
+          <g class="floatY">
+            <rect x="20" y="28" rx="14" ry="14" width="110" height="58" fill="url(#gCPU)"/>
+            <text x="75" y="62" text-anchor="middle" font-weight="800" fill="#0b1220">CPU</text>
+            <!-- pulse ring -->
+            <circle cx="75" cy="58" r="28" fill="none" stroke="#66e3ff66" stroke-width="2">
+              <animate attributeName="r" values="22;28;22" dur="2.4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0;1" dur="2.4s" repeatCount="indefinite"/>
+            </circle>
+          </g>
+
+          <!-- Cache / RAM / Disk блок -->
+          <rect x="168" y="30" rx="12" ry="12" width="180" height="38" fill="url(#gCACHE)" class="glow"/>
+          <text x="258" y="54" text-anchor="middle" font-weight="800" fill="#0b1220">Cache</text>
+
+          <rect x="148" y="108" rx="12" ry="12" width="220" height="70" fill="url(#gRAM)"/>
+          <text x="258" y="146" text-anchor="middle" font-weight="800" fill="#0b1220">Primary (RAM)</text>
+
+          <rect x="108" y="218" rx="12" ry="12" width="300" height="46" fill="url(#gDISK)"/>
+          <text x="258" y="246" text-anchor="middle" font-weight="800" fill="#0b1220">Secondary (SSD/HDD)</text>
+
+          <!-- Дохиур шугамууд -->
+          <g stroke="#8ad2ff" stroke-width="2" fill="none" class="dash">
+            <path d="M130,58 L168,49" stroke-dasharray="8 10"/>
+            <path d="M258,70 L258,108" stroke-dasharray="8 10"/>
+            <path d="M258,178 L258,218" stroke-dasharray="8 10"/>
+          </g>
+
+          <!-- Hit — богино тойрог (CPU↔Cache) -->
+          <circle r="7" fill="#5aa8ff">
+            <animateMotion dur="2.2s" repeatCount="indefinite"
+              path="M 75,58 L 168,49 L 75,58 Z"/>
+          </circle>
+
+          <!-- Miss — урт тойрог (CPU→Cache→RAM→SSD→RAM→CPU) -->
+          <circle r="7" fill="#47ffa8">
+            <animateMotion dur="5.5s" repeatCount="indefinite"
+              path="M 75,58 L 168,49 L 258,143 L 258,236 L 258,143 L 75,58 Z"/>
+          </circle>
+
+          <!-- Legend -->
+          <g font-size="12">
+            <rect x="460" y="36" rx="6" ry="6" width="130" height="26" fill="#0b1730" stroke="#2b4c82"/>
+            <circle cx="474" cy="49" r="6" fill="#5aa8ff"/><text x="486" y="53" fill="#9fb1d6">cache hit</text>
+            <rect x="460" y="68" rx="6" ry="6" width="130" height="26" fill="#0b1730" stroke="#2b4c82"/>
+            <circle cx="474" cy="81" r="6" fill="#47ffa8"/><text x="486" y="85" fill="#9fb1d6">cache miss</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- 2. Hierarchy with animated hits/misses -->
+ <section class="slide">
+  <div class="card reveal">
+    <div class="grid two">
+      <!-- Зүүн тал — ойлголтын фокус -->
+      <div data-in>
+        <h2>1) Memory hierarchy — урсгал</h2>
+        <ul>
+          <li><b>Cache</b> — L1/L2/L3; ~<i>1–10 ns</i>. Temporal &amp; spatial locality-г ашиглаж дундаж хандалтыг бууруулна.</li>
+          <li><b>Primary (RAM)</b> — DRAM; ~<i>60–100 ns</i>. Процессуудын идэвхтэй өгөгдөл энд байрлана.</li>
+          <li><b>Secondary</b> — SSD/HDD; ~<i>μs–ms</i>. Байнгын хадгалалт; хэрэгтэй үедээ RAM руу ачаалж CPU хэрэглэнэ.</li>
+        </ul>
+
+        <div class="section">
+          <b>Цэнхэр бөмбөг</b> — <i>cache hit</i> (CPU ↔ Cache богино тойрог),<br>
+          <b>ногоон бөмбөг</b> — <i>cache miss (RAM)</i> (CPU → Cache → RAM → CPU),<br>
+          <b>улбар шар бөмбөг</b> — <i>cache miss (RAM→SSD)</i> — RAM-д байхгүй бол Disk-ээс уншаад буцаж RAM-д ачаална.
+        </div>
+
+        <div class="small" style="margin-top:14px">
+          Locality quick-take: <b>Temporal</b> = саяхан ашигласан зүйл дахин ашиглагдана; <b>Spatial</b> = ойролцоо хаягууд хамт хэрэг болно.
+        </div>
+      </div>
+
+      <!-- Баруун тал — өөр хэв маягийн хөдөлгөөнт SVG -->
+      <div data-in>
+        <!-- Баруун тал — давхардахгүй шинэ SVG -->
+        <svg viewBox="0 0 820 360" role="img" aria-label="Hierarchy flow clean lanes">
+        <desc>
+            CPU → Cache → RAM → Disk урсгалыг 3 тусдаа “lane”-аар дүрсэлж, бөөмүүдийн хөдөлгөөнийг
+            зөрүүлсэн хугацаагаар эхлүүлж (stagger), элементүүдийг огт давхардахгүй болгосон.
+        </desc>
+
+        <!-- ======= Defs ======= -->
+        <defs>
+            <!-- Gradients -->
+            <linearGradient id="gCPU" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#66e3ff"/><stop offset="100%" stop-color="#47ffa8"/>
+            </linearGradient>
+            <linearGradient id="gCACHE" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4d7dff"/><stop offset="100%" stop-color="#9c8cff"/>
+            </linearGradient>
+            <linearGradient id="gRAM" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#66e3ff"/><stop offset="100%" stop-color="#47ffa8"/>
+            </linearGradient>
+            <linearGradient id="gDISK" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#e3c770"/><stop offset="100%" stop-color="#cf8f4a"/>
+            </linearGradient>
+
+            <!-- Patterns -->
+            <pattern id="pCache" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="8" height="8" fill="#24365a"/>
+            <path d="M0 0 L0 8" stroke="#3c5fa0" stroke-width="2"/>
+            </pattern>
+            <pattern id="pDisk" width="10" height="10" patternUnits="userSpaceOnUse">
+            <rect width="10" height="10" fill="#0f1b2f"/>
+            <circle cx="5" cy="5" r="2.2" fill="#cf8f4a" opacity="0.6"/>
+            </pattern>
+
+            <!-- Filters -->
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+
+            <!-- Arrowhead -->
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#8ad2ff"/>
+            </marker>
+
+            <!-- Lane paths (бөөмүүд зөвхөн эдгээр замаар явна) -->
+            <!-- LANE 1: Hit (CPU↔Cache) бага зэргийн нуман зам — текст, шошгод хүрэхгүй -->
+            <path id="laneHit" d="M 96,70 Q 190,40 284,54 Q 190,68 96,70 Z" fill="none"/>
+            <!-- LANE 2: Miss RAM (CPU→Cache→RAM→CPU), Cache-оос RAM руу багахан баруун тал руу гулзайлган -->
+            <path id="laneMissRam" d="M 96,70 Q 190,42 284,54 T 284,150 Q 190,160 96,70 Z" fill="none"/>
+            <!-- LANE 3: Deep miss Disk (CPU→Cache→RAM→Disk→RAM→CPU), RAM→Disk хэсгийг доош нь тусдаа хонгилоор -->
+            <path id="laneMissDisk" d="M 96,70 Q 190,42 284,54 T 284,150 T 284,260 T 284,150 Q 190,160 96,70 Z" fill="none"/>
+
+            <!-- SVG internal CSS -->
+            <style>
+            .label{font-weight:800;fill:#0b1220}
+            .hint{fill:#9fb1d6;font-size:11px}
+            .pill{fill:#0b1730;stroke:#2b4c82}
+            .dash{stroke-dasharray:8 10;animation: march 2.2s linear infinite}
+            @keyframes march{to{stroke-dashoffset:-18}}
+            .float{animation: float 3.4s ease-in-out infinite}
+            @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-3px)}100%{transform:translateY(0)}}
+            </style>
+        </defs>
+
+        <!-- ======= Layout ======= -->
+        <!-- CPU (зүүн тал) -->
+        <g class="float">
+            <rect x="40" y="40" rx="14" ry="14" width="112" height="60" fill="url(#gCPU)" filter="url(#glow)"/>
+            <text x="96" y="76" text-anchor="middle" class="label">CPU</text>
+            <circle cx="96" cy="70" r="26" fill="none" stroke="#66e3ff66" stroke-width="2">
+            <animate attributeName="r" values="20;26;20" dur="2.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0;1" dur="2.6s" repeatCount="indefinite"/>
+            </circle>
+        </g>
+
+        <!-- Cache блок + L1/L2/L3 pills (дундах хэсэг) -->
+        <g>
+            <rect x="224" y="34" rx="10" ry="10" width="180" height="42" fill="url(#gCACHE)"/>
+            <rect x="224" y="34" rx="10" ry="10" width="180" height="42" fill="url(#pCache)" opacity="0.25"/>
+            <text x="314" y="60" text-anchor="middle" class="label">Cache</text>
+
+            <!-- L1/L2/L3 pills — баруун тал руу зай авч байрлуулсан -->
+            <rect x="424" y="26" rx="8" ry="8" width="64" height="22" class="pill"/>
+            <text x="456" y="41" text-anchor="middle" class="hint">L1 ~1ns</text>
+            <rect x="424" y="52" rx="8" ry="8" width="78" height="22" class="pill"/>
+            <text x="463" y="67" text-anchor="middle" class="hint">L2 ~3–5ns</text>
+            <rect x="424" y="78" rx="8" ry="8" width="94" height="22" class="pill"/>
+            <text x="471" y="93" text-anchor="middle" class="hint">L3 ~8–12ns</text>
+        </g>
+
+        <!-- RAM -->
+        <g>
+            <rect x="194" y="120" rx="12" ry="12" width="240" height="76" fill="url(#gRAM)" filter="url(#glow)"/>
+            <text x="314" y="160" text-anchor="middle" class="label">Primary (RAM)</text>
+            <text x="314" y="180" text-anchor="middle" class="hint">~60–100 ns • active working set</text>
+        </g>
+
+        <!-- Disk -->
+        <g>
+            <rect x="154" y="240" rx="12" ry="12" width="320" height="56" fill="url(#gDISK)"/>
+            <rect x="154" y="240" rx="12" ry="12" width="320" height="56" fill="url(#pDisk)" opacity="0.18"/>
+            <text x="314" y="270" text-anchor="middle" class="label">Secondary (SSD/HDD)</text>
+            <text x="314" y="288" text-anchor="middle" class="hint">~μs–ms • persistent storage</text>
+        </g>
+
+        <!-- Зам заагч шугамууд (элементүүдээс зайтай) -->
+        <g stroke="#8ad2ff" stroke-width="2" fill="none">
+            <path class="dash" d="M152,72 L224,56" />
+            <path class="dash" d="M314,78 L314,120" />
+            <path class="dash" d="M314,196 L314,240" />
+        </g>
+
+        <!-- Баруун талын тайлбар, тэнхлэг — зүүн талын элементүүдтэй огт давхардахгүй бүсэд -->
+        <g>
+            <!-- Legend -->
+            <rect x="580" y="28" rx="10" ry="10" width="220" height="96" class="pill"/>
+            <circle cx="600" cy="50" r="6" fill="#5aa8ff"/><text x="614" y="54" fill="#9fb1d6">cache hit</text>
+            <circle cx="600" cy="72" r="6" fill="#47ffa8"/><text x="614" y="76" fill="#9fb1d6">miss → RAM</text>
+            <circle cx="600" cy="94" r="6" fill="#ffb35c"/><text x="614" y="98" fill="#9fb1d6">miss → RAM→SSD</text>
+
+            <!-- Axes -->
+            <text x="590" y="140" class="hint">Faster (lower latency) ↑</text>
+            <path d="M586,214 L586,146" stroke="#2b4c82" stroke-width="2" marker-start="url(#arrow)"/>
+            <text x="590" y="230" class="hint">Larger capacity ↓</text>
+            <path d="M586,164 L586,232" stroke="#2b4c82" stroke-width="2" marker-end="url(#arrow)"/>
+        </g>
+
+        <!-- ======= Particles: тусдаа LANE, зөрүүлсэн эхлэл/урттай ======= -->
+        <!-- Hit (цэнхэр) -->
+        <circle r="7" fill="#5aa8ff" pointer-events="none">
+            <animateMotion dur="2.2s" begin="0s" repeatCount="indefinite">
+            <mpath href="#laneHit"/>
+            </animateMotion>
+        </circle>
+
+        <!-- Miss RAM (ногоон) -->
+        <circle r="7" fill="#47ffa8" pointer-events="none">
+            <animateMotion dur="4.4s" begin="0.6s" repeatCount="indefinite">
+            <mpath href="#laneMissRam"/>
+            </animateMotion>
+        </circle>
+
+        <!-- Deep miss Disk (улбар шар) -->
+        <circle r="7" fill="#ffb35c" pointer-events="none">
+            <animateMotion dur="6.6s" begin="1.2s" repeatCount="indefinite">
+            <mpath href="#laneMissDisk"/>
+            </animateMotion>
+        </circle>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- 3. Base/Limit — interactive -->
+<!-- ===================== Base/Limit — FULL SLIDE ===================== -->
+<section class="slide" id="slide-base-limit">
+  <div class="card reveal">
+    <div class="grid two">
+      <!-- ЛОГИК + ОРУУЛГА -->
+      <div data-in>
+        <h2>2) Base/Limit — Logical ↦ Physical</h2>
+        <div class="section" style="display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:10px">
+          <div class="input"><label>base</label><input id="bl_base" type="number" value="500"></div>
+          <div class="input"><label style="padding-left: 75px;">limit</label><input id="bl_limit" type="number" value="32" min="1"></div>
+          <div class="input"><label style="padding-left: 65px;">logical</label><input id="bl_L" type="number" value="28" min="0"></div>
+        </div>
+        <div class="small muted" style="margin-top:6px">
+          Дүрэм: <span class="code">if (0 ≤ L &lt; limit) physical = base + L; else TRAP</span>
+        </div>
+        <div id="bl_out" class="section" style="margin-top:10px">—</div>
+      </div>
+
+      <!-- SVG ВИЗУАЛ -->
+      <div data-in>
+        <svg id="bl_svg" viewBox="0 0 960 240" role="img" aria-label="Base/Limit mapping" style="width:100%;height:auto">
+          <defs>
+            <linearGradient id="ramg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#66e3ff"/><stop offset="100%" stop-color="#47ffa8"/>
+            </linearGradient>
+            <marker id="aGreen" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
+              <path d="M0,0 L12,6 L0,12 z" fill="#78ef97"/>
+            </marker>
+            <marker id="aRed" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
+              <path d="M0,0 L12,6 L0,12 z" fill="#ff8a7a"/>
+            </marker>
+          </defs>
+
+          <!-- Гарчигууд -->
+          <text x="240" y="22"  text-anchor="middle" font-size="12" fill="#9fb1d6">Logical address space</text>
+          <text x="700" y="22"   text-anchor="middle" font-size="12" fill="#9fb1d6">Physical RAM segment</text>
+
+          <!-- LOGICAL BAR -->
+          <rect id="logBar" x="60" y="36" rx="10" ry="10" width="360" height="48" fill="#0e1f3f" stroke="#2b4c82"/>
+          <g id="logicalTicks"></g>
+
+          <!-- base / limit pills -->
+          <g>
+            <rect x="80" y="90" rx="10" ry="10" width="96" height="26" fill="#22345f" stroke="#1a2a44"/>
+            <text id="bl_baseLbl"  x="128" y="107" text-anchor="middle" font-weight="800" fill="#eaf2ff">base=—</text>
+            <rect x="186" y="90" rx="10" ry="10" width="96" height="26" fill="#5d2b2b" stroke="#3a1a1a"/>
+            <text id="bl_limitLbl" x="234" y="107" text-anchor="middle" font-weight="800" fill="#ffd7d7">limit=—</text>
+          </g>
+
+          <!-- L маркер (бүлэг болгож төвөөр нь хөдөлгөнө) -->
+          <g id="Lgroup" transform="translate(60,0)">
+            <line x1="0" y1="36" x2="0" y2="84" stroke="#86b7ff" stroke-width="2" stroke-dasharray="4 6"/>
+            <rect x="-20" y="44" width="40" height="28" rx="6" ry="6" fill="#4d7dff88" stroke="#2b4c82"/>
+            <text id="Lval" x="0" y="63" text-anchor="middle" fill="#eaf2ff" font-weight="800">L=—</text>
+          </g>
+
+          <!-- ФИЗИК BAR -->
+          <rect id="phyBar" x="520" y="36" rx="12" ry="12" width="360" height="48" fill="url(#ramg)"/>
+          <g id="physicalTicks"></g>
+
+          <!-- OK сум (L→P) ба P маркер -->
+          <line id="okArrow"  x1="60" y1="120" x2="60" y2="120" stroke="#78ef97" stroke-width="6" marker-end="url(#aGreen)" opacity="0" stroke-dasharray="10 8"/>
+          <g id="Pgroup" transform="translate(520,0)" opacity="0">
+            <line x1="0" y1="36" x2="0" y2="84" stroke="#78ef97" stroke-width="2" stroke-dasharray="4 6"/>
+            <rect x="-24" y="44" width="48" height="28" rx="6" ry="6" fill="#49e3b388" stroke="#0d2a4f"/>
+            <text id="physTxt" x="0" y="62" text-anchor="middle" fill="#0b1220" font-weight="800">—</text>
+          </g>
+
+          <!-- TRAP сум (доош) ба TRAP badge -->
+          <line id="badArrow" x1="60" y1="120" x2="60" y2="164" stroke="#ff8a7a" stroke-width="6" marker-end="url(#aRed)" opacity="0" stroke-dasharray="8 6"/>
+          <g id="Trap" transform="translate(60,0)" opacity="0">
+            <rect x="-30" y="168" rx="10" ry="10" width="60" height="26" fill="#7a2a2a"/>
+            <text x="0" y="186" text-anchor="middle" fill="#ffd7d7" font-weight="800">TRAP</text>
+          </g>
+
+          <!-- Тэгшитгэлийн мөр -->
+          <g id="EqRow" opacity="0">
+            <text x="520" y="206" font-size="12" fill="#9fb1d6">
+              physical = base(<tspan id="EqBase" fill="#eaf2ff">—</tspan>)
+              + L(<tspan id="EqL" fill="#eaf2ff">—</tspan>)
+              = <tspan id="EqP" fill="#78ef97" font-weight="800">—</tspan>
+            </text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- 4. Fragmentation -->
+<section class="slide">
+  <div class="card reveal">
+    <div class="grid two">
+      <div data-in>
+        <h2>3) Тасралтгүй байршуулалт ба фрагментаци</h2>
+        <ul>
+          <li>Процесс бүр RAM дээр <b>нэг тасралтгүй</b> хэсгийг эзэлнэ (<i>base/limit</i>-ээр хамгаална).</li>
+          <li>Олон давтамжтай ачилт/чөлөөлөлтөөс жижиг “нүхнүүд” үүсэж <b>гадаад фрагментаци</b> бий болдог.</li>
+          <li>Нийт чөлөөт дүн нь <b>6K</b> байсан ч хэрэв <i>2K + 2K + 2K</i> гэж <u>тасархай</u> байвал <b>5K</b>-ийн процесс <b>багтахгүй</b>.</li>
+          <li>Байршуулах бодлогууд: <b>First-fit</b>, <b>Next-fit</b>, <b>Best-fit</b>, <b>Worst-fit</b> — хурд ба фрагментацийн солилцоо.</li>
+          <li>Шийдэл: <b>компакцлах</b> (блокуудаа шахаж нүхнүүдийг нэгтгэх — зардалтай) эсвэл <b>paging</b> рүү шилжих.</li>
+        </ul>
+        <div class="section small muted">
+          Зүүн талд: жижиг нүхнүүд (штрих). Баруун талд: нэг том <b>залгаа</b> чөлөөт блок — шинэ процесс зөвхөн иймд л багтана.  
+          RAM зурвасыг <b>дарж</b> компакцлахыг турш.
+        </div>
+      </div>
+
+      <div data-in>
+        <svg viewBox="0 0 680 240" role="img" aria-label="Тасралтгүй байршуулалт ба гадаад фрагментаци">
+          <defs>
+            <linearGradient id="ramGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#66e3ff"/><stop offset="100%" stop-color="#47ffa8"/>
+            </linearGradient>
+            <linearGradient id="freeGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#49e3b3"/><stop offset="100%" stop-color="#84ffcc"/>
+            </linearGradient>
+            <pattern id="frag" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+              <rect width="6" height="6" fill="#0e1f3f"/>
+              <path d="M0 0 L0 6" stroke="#244472" stroke-width="2"/>
+            </pattern>
+            <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#78ef97"/>
+            </marker>
+          </defs>
+
+          <!-- Толгой тайлбар -->
+          <text x="340" y="24" text-anchor="middle" fill="#9fb1d6" font-size="12">
+            RAM (тасралтгүй); 5K-ийн блок хайгч залгаа чөлөөт хэсэг эрж байна
+          </text>
+
+          <!-- RAM зурвас (дарвал компакцлана) -->
+          <g id="ramBar" cursor="pointer">
+            <rect x="40" y="40" rx="14" ry="14" width="600" height="68" fill="url(#ramGrad)" opacity="0.95"/>
+
+            <!-- Олгогдсон блок A -->
+            <g id="blkA">
+              <rect x="60" y="52" width="110" height="44" rx="8" ry="8" fill="#9ca7ff" stroke="#20335a"/>
+              <text x="115" y="78" text-anchor="middle" fill="#0b1220" font-weight="700">A</text>
+            </g>
+
+            <!-- Нүх #1 -->
+            <g id="hole1">
+              <rect id="hole1rect" x="176" y="52" width="36" height="44" rx="6" ry="6" fill="url(#frag)" stroke="#20335a"/>
+              <!-- компакцалсны дараа чөлөөт болж харагдана -->
+              <set attributeName="fill" xlink:href="#hole1rect" to="url(#freeGrad)" begin="ramBar.click+0.7s" fill="freeze"/>
+            </g>
+
+            <!-- Олгогдсон блок B -->
+            <g id="blkB">
+              <rect id="blkBrect" x="216" y="52" width="70" height="44" rx="8" ry="8" fill="#c58cff" stroke="#20335a"/>
+              <text x="251" y="78" text-anchor="middle" fill="#0b1220" font-weight="700">B</text>
+              <!-- компакцлах: 216 → 172 -->
+              <animate attributeName="x" xlink:href="#blkBrect" begin="ramBar.click" dur="0.7s" fill="freeze" to="172"/>
+            </g>
+
+            <!-- Нүх #2 -->
+            <g id="hole2">
+              <rect id="hole2rect" x="290" y="52" width="42" height="44" rx="6" ry="6" fill="url(#frag)" stroke="#20335a"/>
+              <animate attributeName="x" xlink:href="#hole2rect" begin="ramBar.click" dur="0.7s" fill="freeze" to="246"/>
+              <set attributeName="fill" xlink:href="#hole2rect" to="url(#freeGrad)" begin="ramBar.click+0.7s" fill="freeze"/>
+            </g>
+
+            <!-- Олгогдсон блок C -->
+            <g id="blkC">
+              <rect id="blkCrect" x="336" y="52" width="40" height="44" rx="8" ry="8" fill="#66e3ff" stroke="#20335a"/>
+              <text x="356" y="78" text-anchor="middle" fill="#0b1220" font-weight="700">C</text>
+              <!-- компакцлах: 336 → 292 -->
+              <animate attributeName="x" xlink:href="#blkCrect" begin="ramBar.click" dur="0.7s" fill="freeze" to="292"/>
+            </g>
+
+            <!-- Нүх #3 -->
+            <g id="hole3">
+              <rect id="hole3rect" x="380" y="52" width="28" height="44" rx="6" ry="6" fill="url(#frag)" stroke="#20335a"/>
+              <animate attributeName="x" xlink:href="#hole3rect" begin="ramBar.click" dur="0.7s" fill="freeze" to="336"/>
+              <set attributeName="fill" xlink:href="#hole3rect" to="url(#freeGrad)" begin="ramBar.click+0.7s" fill="freeze"/>
+            </g>
+
+            <!-- Том залгаа чөлөөт хэсэг -->
+            <rect id="bigFree" x="414" y="52" width="206" height="44" rx="10" ry="10" fill="url(#freeGrad)" stroke="#20335a"/>
+            <text x="517" y="79" text-anchor="middle" fill="#0b1220" font-weight="700">Чөлөөтэй (залгаа)</text>
+          </g>
+
+          <!-- Хайгч (сканнер) — эхлээд жижиг нүхнүүд дээр бүтэлгүйтээд, эцэст нь томд таарна -->
+          <g>
+            <path d="M 60 132 H 620" stroke="#9be7b2" stroke-width="4" stroke-dasharray="8 8" fill="none" opacity="0.8"/>
+            <line id="scanArrow" x1="60" y1="132" x2="100" y2="132" stroke="#78ef97" stroke-width="6" marker-end="url(#arrowHead)">
+              <animate id="scanMove" attributeName="x1" values="90;190;312;394;590" keyTimes="0;0.25;0.5;0.75;1" dur="6s" repeatCount="indefinite"/>
+              <animate attributeName="x2" values="130;230;352;434;630" keyTimes="0;0.25;0.5;0.75;1" dur="6s" repeatCount="indefinite"/>
+            </line>
+          </g>
+
+          <!-- “Багтахгүй/Багтана” тэмдэглэгээ -->
+          <g font-size="12" font-weight="800">
+            <g opacity="0">
+              <text x="194" y="124" fill="#ff8a7a">Багтахгүй</text>
+              <set attributeName="opacity" to="1" begin="scanMove.begin+1.1s" dur="0.6s"/>
+              <set attributeName="opacity" to="0" begin="scanMove.begin+1.7s"/>
+            </g>
+            <g opacity="0">
+              <text x="304" y="124" fill="#ff8a7a">Багтахгүй</text>
+              <set attributeName="opacity" to="1" begin="scanMove.begin+2.6s" dur="0.6s"/>
+              <set attributeName="opacity" to="0" begin="scanMove.begin+3.2s"/>
+            </g>
+            <g opacity="0">
+              <text x="386" y="124" fill="#ff8a7a">Багтахгүй</text>
+              <set attributeName="opacity" to="1" begin="scanMove.begin+4s" dur="0.6s"/>
+              <set attributeName="opacity" to="0" begin="scanMove.begin+4.6s"/>
+            </g>
+            <g opacity="0">
+              <text x="520" y="124" fill="#78ef97">Багтана (≥5K)</text>
+              <set attributeName="opacity" to="1" begin="scanMove.begin+5.2s" dur="0.8s"/>
+              <set attributeName="opacity" to="0" begin="scanMove.begin+6s"/>
+            </g>
+          </g>
+
+          <!-- Шинэ 5K процесс — том чөлөөт хэсэгт шилжин орно -->
+          <rect id="newProc" x="60" y="160" width="120" height="38" rx="8" ry="8" fill="#ffd166" stroke="#7a5a1a"/>
+          <text x="120" y="184" text-anchor="middle" fill="#0b1220" font-weight="800">Шинэ 5K</text>
+          <animate attributeName="x" xlink:href="#newProc" values="60; 60; 474" keyTimes="0;0.86;1" dur="6s" repeatCount="indefinite"/>
+          <animate attributeName="fill" xlink:href="#newProc" values="#ffd166; #ffd166; #78ef97" keyTimes="0;0.86;1" dur="6s" repeatCount="indefinite"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- 5. FIFO + Swapping animated -->
+  <section class="slide">
+    <div class="card reveal">
+      <h2 data-in>4) FIFO & Swapping — хөдөлгөөний логик</h2>
+      <div class="grid two">
+        <div class="section" data-in>
+          <ol>
+            <li>Шинэ процесс орж ирэхэд тасралтгүй хоосон блок олдохгүй бол <b>FIFO</b>-гоор хамгийн эрт байрлуулсан процессыг түр гаргана.</li>
+            <li><i>swap-out</i> → RAM-д зай гарна → шинийг байрлуулна.</li>
+            <li>Дахин хэрэгтэй болох үед тухайн процессыг <i>swap-in</i> хийнэ.</li>
+          </ol>
+          <div class="small muted">Диск⇄RAM шилжилт удаан (μs–ms) — ойр ойр давтвал <b>thrashing</b> гарч бүхэл систем удааширна.</div>
+        </div>
+        <div data-in>
+          <svg viewBox="0 0 620 300" role="img" aria-label="Swapping anim">
+            <defs>
+              <linearGradient id="ramG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#66e3ff"/><stop offset="100%" stop-color="#47ffa8"/></linearGradient>
+              <linearGradient id="diskG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e3c770"/><stop offset="100%" stop-color="#cf8f4a"/></linearGradient>
+              <marker id="arrD" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ff8a7a"/></marker>
+              <marker id="arrU" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto"><path d="M0,10 L10,5 L0,0 z" fill="#78ef97"/></marker>
+            </defs>
+            <!-- RAM -->
+            <rect x="80" y="40" rx="16" ry="16" width="460" height="70" fill="url(#ramG)"/>
+            <text x="310" y="30" text-anchor="middle" fill="#cfe3ff">RAM (Primary)</text>
+            <!-- Victim + free -->
+            <rect x="100" y="54" width="90" height="42" rx="8" ry="8" fill="#9ca7ff" stroke="#20335a"/>
+            <rect x="200" y="54" width="80" height="42" rx="8" ry="8" fill="#183055" opacity=".55" stroke="#20335a"/>
+            <rect x="290" y="54" width="80" height="42" rx="8" ry="8" fill="#183055" opacity=".55" stroke="#20335a"/>
+            <rect x="380" y="54" width="140" height="42" rx="10" ry="10" fill="#49e3b355" stroke="#20335a"/>
+            <text x="145" y="78" text-anchor="middle" fill="#0b1220" font-weight="800">Victim</text>
+
+            <!-- Disk -->
+            <rect x="120" y="190" rx="16" ry="16" width="380" height="56" fill="url(#diskG)"/>
+            <text x="310" y="220" text-anchor="middle" font-weight="800" fill="#0b1220">Secondary (SSD/HDD)</text>
+
+            <!-- arrows -->
+            <line x1="145" y1="96" x2="145" y2="180" stroke="#ff8a7a" stroke-width="5" marker-end="url(#arrD)"/>
+            <line x1="430" y1="186" x2="430" y2="96"  stroke="#78ef97" stroke-width="5" marker-end="url(#arrU)"/>
+
+            <!-- New block bouncing into free area -->
+            <rect x="430" y="158" width="74" height="34" rx="8" ry="8" fill="#66e3ff88" stroke="#20335a">
+              <animate attributeName="y" values="158;90;158;90;58" dur="6s" repeatCount="indefinite"/>
+            </rect>
+          </svg>
+
+          <!-- FIFO queue strip -->
+          <div style="margin-top:10px;border:1px dashed #2b4c82;border-radius:10px;padding:8px;overflow:hidden">
+            <div style="display:flex;gap:10px;will-change:transform" class="qmove">
+              <div class="chip">A</div><div class="chip">B</div><div class="chip">C</div>
+              <div class="chip">A</div><div class="chip">B</div><div class="chip">B</div>
+              <div class="chip">A</div><div class="chip">C</div><div class="chip">B</div>
+            </div>
+            <small class="muted">FIFO дараалал — зүүнээс баруун тийш “урсаж” байгаа нь харагдана.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. EMAT visual -->
+  <section class="slide">
+    <div class="card reveal">
+      <div class="grid two">
+        <div data-in>
+          <h2>5) EMAT — кэштэй үеийн дундаж хандалтын хугацаа</h2>
+          <div class="section">
+            <b>EMAT</b> = h·t<sub>cache</sub> + (1 − h)·(t<sub>cache</sub> + t<sub>mem</sub>)  
+            <ul>
+              <li><i>Hit</i> — зөвхөн кэш (<code>t_cache</code>), <i>Miss</i> — кэш + үндсэн ой (<code>t_cache + t_mem</code>).</li>
+              <li>Жишээ: h=70%, t<sub>cache</sub>=10ns, t<sub>mem</sub>=200ns → <b>70ns</b>.</li>
+              <li><b>Speedup vs. RAM only</b> = t<sub>mem</sub> / EMAT ≈ <b>2.86×</b>.</li>
+              <li>Кэш ашигтай байх доод нөхцөл: h &gt; t<sub>cache</sub>/t<sub>mem</sub> → 10/200 = <b>5%</b>.</li>
+            </ul>
+          </div>
+          <div class="section">
+            <b>Time units</b>
+            <ul>
+              <li>1 second = 10<sup>9</sup> ns = 10<sup>12</sup> ps</li>
+              <li>1 ns = 10<sup>−9</sup> s = 1,000 ps</li>
+              <li>1 ps = 10<sup>−12</sup> s = 0.001 ns</li>
+            </ul>
+          </div>
+        </div>
+        <div data-in>
+          <div class="section">
+            <div class="input"><label>t<sub>cache</sub> (ns)</label><input id="tc" type="number" value="10" min="0"></div>
+            <div class="input"><label>t<sub>mem</sub> (ns)</label><input id="tm" type="number" value="200" min="0"></div>
+            <div class="input"><label>Hit rate h (%)</label><input id="hr" type="range" value="70" min="0" max="100"><span id="hrv">70%</span></div>
+          </div>
+          <div class="section">
+            <div>EMAT: <b id="emat">—</b> ns</div>
+            <div>Speedup (vs. RAM only): <b id="spd">—</b> ×</div>
+            <div style="display:grid;gap:8px;margin-top:8px">
+              <div>
+                <small class="muted">EMAT</small>
+                <div style="height:18px;border:1px solid #2b4c82;border-radius:999px;background:#0b1730;overflow:hidden">
+                  <div id="barE" class="barGrow" style="--w:35%;height:100%;background:#2e7dff55"></div>
+                </div>
+              </div>
+              <div>
+                <small class="muted">Зөвхөн RAM</small>
+                <div style="height:18px;border:1px solid #2b4c82;border-radius:999px;background:#0b1730;overflow:hidden">
+                  <div class="barGrow" style="--w:100%;height:100%;background:#ffcc5a55"></div>
+                </div>
+              </div>
+            </div>
+            <small class="muted">“vs. RAM only” = кэшгүй, зөвхөн үндсэн ойтой хувилбар.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+<section class="slide">
+  <div class="card reveal">
+    <div data-in><h2>Дүгнэлт</h2></div>
+    <ul data-in>
+      <li>Hierarchy: Cache → RAM → SSD/HDD (ойртох тусам <b>хурд</b>, холдох тусам <b>багтаамж</b> өснө).</li>
+      <li>Base/Limit: <span class="code">L &lt; limit ? base+L : TRAP</span>.</li>
+      <li>Contiguous & FIFO/Swapping: залгаа блок хэрэгтэй → багтахгүй бол эрт ирснийг (FIFO) түр гаргаж зай гаргана.</li>
+      <li>EMAT: hit их, t<sub>cache</sub> бага байх тусам дундаж хугацаа эрс буурна.</li>
+    </ul>
+
+    <!-- ===== Summary SVG: 4 жижиг панелтэй анимейшн ===== -->
+    <div data-in style="margin-top:16px">
+      <svg viewBox="0 0 960 330" role="img" aria-label="Санах ой — Дүгнэлтийн анимейшн">
+        <defs>
+          <!-- gradients (1 удаа л зарлана) -->
+          <linearGradient id="sum_g1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#66e3ff"/><stop offset="100%" stop-color="#47ffa8"/>
+          </linearGradient>
+          <linearGradient id="sum_g2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4d7dff"/><stop offset="100%" stop-color="#9c8cff"/>
+          </linearGradient>
+          <linearGradient id="sum_g3" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#e3c770"/><stop offset="100%" stop-color="#cf8f4a"/>
+          </linearGradient>
+          <pattern id="sum_frag" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+            <rect width="6" height="6" fill="#0e1f3f"/>
+            <path d="M0 0 L0 6" stroke="#244472" stroke-width="2"/>
+          </pattern>
+          <!-- arrows -->
+          <marker id="sum_a_green" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#78ef97"/>
+          </marker>
+          <marker id="sum_a_red" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#ff8a7a"/>
+          </marker>
+        </defs>
+
+        <!-- ========= 4 панел ========= -->
+        <g>
+
+          <!-- ========== (1) Hierarchy / Flow ========== -->
+          <g transform="translate(10,10)">
+            <rect x="0" y="0" width="460" height="150" rx="14" ry="14" fill="#0b162b" stroke="#213a66"/>
+            <text x="16" y="24" fill="#cfe3ff" font-weight="700">1) Hierarchy — урсгал</text>
+
+            <!-- Мини блокийг 20% жижгилж байрлуулна -->
+            <g transform="translate(12,28) scale(0.70)">
+              <!-- CPU / Cache / RAM / Secondary -->
+              <rect x="24"  y="44" rx="12" ry="12" width="90"  height="44" fill="url(#sum_g1)"/>
+              <text x="69"  y="72" text-anchor="middle" fill="#0b1220" font-weight="800">CPU</text>
+
+              <rect x="132" y="46" rx="10" ry="10" width="130" height="30" fill="url(#sum_g2)"/>
+              <text x="197" y="67" text-anchor="middle" fill="#0b1220" font-weight="800">Cache</text>
+
+              <rect x="120" y="88" rx="12" ry="12" width="160" height="44" fill="url(#sum_g1)"/>
+              <text x="200" y="114" text-anchor="middle" fill="#0b1220" font-weight="800">RAM</text>
+
+              <rect x="88"  y="136" rx="10" ry="10" width="230" height="30" fill="url(#sum_g3)"/>
+              <text x="203" y="156" text-anchor="middle" fill="#0b1220" font-weight="800">SSD / HDD</text>
+
+              <!-- чиглэлийн штрих -->
+              <g stroke="#88d6ff" stroke-width="2" fill="none" opacity=".7" vector-effect="non-scaling-stroke">
+                <path d="M114,66 L132,61" stroke-dasharray="6 8"/>
+                <path d="M197,76 L197,88" stroke-dasharray="6 8"/>
+                <path d="M200,132 L200,136" stroke-dasharray="6 8"/>
+              </g>
+
+              <!-- ХИТ (цэнхэр) — CPU↔Cache богино тойрог -->
+              <circle r="6" fill="#5aa8ff">
+                <animateMotion dur="2.2s" repeatCount="indefinite" path="M 69,64 L 132,61 L 69,64 Z"/>
+              </circle>
+              <!-- МИСС (ногоон) — CPU→Cache→RAM→SSD→RAM→CPU урт тойрог -->
+              <circle r="6" fill="#47ffa8">
+                <animateMotion dur="5.2s" repeatCount="indefinite"
+                  path="M 69,64 L 132,61 L 200,110 L 203,151 L 200,110 L 69,64 Z"/>
+              </circle>
+            </g>
+          </g>
+
+          <!-- ========== (2) Base/Limit mini ========== -->
+          <g transform="translate(490,10)">
+            <rect x="0" y="0" width="460" height="150" rx="14" ry="14" fill="#0b162b" stroke="#213a66"/>
+            <text x="16" y="24" fill="#cfe3ff" font-weight="700">2) Base/Limit — логик → физик зураглал</text>
+
+            <!-- logical bar -->
+            <rect x="24" y="46" width="260" height="30" rx="8" ry="8" fill="#0e1f3f" stroke="#2b4c82"/>
+            <text x="154" y="42" text-anchor="middle" fill="#9fb1d6" font-size="12">Logical (L)</text>
+
+            <!-- L marker (анимац: OK→TRAP) -->
+            <rect id="sum_bl_L" x="210" y="50" width="36" height="22" rx="6" ry="6" fill="#4d7dff88" stroke="#2b4c82"/>
+            <text id="sum_bl_Lt" x="228" y="66" text-anchor="middle" fill="#eaf6ff" font-weight="800">L</text>
+
+            <!-- OK (эхний 2.5s) -->
+            <line id="sum_bl_ok"  x1="228" y1="82" x2="396" y2="82" stroke="#78ef97" stroke-width="5" marker-end="url(#sum_a_green)"/>
+            <!-- TRAP (дараагийн 2.5s) -->
+            <line id="sum_bl_bad" x1="258" y1="82" x2="258" y2="112" stroke="#ff8a7a" stroke-width="5" marker-end="url(#sum_a_red)" opacity="0"/>
+            <rect id="sum_bl_trap" x="240" y="116" width="36" height="20" rx="6" ry="6" fill="#7a2a2a" opacity="0"/>
+            <text id="sum_bl_trapt" x="258" y="131" text-anchor="middle" fill="#ffd7d7" font-weight="800" opacity="0">TRAP</text>
+
+            <!-- Physical -->
+            <rect x="356" y="54" width="84" height="48" rx="10" ry="10" fill="url(#sum_g1)"/>
+            <text x="398" y="83" text-anchor="middle" fill="#0b1220" font-weight="800">Physical</text>
+
+            <!-- timeline: 0–2.5s OK; 2.5–5s TRAP; loop -->
+            <animate xlink:href="#sum_bl_L" attributeName="x" values="210;210;240" keyTimes="0;0.5;1" dur="5s" repeatCount="indefinite"/>
+            <set xlink:href="#sum_bl_ok"  attributeName="opacity" to="1" begin="0s; sum_bl_cycle.end"/>
+            <set xlink:href="#sum_bl_bad" attributeName="opacity" to="0" begin="0s; sum_bl_cycle.end"/>
+            <set xlink:href="#sum_bl_trap" attributeName="opacity" to="0" begin="0s; sum_bl_cycle.end"/>
+            <set xlink:href="#sum_bl_trapt" attributeName="opacity" to="0" begin="0s; sum_bl_cycle.end"/>
+
+            <set xlink:href="#sum_bl_ok"  attributeName="opacity" to="0" begin="2.5s; sum_bl_half.begin"/>
+            <set xlink:href="#sum_bl_bad" attributeName="opacity" to="1" begin="2.5s; sum_bl_half.begin"/>
+            <set xlink:href="#sum_bl_trap" attributeName="opacity" to="1" begin="2.6s; sum_bl_half.begin"/>
+            <set xlink:href="#sum_bl_trapt" attributeName="opacity" to="1" begin="2.6s; sum_bl_half.begin"/>
+
+            <animate id="sum_bl_half"  begin="2.5s" dur="0.01s"/>
+            <animate id="sum_bl_cycle" begin="5s"   dur="0.01s" repeatCount="indefinite"/>
+          </g>
+
+          <!-- ========== (3) Contiguous & fragmentation ========== -->
+          <g transform="translate(10,170)">
+            <rect x="0" y="0" width="460" height="150" rx="14" ry="14" fill="#0b162b" stroke="#213a66"/>
+            <text x="16" y="24" fill="#cfe3ff" font-weight="700">3) Тасралтгүй байршуулалт ба фрагментаци</text>
+
+            <!-- RAM зурвас -->
+            <rect x="24" y="40" width="410" height="44" rx="12" ry="12" fill="url(#sum_g1)"/>
+
+            <!-- Олгогдсон/Нүх/Чөлөөт -->
+            <rect x="36"  y="48" width="96" height="28" rx="6" ry="6" fill="#9ca7ff" stroke="#20335a"/>
+            <rect x="140" y="48" width="42" height="28" rx="6" ry="6" fill="url(#sum_frag)" stroke="#20335a"/>
+            <rect x="188" y="48" width="44" height="28" rx="6" ry="6" fill="url(#sum_frag)" stroke="#20335a"/>
+            <rect x="236" y="48" width="36" height="28" rx="6" ry="6" fill="url(#sum_frag)" stroke="#20335a"/>
+            <rect x="276" y="48" width="144" height="28" rx="8" ry="8" fill="#49e3b355" stroke="#20335a"/>
+            <text x="348" y="66" text-anchor="middle" fill="#0b1220" font-weight="700">Залгаа чөлөөт</text>
+
+            <!-- Сканнер сум — жижиг нүхнүүд дээр “Багтахгүй”, том хэсэгт “Багтана” -->
+            <line x1="36" y1="92" x2="420" y2="92" stroke="#9be7b2" stroke-dasharray="7 7" opacity=".8"/>
+            <line id="sum_frag_scan" x1="36" y1="92" x2="76" y2="92" stroke="#78ef97" stroke-width="6" marker-end="url(#sum_a_green)">
+              <animate attributeName="x1" values="60;160;212;260;396" keyTimes="0;0.25;0.5;0.75;1" dur="6s" repeatCount="indefinite"/>
+              <animate attributeName="x2" values="100;200;252;300;436" keyTimes="0;0.25;0.5;0.75;1" dur="6s" repeatCount="indefinite"/>
+            </line>
+            <g font-size="12" font-weight="800">
+              <g opacity="0"><text x="160" y="112" fill="#ff8a7a">Багтахгүй</text>
+                <set attributeName="opacity" to="1" begin="sum_frag_scan.begin+1.0s" dur="0.6s"/>
+                <set attributeName="opacity" to="0" begin="sum_frag_scan.begin+1.6s"/></g>
+              <g opacity="0"><text x="212" y="112" fill="#ff8a7a">Багтахгүй</text>
+                <set attributeName="opacity" to="1" begin="sum_frag_scan.begin+2.4s" dur="0.6s"/>
+                <set attributeName="opacity" to="0" begin="sum_frag_scan.begin+3.0s"/></g>
+              <g opacity="0"><text x="260" y="112" fill="#ff8a7a">Багтахгүй</text>
+                <set attributeName="opacity" to="1" begin="sum_frag_scan.begin+3.8s" dur="0.6s"/>
+                <set attributeName="opacity" to="0" begin="sum_frag_scan.begin+4.4s"/></g>
+              <g opacity="0"><text x="360" y="112" fill="#78ef97">Багтана (≥5K)</text>
+                <set attributeName="opacity" to="1" begin="sum_frag_scan.begin+5.0s" dur="0.8s"/>
+                <set attributeName="opacity" to="0" begin="sum_frag_scan.begin+5.8s"/></g>
+            </g>
+          </g>
+
+          <!-- ========== (4) EMAT summary ========== -->
+          <g transform="translate(490,170)">
+            <rect x="0" y="0" width="460" height="150" rx="14" ry="14" fill="#0b162b" stroke="#213a66"/>
+            <text x="16" y="24" fill="#cfe3ff" font-weight="700">4) EMAT — кэштэй дундаж хандалт</text>
+
+            <!-- Тоон жишээ -->
+            <text x="16" y="46" fill="#9fb1d6" font-size="12">
+              Жишээ: h=60%, t₍cache₎=5ns, t₍mem₎=100ns → EMAT = 0.6·5 + 0.4·(5+100) =
+              <tspan fill="#78ef97" font-weight="800">45ns</tspan>
+            </text>
+
+            <!-- Суурь масштаб 100ns -->
+            <text x="16" y="70" fill="#cfe3ff" font-size="12">RAM л бол</text>
+            <rect x="90" y="58" width="300" height="16" rx="8" ry="8" fill="#ff8a7a55" stroke="#7a2a2a"/>
+            <text x="400" y="71" fill="#ffd7d7" font-weight="700">100ns</text>
+
+            <text x="16" y="100" fill="#cfe3ff" font-size="12">Кэштэй (EMAT)</text>
+            <rect x="90" y="88" width="135" height="16" rx="8" ry="8" fill="#2e7dff55" stroke="#234071">
+              <animate attributeName="width" from="10" to="135" dur="1.6s" begin="0s; sum_emat_restart.end" fill="freeze"/>
+            </rect>
+            <text x="232" y="101" fill="#eaf6ff" font-weight="700">45ns</text>
+
+            <!-- Хурдны харьцуулалт -->
+            <text x="16" y="130" fill="#cfe3ff" font-size="12">Кэшгүйтэй харьцуулах хурд:</text>
+            <text x="260" y="132" fill="#78ef97" font-weight="900" font-size="18">≈ 2.22×</text>
+            <text x="330" y="132" fill="#9fb1d6" font-size="12"> (= 100 / 45 )</text>
+
+            <!-- давталт trigger -->
+            <animate id="sum_emat_restart" begin="4.5s" dur="0.01s"/>
+          </g>
+
+        </g>
+      </svg>
+    </div>
+
+    <div class="section" data-in>
+      <b>Mini-quiz:</b> t<sub>cache</sub>=5ns, t<sub>mem</sub>=100ns, h=60% → EMAT=?  
+      <span class="muted">Хариу: 0.6·5 + 0.4·(5+100) = 3 + 42 = <b>45ns</b> (кэшгүй 100ns-оос <b>~2.22×</b> хурдан).</span>
+    </div>
+  </div>
+</section>
+
+
+
+</div></div>
+<script>
+/* ================= Slide engine (container-width based) ================= */
+const track = document.getElementById('track');
+const deck  = document.getElementById('deck');
+const slides = [...document.querySelectorAll('.slide')];
+const bar   = document.querySelector('#prog>i');
+let i = 0;
+function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+function go(n){
+  i = clamp(n, 0, slides.length - 1);
+  const w = deck.clientWidth;
+  track.style.transform = `translateX(${ -i*w }px)`;
+  bar.style.width = ((i+1)/slides.length*100) + '%';
+  slides.forEach((s,k)=> s.querySelector('.reveal')?.classList.toggle('active', k===i));
+}
+window.addEventListener('resize', ()=>go(i));
+document.getElementById('prev').onclick = ()=>go(i-1);
+document.getElementById('next').onclick = ()=>go(i+1);
+document.addEventListener('keydown', e=>{
+  if(['ArrowRight','PageDown',' '].includes(e.key)){ e.preventDefault(); go(i+1); }
+  if(['ArrowLeft','PageUp'].includes(e.key)){ e.preventDefault(); go(i-1); }
+});
+document.getElementById('fs').onclick = ()=>{
+  const el=document.documentElement;
+  if(!document.fullscreenElement){ el.requestFullscreen?.(); }
+  else { document.exitFullscreen?.(); }
+};
+go(0);
+
+/* ================= helpers (one-time) ================= */
+const $  = (s, r=document)=>r.querySelector(s);
+const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
+
+/* ================= EMAT (кэш) ================= */
+const tc  = $('#tc'), tm = $('#tm'), hr = $('#hr');
+const hrv = $('#hrv'), emat = $('#emat'), spd = $('#spd'), barE = $('#barE');
+
+function updEMAT(){
+  const tcache = Math.max(0, +tc.value||0);
+  const tmem   = Math.max(0, +tm.value||0);
+  const h      = (+hr.value||0) / 100;
+  const E = h*tcache + (1-h)*(tcache + tmem);
+  const speed = (tmem>0 && E>0) ? (tmem/E) : 0;
+
+  hrv.textContent = Math.round(h*100) + '%';
+  emat.textContent = E.toFixed(2);
+  spd.textContent  = speed.toFixed(2);
+
+  // бар – EMAT-ыг RAM-only (tmem)-тэй харьцуулсан хувиар
+  const w = tmem>0 ? clamp(E/tmem*100, 0, 100) : 0;
+  barE.style.setProperty('--w', w+'%');
+  // жижиг reflow animation
+  barE.classList.remove('barGrow'); void barE.offsetWidth; barE.classList.add('barGrow');
+}
+[tc, tm, hr].forEach(el=> el?.addEventListener('input', updEMAT));
+updEMAT();
+
+/* ================= Base/Limit (шинэ SVG хувилбарт нийцүүлсэн) ================= */
+/* геометр (логик/физик ruler-ийн координат) */
+const LOG_X=60,  LOG_W=360, LOG_Y=36, LOG_H=48;
+const PHY_X=520, PHY_W=360, PHY_Y=36, PHY_H=48;
+const L_HALF=20, P_HALF=24; // маркерийн хагас-өргөн (ирмэгээс гарахаас сэргийлнэ)
+
+/* DOM refs */
+const blIn = { base: $('#bl_base'), limit: $('#bl_limit'), L: $('#bl_L') };
+const blSvg = {
+  baseLbl: $('#bl_baseLbl'), limitLbl: $('#bl_limitLbl'), Lval: $('#Lval'),
+  Lgroup:  $('#Lgroup'),     Pgroup:   $('#Pgroup'),      physTxt: $('#physTxt'),
+  ok:      $('#okArrow'),    bad:      $('#badArrow'),    Trap:    $('#Trap'),
+  EqBase:  $('#EqBase'),     EqL:      $('#EqL'),         EqP:     $('#EqP'),
+  EqRow:   $('#EqRow'),
+  logicalTicks:  $('#logicalTicks'),
+  physicalTicks: $('#physicalTicks')
+};
+
+/* ticks зурдаг функц */
+function drawTicks(g, x0, limit, width, step=4, withBase=false, base0=0){
+  g.innerHTML = '';
+  if(!(Number.isFinite(limit) && limit>0)) return;
+  const span = Math.max(1, step);
+  const n = Math.floor(limit/span);
+  for(let i=0;i<=n;i++){
+    const L = i*span;
+    const t = L/limit;
+    const x = x0 + t*width;
+    const major = (L % (span*2) === 0);
+    const h = major ? 10 : 6;
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x); line.setAttribute('x2',x);
+    line.setAttribute('y1',LOG_Y+LOG_H+2); line.setAttribute('y2',LOG_Y+LOG_H+2+h);
+    line.setAttribute('stroke','#2b4c82'); line.setAttribute('stroke-width','2');
+    g.appendChild(line);
+
+    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',x); txt.setAttribute('y',LOG_Y+LOG_H+18);
+    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-size','10');
+    txt.setAttribute('fill','#9fb1d6');
+    txt.textContent = withBase ? (base0 + L) : L;
+    g.appendChild(txt);
+  }
+}
+
+/* гол update (хуучин “mini tool”-ийг бүрэн орлож байна) */
+function refreshBL(){
+  const base  = parseInt(blIn.base.value, 10);
+  const limit = parseInt(blIn.limit.value,10);
+  const L     = parseInt(blIn.L.value,    10);
+
+  blSvg.baseLbl.textContent  = Number.isFinite(base)  ? `base=${base}`  : 'base=—';
+  blSvg.limitLbl.textContent = (Number.isFinite(limit)&&limit>0) ? `limit=${limit}` : 'limit=—';
+  blSvg.Lval.textContent     = Number.isFinite(L) ? `L=${L}` : 'L=—';
+
+  if(Number.isFinite(limit) && limit>0){
+    drawTicks(blSvg.logicalTicks,  LOG_X, limit, LOG_W, limit>=32?4:2, false, 0);
+    drawTicks(blSvg.physicalTicks, PHY_X, limit, PHY_W, limit>=32?4:2, true, Number.isFinite(base)?base:0);
+  } else {
+    blSvg.logicalTicks.innerHTML = ''; blSvg.physicalTicks.innerHTML = '';
+  }
+
+  // L marker (center) – ruler дотор кламп
+  if(Number.isFinite(L) && Number.isFinite(limit) && limit>0){
+    const t  = clamp((L + 0.5)/limit, 0, 1);
+    const lx = clamp(LOG_X + t*LOG_W, LOG_X+L_HALF, LOG_X+LOG_W-L_HALF);
+    blSvg.Lgroup.setAttribute('transform', `translate(${lx},0)`);
+  }
+
+  const ok = Number.isFinite(base) && Number.isFinite(limit) && Number.isFinite(L)
+          && limit>0 && L>=0 && L<limit;
+  const P  = ok ? base + L : null;
+
+  // одоогийн L-ийн center x
+  const Lx = +(blSvg.Lgroup.getAttribute('transform').match(/translate\(([^,]+)/)?.[1] ?? (LOG_X+L_HALF));
+
+  if(ok){
+    const t  = (L + 0.5)/limit;
+    const px = clamp(PHY_X + t*PHY_W, PHY_X+P_HALF, PHY_X+PHY_W-P_HALF);
+
+    blSvg.ok.setAttribute('x1', Lx); blSvg.ok.setAttribute('x2', px);
+    blSvg.ok.setAttribute('opacity', '1');
+    blSvg.bad.setAttribute('opacity', '0');
+
+    blSvg.Pgroup.setAttribute('transform', `translate(${px},0)`);
+    blSvg.Pgroup.setAttribute('opacity', '1');
+    blSvg.Trap.setAttribute('opacity', '0');
+
+    blSvg.physTxt.textContent = P;
+    blSvg.EqBase.textContent  = base;
+    blSvg.EqL.textContent     = L;
+    blSvg.EqP.textContent     = P;
+    blSvg.EqRow.setAttribute('opacity','1');
+
+    $('#bl_out').innerHTML =
+      `<div><b class="ok">OK</b> — L = <b>${L}</b> &lt; limit = <b>${limit}</b></div>
+       <div>physical = base + L = <b>${base}</b> + <b>${L}</b> = <b>${P}</b></div>`;
+  } else {
+    blSvg.ok.setAttribute('opacity','0');
+    blSvg.bad.setAttribute('x1', Lx); blSvg.bad.setAttribute('x2', Lx);
+    blSvg.bad.setAttribute('opacity','1');
+
+    blSvg.Pgroup.setAttribute('opacity','0');
+    blSvg.Trap.setAttribute('transform', `translate(${Lx},0)`);
+    blSvg.Trap.setAttribute('opacity','1');
+    blSvg.EqRow.setAttribute('opacity','0');
+
+    let reason = 'L нь буруу утга.';
+    if(!(Number.isFinite(limit) && limit>0)) reason = 'limit ≥ 1 байх ёстой.';
+    else if(!Number.isFinite(L))              reason = 'L бүхэл тоо байх ёстой.';
+    else if(L < 0)                            reason = 'L &lt; 0.';
+    else if(L >= limit)                       reason = 'L ≥ limit.';
+    $('#bl_out').innerHTML =
+      `<div><b class="bad">TRAP</b> — ${reason}</div>
+       <div>Дүрэм: 0 ≤ L &lt; limit байх үед л физик хаяг руу зурагдана.</div>`;
+  }
+}
+
+/* bind + init */
+['input','change'].forEach(ev=>{
+  blIn.base?.addEventListener(ev, refreshBL);
+  blIn.limit?.addEventListener(ev, refreshBL);
+  blIn.L?.addEventListener(ev, refreshBL);
+});
+refreshBL();
+</script>
+</body>
+</html>

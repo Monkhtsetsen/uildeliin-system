@@ -1,0 +1,1038 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Санах ой — Танилцуулга + Base/Limit (A) + FIFO (B) + Swapping (3a/3b) + EMAT (4)</title>
+<style>
+:root {
+  --bg: #0a0f1a;
+  --panel: #0b1426;
+  --card: #111d33;
+  --text: #e8f0ff;
+  --muted: #9fb1d6;
+  --line: #264675;
+  --brand: #3d6fe8;
+  --brand-2: #1a3060;
+  --good: #78ef97;
+  --bad: #ff8a7a;
+  --warn: #ffd166;
+  --shadow: 0 16px 36px rgba(0,0,0,.40);
+
+  /* chips used below (were missing → caused invalid colors) */
+  --chip:#0b1730;
+  --chip-active:#153063;
+}
+
+/* base */
+*{ box-sizing:border-box }
+html,body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family: ui-sans-serif,system-ui,Segoe UI,Roboto,Consolas,monospace;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+/* ===== BACKGROUND LAYERS (FIXED) ===== */
+.bg-wrapper{
+  position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+}
+.bg-layer{ position:absolute; inset:0; will-change:transform, background-position; }
+
+/* L1 — Code syntax */
+.bg-code{
+  background:
+    linear-gradient(180deg, rgba(20,40,80,.35), rgba(10,20,40,.85)),
+    url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560'%3E%3Cstyle%3Etext{font-family:Consolas,monospace;font-size:13px;fill:%239fb1d6;opacity:.12}%3C/style%3E%3Ctext x='40' y='60'%3Efor(i=0;i%3Cn;i++)%7B%3C/text%3E%3Ctext x='50' y='90'%3Esum+=array[i];%3C/text%3E%3Ctext x='40' y='120'%3Eif(limit%3Cval)TRAP;%3C/text%3E%3Ctext x='40' y='150'%3E%7D%3C/text%3E%3Ctext x='40' y='200'%3EFIFO | LRU | CLOCK | OPT%3C/text%3E%3Ctext x='40' y='240'%3Epage-in/out --%3E SSD%3C/text%3E%3C/svg%3E");
+  background-size:auto, 560px;
+  background-repeat:no-repeat, repeat;
+}
+
+/* L2 — Math formulas */
+.bg-math{
+  background:
+    url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640'%3E%3Cstyle%3Etext{font-family:Consolas,monospace;font-size:14px;fill:%23b0c5ff;opacity:.10}%3C/style%3E%3Ctext x='40' y='70'%3EEMAT = h·t1 + (1-h)·(t1+t2)%3C/text%3E%3Ctext x='40' y='120'%3ESpeedup = t2 / EMAT%3C/text%3E%3Ctext x='40' y='170'%3Eif(Logical ≥ Limit) → TRAP!%3C/text%3E%3Ctext x='40' y='210'%3EPhysical = Base + Logical%3C/text%3E%3C/svg%3E");
+  background-size: 560px;
+  background-repeat: repeat;
+  opacity:.85;
+}
+
+/* L3 — Orbs (lighter + fewer paints) */
+.bg-orbs{
+  background:
+    radial-gradient(160px 160px at 22% 30%, rgba(100,150,255,.22), transparent 70%),
+    radial-gradient(200px 200px at 78% 65%, rgba(100,255,180,.16), transparent 70%),
+    radial-gradient(130px 130px at 52% 88%, rgba(255,200,120,.10), transparent 70%);
+  opacity:.9;
+}
+
+/* L4 — gentle scanlines (optional) */
+.bg-scan{
+  background: repeating-linear-gradient(-10deg, rgba(255,255,255,.02) 0 2px, transparent 2px 6px);
+  opacity:.5;
+}
+
+/* === Performance-first animation policy === */
+/* Animations are OFF by default. To enable, add <body class="animate"> */
+.animate .bg-code{ animation: codeDrift 80s linear infinite; }
+.animate .bg-math{ animation: mathFloat 110s linear infinite; }
+.animate .bg-orbs{ animation: orbMove 18s ease-in-out infinite alternate; }
+.animate .bg-scan{ animation: scan 12s linear infinite; }
+
+@keyframes codeDrift{ to{ background-position: -1400px -900px } }
+@keyframes mathFloat{ to{ background-position: 900px 700px } }
+@keyframes orbMove{
+  0%{ transform:translate(0,0) scale(1) }
+  50%{ transform:translate(-8px,6px) scale(1.02) }
+  100%{ transform:translate(6px,-6px) scale(.985) }
+}
+@keyframes scan{ to{ background-position:0 700px } }
+
+/* Respect user “reduce motion” */
+@media (prefers-reduced-motion: reduce){
+  .bg-code,.bg-math,.bg-orbs,.bg-scan{ animation:none !important }
+}
+
+/* Content above BG */
+header, main{ position:relative; z-index:1; }
+
+/* focus ring */
+:where(button,input,select){ outline:none }
+:where(button,input,select):focus-visible{
+  box-shadow:0 0 0 3px #86b7ff33,0 0 0 1.5px #86b7ff inset; border-radius:10px;
+}
+
+/* layout */
+header{
+  padding:22px 16px; border-bottom:1px solid #1b2a45;
+  background:linear-gradient(180deg,#0b162b,#0a1223);
+}
+h1{ margin:0; text-align:center; font-size:28px }
+.container{ max-width:1160px; margin:0 auto; padding:16px 18px }
+
+/* Cards — removed heavy blur, kept depth */
+.card{
+  background: linear-gradient(180deg,#101b33,#0b1426);
+  border:1px solid #243c67;
+  border-radius:14px;
+  padding:16px 20px;
+  box-shadow:var(--shadow);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+/* Optional light blur only on big screens (cheaper) */
+@media (min-width: 1000px){
+  @supports (backdrop-filter: blur(4px)){
+    .card{ backdrop-filter: blur(4px); }
+  }
+}
+.card:hover{ transform:translateY(-2px); box-shadow:0 20px 50px rgba(0,0,0,.45) }
+
+h1,h2,h3{ font-family:"Segoe UI", Roboto, sans-serif; letter-spacing:.4px; color:#f1f7ff }
+p{ color:var(--muted); max-width:680px }
+
+/* Scrollbar */
+::-webkit-scrollbar{ width:10px }
+::-webkit-scrollbar-thumb{ background:#1e355c; border-radius:10px }
+
+/* Grid + form bits (unchanged) */
+.card h2{ margin:6px 0 12px 0; letter-spacing:.2px }
+.grid{ display:grid; gap:14px }
+.row{ display:flex; gap:12px; flex-wrap:wrap } .row>*{ flex:1 1 220px }
+label{ display:block; margin-bottom:6px; font-size:13px; color:var(--muted) }
+input,select,button{ font:inherit }
+
+/* Buttons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 14px; border-radius:12px; border:1px solid var(--brand);
+  background:linear-gradient(180deg,#0f2957,#0a1a35); color:#eaf6ff; font-weight:700;
+  cursor:pointer; transition:.17s ease;
+}
+.btn:hover{ transform:translateY(-1px); box-shadow:0 10px 26px #0006 }
+.legend{ display:flex; gap:10px; flex-wrap:wrap; margin-top:8px }
+.dot{ width:14px; height:14px; border-radius:4px; border:1px solid #0006; display:inline-block }
+.ok{ color:var(--good) } .bad{ color:var(--bad) } .warn{ color:var(--warn) }
+
+/* chips */
+#mem-intro{ padding-top:18px }
+.mem-chips{ display:flex; gap:10px; flex-wrap:wrap; margin:8px 0 12px }
+.mem-chip{
+  border:1px solid var(--brand); background:var(--chip); color:#eaf6ff; cursor:pointer;
+  padding:8px 14px; border-radius:12px; font-weight:700; transition:.15s;
+  box-shadow:0 1px 0 #0008, inset 0 0 0 1px #193260;
+}
+.mem-chip:hover{ background:#10234a }
+.mem-chip.mem-active{ background:var(--chip-active) }
+
+/* memory grid */
+.mem-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px }
+@media (max-width:980px){ .mem-grid{ grid-template-columns:1fr } }
+.mem-hero-right{
+  background:#071427; border:1px solid #233a61; border-radius:14px;
+  padding:18px; display:flex; align-items:center; justify-content:center;
+}
+.mem-svg{ width:100%; height:auto; display:block }
+.mem-info{
+  background:linear-gradient(180deg,#0b162c,#0a1121);
+  border:1px solid #213a66; border-radius:14px; overflow:hidden;
+}
+.mem-info-head{
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 14px;
+  border-bottom:1px solid #1d335a;
+  background:repeating-linear-gradient(135deg,#0a1324 0,#0a1324 10px,#091123 10px,#091123 20px);
+}
+.mem-pill{ border:1px solid #234071; background:#0b1730; color:#cfe3ff; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700 }
+.mem-pill--main{ background:#143063; color:#fff }
+.mem-info-body{ padding:14px 16px }
+.mem-info-body p{ margin:0 0 10px }
+.mem-info-body ul{ margin:0 0 4px 18px }
+
+/* A) exact two-process */
+#aWrap{ display:grid; grid-template-columns:1fr 1fr; gap:18px }
+.aCol{
+  position:relative; border:1px solid #31548e; border-radius:16px; padding:14px;
+  background:linear-gradient(180deg,#0b142b,#0c1630);
+}
+.aHead{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; color:#cfe3ff }
+.aStack{ display:flex; flex-direction:column-reverse; gap:6px }
+.cellA{
+  height:26px; border:1px solid var(--line); border-radius:8px; background:#0e1f3f;
+  display:flex; align-items:center; justify-content:center; color:#cfe3ff; position:relative;
+}
+.addr{ position:absolute; left:8px; top:2px; font-size:10px; color:#8fb1ef }
+.jmp{ outline:2px dashed var(--warn) }
+.tag{
+  position:absolute; left:-74px; top:50%; transform:translateY(-50%);
+  padding:5px 10px; font-size:12px; color:#eaf6ff; white-space:nowrap;
+  background:rgba(20,35,70,.92); border-radius:10px; border:1px solid #345d9c; pointer-events:none;
+}
+.tag.base{ background:rgba(255,227,106,.16); border-color:#6b5a1a }
+.tag.limit{ background:rgba(255,77,77,.16); border-color:#7a2a2a }
+.tag::after{
+  content:""; position:absolute; right:-8px; top:50%; transform:translateY(-50%);
+  border-top:7px solid transparent; border-bottom:7px solid transparent; border-left:8px solid rgba(20,35,70,.92);
+}
+.note{ margin-top:8px; color:var(--muted) }
+
+/* B) FIFO */
+.grid-3{ grid-template-columns:1.05fr .9fr 1.05fr }
+@media (max-width:980px){ .grid-3{ grid-template-columns:1fr } }
+.segmented{ display:inline-flex; border:1px solid var(--brand); border-radius:12px; overflow:hidden }
+.segmented .segBtn{
+  border:0; background:linear-gradient(180deg,#0f2957,#0a1a35);
+  color:#cfe3ff; padding:8px 14px; font-weight:700; cursor:pointer; transition:.15s;
+}
+.segmented .segBtn + .segBtn{ border-left:1px solid var(--brand) }
+.segmented .segBtn:hover{ background:#123167 }
+.segmented .segBtn.active{ background:#1a2f59; color:#fff; box-shadow:inset 0 0 0 1px #2b5293 }
+
+#logB{
+  height:220px; overflow:auto; background:#0a1426; border:1px solid #274274; border-radius:12px;
+  padding:10px; font-family:ui-monospace,Consolas,monospace;
+}
+
+.matrixWrap{ margin-top:10px }
+.matrix{
+  width:100%; border-collapse:separate; border-spacing:0; background:#0b152a;
+  border:1px solid #2b4c82; border-radius:12px; overflow:hidden;
+}
+.matrix thead th{
+  position:sticky; top:0; z-index:1; padding:8px 10px; background:#0f1e3a;
+  border-bottom:1px solid #234071; text-align:center; font-weight:700; color:#eaf3ff;
+}
+.matrix td{ padding:9px 10px; text-align:center; border-right:1px solid #234071; color:#d8e8ff }
+.matrix tr:nth-child(odd) td{ background:#0b1730 }
+.matrix td:last-child,.matrix th:last-child{ border-right:none }
+.tag-trap{ color:var(--bad); font-weight:700 }
+.tag-ok{ color:var(--good); font-weight:700 }
+
+#ramWrapB{
+  position:relative; height:480px; background:linear-gradient(180deg,#0b142b,#0c1630);
+  border:1px solid #31548e; border-radius:16px; padding:16px 16px 16px 88px;
+  box-shadow:inset 0 0 40px rgba(0,0,0,.35),0 0 0 1px #213a66; overflow:auto;
+}
+#ramGridB{ position:relative; z-index:1; display:flex; flex-direction:column-reverse; gap:6px }
+.cellB{
+  position:relative; height:24px; border:1px solid var(--line); border-radius:8px; background:#0e1f3f;
+  color:#cfe3ff; display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+}
+.cellB.fill{ box-shadow:inset 0 0 0 2px rgba(0,0,0,.15) }
+.tagB{
+  position:absolute; top:50%; transform:translateY(-50%); left:-72px; padding:6px 10px; font-size:12px;
+  color:#eaf6ff; background:#152346cc; border:1px solid #345d9c; border-radius:10px; white-space:nowrap; pointer-events:none;
+}
+.tagB.base{ background:rgba(255,227,106,.16) } .tagB.limit{ background:rgba(255,77,77,.16) }
+
+#ramWrapB::-webkit-scrollbar,#logB::-webkit-scrollbar{ height:10px; width:10px }
+#ramWrapB::-webkit-scrollbar-thumb,#logB::-webkit-scrollbar-thumb{
+  background:#1e355c; border-radius:10px; border:2px solid #0b1426;
+}
+
+/* EMAT bars */
+.emat-bar{ height:18px; border-radius:999px; background:#0b1730; border:1px solid #2b4c82; overflow:hidden }
+.emat-hit{ display:inline-block; height:100%; background:rgba(46,125,255,.33) }
+.emat-miss{ display:inline-block; height:100%; background:rgba(255,138,122,.33); border-left:1px solid #1a2a44 }
+#eqText b{ color:#78ef97 }
+
+/* Inputs (dark, rounded) */
+:where(input[type="text"], input[type="number"], select){
+  background:#0b1730; color:var(--text); border:1px solid #294a84; border-radius:12px;
+  padding:10px 12px; min-width:140px; line-height:1.2;
+  box-shadow:inset 0 0 0 1px #0a162c, 0 2px 10px rgba(0,0,0,.25);
+  transition:border-color .2s, box-shadow .2s, background .2s, transform .08s;
+}
+:where(input[type="text"], input[type="number"], select):hover{
+  border-color:#3566bd; background:#0d1f3e;
+}
+:where(input[type="text"], input[type="number"], select):focus-visible{
+  outline:none; border-color:#3a7aff;
+  box-shadow:0 0 0 3px #132646, 0 0 0 5px rgba(90,170,255,.35), inset 0 0 0 1px #1c2f55;
+  transform:translateY(-1px);
+}
+:where(input[type="text"], input[type="number"], select):disabled{ opacity:.6; cursor:not-allowed }
+::placeholder{ color:#b5c7ea; opacity:.7 }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0 }
+input[type="number"]{ appearance:textfield }
+
+/* Range slider */
+input[type="range"]{ appearance:none; -webkit-appearance:none; width:100%; background:transparent; height:26px; cursor:pointer }
+input[type="range"]::-webkit-slider-runnable-track{
+  height:8px; border-radius:999px;
+  background:linear-gradient(90deg, rgba(46,125,255,.33), rgba(71,255,168,.33));
+  border:1px solid #294a84; box-shadow:inset 0 0 0 1px #0a162c;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none; margin-top:-6px; height:20px; width:20px; border-radius:50%;
+  background:linear-gradient(180deg,#4d7dff,#47ffa8);
+  border:2px solid #0d1c34; box-shadow:0 2px 8px rgba(0,0,0,.45);
+  transition:transform .08s;
+}
+input[type="range"]:active::-webkit-slider-thumb{ transform:scale(1.03) }
+input[type="range"]:focus-visible::-webkit-slider-thumb{
+  box-shadow:0 0 0 3px #132646, 0 0 0 5px rgba(90,170,255,.35);
+}
+/* Firefox */
+input[type="range"]::-moz-range-track{
+  height:8px; border-radius:999px;
+  background:linear-gradient(90deg, rgba(46,125,255,.33), rgba(71,255,168,.33));
+  border:1px solid #294a84;
+}
+input[type="range"]::-moz-range-thumb{
+  height:20px; width:20px; border-radius:50%;
+  border:2px solid #0d1c34;
+  background:linear-gradient(180deg,#4d7dff,#47ffa8);
+  box-shadow:0 2px 8px rgba(0,0,0,.45);
+}
+
+/* small polish around inputs in layout */
+.row>div>label{ font-weight:600; letter-spacing:.2px }
+.row>div>input{ max-width:100% }
+.matrixHead input{ width:100%; max-width:160px }
+</style>
+</head>
+<body class="animate">
+  <!-- ===== BACKGROUND WRAPPER ===== -->
+<div class="bg-wrapper">
+  <div class="bg-layer bg-orbs"></div>
+  <div class="bg-layer bg-code"></div>
+  <div class="bg-layer bg-math"></div>
+  <div class="bg-layer bg-scan"></div>
+</div>
+
+<header><h1><b>Санах ой — Танилцуулга + Base/Limit (A) + FIFO (B) + Swapping (3a/3b) + EMAT (4)</b></h1></header>
+
+<a href="slide.html" style="position:absolute;top:18px;right:18px;
+  background:#0b1730;color:#cfe3ff;padding:8px 12px;border-radius:12px;
+  text-decoration:none;font-size:13px;box-shadow:0 2px 6px #0008;z-index:9">slide руу</a>
+<a href="index.html" style="position:absolute;top:10px;right:238px;  
+  background:#0b1730;color:#cfe3ff;padding:8px 12px;border-radius:12px;
+  text-decoration:none;font-size:13px;box-shadow:0 2px 6px #0008">Index руу</a>
+<a href="point.html" style="position:absolute;top:10px;right:318px;  
+  background:#0b1730;color:#cfe3ff;padding:8px 12px;border-radius:12px;
+  text-decoration:none;font-size:13px;box-shadow:0 2px 6px #0008">Point руу</a>
+
+<main class="container">
+
+  <!-- ===================== 1) Санах ой гэж юу вэ? ===================== -->
+<section id="mem-intro" class="card">
+  <h2>1) Санах ой гэж юу вэ?</h2>
+  <p style="color:var(--muted);margin:6px 0 14px">
+    CPU-д өгөгдөл хүргэх шаталсан тогтолцоо. Дараах гурван түвшин хамгийн үндсэн нь:
+  </p>
+
+  <div class="mem-chips">
+    <button class="mem-chip mem-active" data-tab="ram">Primary (RAM)</button>
+    <button class="mem-chip" data-tab="cache">Cache</button>
+    <button class="mem-chip" data-tab="sec">Secondary</button>
+  </div>
+
+  <div class="mem-grid">
+    <!-- ===== Improved SVG with animations ===== -->
+    <div class="mem-hero-right">
+      <svg class="mem-svg" viewBox="0 0 520 270" role="img" aria-label="Memory hierarchy animated">
+        <defs>
+          <linearGradient id="mh_g1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#66e3ff"/><stop offset="100%" stop-color="#47ffa8"/>
+          </linearGradient>
+          <linearGradient id="mh_g2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4d7dff"/><stop offset="100%" stop-color="#9c8cff"/>
+          </linearGradient>
+          <linearGradient id="mh_g3" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#e3c770"/><stop offset="100%" stop-color="#cf8f4a"/>
+          </linearGradient>
+          <filter id="mh_glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <marker id="mh_arrow" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#8ad2ff"/>
+          </marker>
+          <style>
+            .march{stroke-dasharray:7 9; animation:march 9s linear infinite}
+            @keyframes march{to{stroke-dashoffset:-360}}
+            .pulse{animation:pulse 2.2s ease-in-out infinite}
+            @keyframes pulse{0%,100%{opacity:.9}50%{opacity:1}}
+          </style>
+        </defs>
+
+        <!-- CPU -->
+        <g transform="translate(30,24)">
+          <rect x="0" y="0" rx="14" ry="14" width="110" height="60" fill="url(#mh_g1)" filter="url(#mh_glow)"/>
+          <text x="55" y="38" text-anchor="middle" font-size="14" fill="#0b1220" font-weight="800">CPU</text>
+          <title>CPU — команд/өгөгдөл руу хамгийн ойр</title>
+        </g>
+
+        <!-- Cache / RAM / Secondary -->
+        <g>
+          <rect x="190" y="30" rx="12" ry="12" width="160" height="40" fill="url(#mh_g2)"/>
+          <text x="270" y="54" text-anchor="middle" font-size="13" fill="#0b1220" font-weight="800">Cache</text>
+          <text x="270" y="69" text-anchor="middle" font-size="10" fill="#0b1220">~1–10ns</text>
+          <title>Cache — хамгийн хурдан, хамгийн жижиг</title>
+        </g>
+
+        <g>
+          <rect x="170" y="102" rx="12" ry="12" width="200" height="60" fill="url(#mh_g1)"/>
+          <text x="270" y="135" text-anchor="middle" font-size="13" fill="#0b1220" font-weight="800">Primary (RAM)</text>
+          <text x="270" y="150" text-anchor="middle" font-size="10" fill="#0b1220">~60–100ns</text>
+          <title>RAM — ажиллаж буй програм/өгөгдөл байрлана</title>
+        </g>
+
+        <g>
+          <rect x="120" y="205" rx="12" ry="12" width="300" height="40" fill="url(#mh_g3)"/>
+          <text x="270" y="230" text-anchor="middle" font-size="13" fill="#0b1220" font-weight="800">Secondary (SSD/HDD)</text>
+          <text x="270" y="244" text-anchor="middle" font-size="10" fill="#0b1220">μs–ms</text>
+          <title>SSD/HDD — байнгын хадгалалт, удаан хэдий ч том</title>
+        </g>
+
+        <!-- Connections (marching dashed) -->
+        <g stroke="#88d6ff" stroke-width="2" fill="none">
+          <path class="march" d="M140,54 L190,50" marker-end="url(#mh_arrow)"/>
+          <path class="march" d="M270,72 L270,102" marker-end="url(#mh_arrow)"/>
+          <path class="march" d="M270,162 L270,205" marker-end="url(#mh_arrow)"/>
+        </g>
+
+        <!-- Moving particles: hit / miss / page-in -->
+        <!-- Cache hit: short loop CPU↔Cache -->
+        <circle r="6" fill="#5aa8ff" class="pulse">
+          <animateMotion dur="2.2s" repeatCount="indefinite"
+            path="M 85,54 L 190,50 L 85,54 Z"/>
+          <title>Cache hit — өгөгдөл кэшэд байв</title>
+        </circle>
+
+        <!-- Cache miss (RAM хүртэл): CPU→Cache→RAM→CPU -->
+        <circle r="6" fill="#47ffa8">
+          <animateMotion dur="4.6s" begin="0.4s" repeatCount="indefinite"
+            path="M 85,54 L 190,50 L 270,132 L 85,54 Z"/>
+          <title>Cache miss — RAM-аас дуудаж кэшлэнэ</title>
+        </circle>
+
+        <!-- Page-in (RAM-д байхгүй тохиолдол): CPU→…→SSD→RAM→CPU -->
+        <circle r="6" fill="#ffd166">
+          <animateMotion dur="6.2s" begin="1.0s" repeatCount="indefinite"
+            path="M 85,54 L 190,50 L 270,132 L 270,225 L 270,132 L 85,54 Z"/>
+          <title>Page-in — дискнээс RAM руу ачаалахад хамгийн удаан</title>
+        </circle>
+
+        <!-- Legend -->
+        <g transform="translate(370,20)">
+          <rect x="0" y="0" rx="8" ry="8" width="130" height="68" fill="#0b1730" stroke="#2b4c82"/>
+          <g transform="translate(10,12)" font-size="11" font-weight="700">
+            <circle cx="8" cy="6" r="5" fill="#5aa8ff"/><text x="20" y="10" fill="#cfe3ff">Hit (кэш)</text>
+            <circle cx="8" cy="24" r="5" fill="#47ffa8"/><text x="20" y="28" fill="#cfe3ff">Miss → RAM</text>
+            <circle cx="8" cy="42" r="5" fill="#ffd166"/><text x="20" y="46" fill="#cfe3ff">Page-in → SSD</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Right panel stays dynamic via your memData JS -->
+    <div class="mem-info">
+      <div class="mem-info-head" id="mem-head">
+        <span class="mem-pill mem-pill--main">Primary (RAM)</span>
+        <span class="mem-pill">Latency: ~60–100ns</span>
+        <span class="mem-pill">Volatile</span>
+      </div>
+      <div class="mem-info-body" id="mem-body">
+        <p>
+          CPU-д ажиллах өгөгдөл, програм шууд RAM дээр байрлана. Цахилгаан унтарвал алга болдог (volatile).
+          Хэмжээ их, кэшээс удаан ч дискнээс хэдэн зуун дахин хурдан.
+        </p>
+        <ul>
+          <li>CPU өгөгдлийг RAM-аас авч эсвэл шинэчилж хадгална</li>
+          <li>Олон програмыг зэрэг хадгалж, ажиллуулна</li>
+          <li>Зүйрлэл: “далд ухамсар”</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- ===================== 2.А) EXACT two-process ===================== -->
+  <section class="card" id="sectionA">
+    <h2>2.А) Санах ойд 2 процесс — Base/Limit-ээр <i>яг зурагтай адил</i> байрлуулах</h2>
+    <div class="row">
+      <button class="btn" id="btnShowA">Байрлалыг харуулах</button>
+      <button class="btn" id="btnResetA">Reset (A)</button>
+    </div>
+
+    <div id="aWrap">
+      <div class="aCol" id="colA">
+        <div class="aHead"><b>Процесс A</b><span>base=<b>0</b>, limit=<b>32</b></span></div>
+        <div class="aStack" id="stackA"></div>
+        <div class="note" id="noteA"></div>
+      </div>
+
+      <div class="aCol" id="colB">
+        <div class="aHead"><b>Процесс B</b><span>base=<b>500</b>, limit=<b>32</b></span></div>
+        <div class="aStack" id="stackB"></div>
+        <div class="note" id="noteB"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 2.Б) FIFO simulator ===================== -->
+  <section class="card" id="sectionB">
+    <h2>2.B) N процесс — Contiguous + FIFO (preview-first)</h2>
+
+    <div class="row">
+      <div><label>RAM хэмжээ (K)</label><input id="ramSizeB" type="number" value="16" min="4"></div>
+      <div><label>Блокын хэмжээ (K/нэгж)</label><input id="blockSizeB" type="number" value="1" min="1"></div>
+    </div>
+    <div class="row">
+      <div><label>Процессууд (нэр:K — дарааллаар)</label><input id="procListB" type="text" value="A:6,B:4,C:5,A:6,B:4,C:5"></div>
+      <div>
+        <label>Хурдасгал</label>
+        <div class="segmented" id="speedGroup">
+          <button type="button" class="segBtn" data-speed="low">Low</button>
+          <button type="button" class="segBtn active" data-speed="med">Medium</button>
+          <button type="button" class="segBtn" data-speed="high">High</button>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Low = удаан, High = хурдан</div>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn" id="btnBuildB">RAM бэлдэх (B)</button>
+      <button class="btn" id="btnStepB" disabled>Алхам</button>
+      <button class="btn" id="btnPlayB" disabled>Ажиллуулах</button>
+      <button class="btn" id="btnResetB">Reset</button>
+    </div>
+
+    <div class="grid grid-3">
+      <div>
+        <h3>Base/Limit калькулятор</h3>
+        <div class="matrixWrap">
+          <div class="matrixHead">
+            <label for="logicalAll">Logical (addr) — бүх баганад ижил L:</label>
+            <input id="logicalAll" type="number" value="0" min="0" style="max-width:160px">
+          </div>
+          <table class="matrix" id="matrixCalc"></table>
+          <div style="margin-top:6px;font-family:ui-monospace,Consolas,monospace;color:var(--muted)">
+            physical = base + logical, харин <b>logical ≥ limit</b> бол <i>TRAP</i>.
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div id="ramWrapB" style="margin-top: 70px;">
+          <div id="ramGridB"></div>
+          <div id="tagBaseB"  class="tagB base"  style="display:none"></div>
+          <div id="tagLimitB" class="tagB limit" style="display:none"></div>
+        </div>
+        <div class="legend">
+          <span class="dot" style="background:#2e7dff"></span> A
+          <span class="dot" style="background:#c58cff"></span> B
+          <span class="dot" style="background:#49e3b3"></span> C
+          <span class="dot" style="background:#ffd166"></span> D
+          <span class="dot" style="background:#ff7043"></span> E
+        </div>
+      </div>
+
+      <div>
+        <h3>Лог (B)</h3>
+        <div id="logB"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 3) Swapping ба 7K сценари ===================== -->
+  <section class="card" id="section3">
+    <h2>3.А) Солилцоо (Swapping)</h2>
+
+    <div class="mem-info" style="margin-top:10px">
+      <div class="mem-info-head">
+        <span class="mem-pill mem-pill--main">Swapping</span>
+        <span class="mem-pill">Нэгж: бүхэл процесс</span>
+        <span class="mem-pill">Бодлого: FIFO (жишээ)</span>
+      </div>
+      <div class="mem-info-body">
+        <div class="grid" style="grid-template-columns:1.15fr .85fr;gap:14px;align-items:center">
+          <!-- Тайлбар (зүүн тал) -->
+          <div>
+            <p>
+              RAM дээр тасралтгүй сул зай олдохгүй үед <b>бүхэл процессыг</b>
+              хоёрдогч хадгалалт (SSD/HDD) руу <i>swap-out</i> хийж зай гаргаад,
+              шинээр ирж буй процессыг RAM-д байрлуулна. Дараа нь тэр процесс дахин хэрэгтэй
+              бол <i>swap-in</i> хийж буцаан ачаална.
+            </p>
+            <ul>
+              <li><b>Хэзээ?</b> Contiguous (тасралтгүй) хуваарилалтад шинэ процессыг багтаах хэмжээний <u>тасралтгүй блок</u> олдохгүй үед.</li>
+              <li><b>Яаж?</b> Сонгосон бодлогоор (FIFO, LRU, …) RAM-аас түр гаргах процессыг тодорхойлоод → түүнийг <i>swap-out</i> → шинэ процессыг байрлуулна → тухайн процессыг дахин ажиллуулах үед <i>swap-in</i> хийнэ.</li>
+              <li><b>Зардал?</b> Диск⇄RAM шилжилт <i>удаан</i> (μs–ms). Давтамж ихдвэл <b>thrashing</b> үүсч гүйцэтгэл огцом муудна.</li>
+              <li><b>Ялгаа:</b> <b>Swapping</b> = <u>бүхэл процесс</u> шилжинэ; <b>Paging</b> = процессын <u>хуудсууд</u> тус тусдаа шилжинэ.</li>
+            </ul>
+          </div>
+
+          <!-- Диаграм (баруун тал) -->
+          <div class="mem-hero-right" aria-label="Swapping illustration" style="padding:14px">
+            <svg class="mem-svg" viewBox="0 0 520 260" role="img">
+              <defs>
+                <linearGradient id="gRAMs" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#66e3ff"/>
+                  <stop offset="100%" stop-color="#47ffa8"/>
+                </linearGradient>
+                <linearGradient id="gDISKs" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#e3c770"/>
+                  <stop offset="100%" stop-color="#cf8f4a"/>
+                </linearGradient>
+                <linearGradient id="gPROC" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#4d7dff"/>
+                  <stop offset="100%" stop-color="#9c8cff"/>
+                </linearGradient>
+                <filter id="glows" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="6" result="b"/>
+                  <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+                <marker id="arrowDown" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto">
+                  <path d="M0,0 L10,5 L0,10 z" fill="#ff8a7a"/>
+                </marker>
+                <marker id="arrowUp" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto">
+                  <path d="M0,10 L10,5 L0,0 z" fill="#78ef97"/>
+                </marker>
+                <pattern id="frag" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+                  <rect width="6" height="6" fill="#0e1f3f"/>
+                  <path d="M0 0 L0 6" stroke="#244472" stroke-width="2"/>
+                </pattern>
+              </defs>
+
+              <!-- RAM pill label (centered, separate from container) -->
+              <g transform="translate(260,28)">
+                <rect x="-100" y="-12" rx="12" ry="12" width="200" height="32"
+                      fill="#0b1730" stroke="#2b4c82"/>
+                <text x="0" y="8" text-anchor="middle" font-size="14"
+                      fill="#eaf6ff" font-weight="800">RAM (Primary)</text>
+              </g>
+
+              <!-- RAM container -->
+              <rect x="60" y="56" rx="16" ry="16" width="400" height="68"
+                    fill="url(#gRAMs)" filter="url(#glows)"/>
+
+              <!-- RAM slots: victim, fragmentation, free -->
+              <rect x="78"  y="66" width="92" height="48" rx="8" ry="8"
+                    fill="url(#gPROC)" stroke="#233a61"/>
+              <text x="124" y="95" text-anchor="middle" font-size="12"
+                    fill="#0b1220" font-weight="800">Victim</text>
+
+              <rect x="176" y="66" width="80" height="48" rx="8" ry="8"
+                    fill="url(#frag)" stroke="#244472"/>
+              <rect x="262" y="66" width="80" height="48" rx="8" ry="8"
+                    fill="url(#frag)" stroke="#244472"/>
+
+              <rect x="348" y="66" width="96" height="48" rx="10" ry="10"
+                    fill="#49e3b355" stroke="#233a61"/>
+              <text x="396" y="95" text-anchor="middle" font-size="11"
+                    fill="#0b1220" font-weight="700">Free</text>
+
+              <!-- Secondary (SSD/HDD) -->
+              <rect x="90" y="180" rx="16" ry="16" width="340" height="54"
+                    fill="url(#gDISKs)"/>
+              <text x="260" y="210" text-anchor="middle" font-size="15"
+                    fill="#0b1220" font-weight="800">Secondary (SSD / HDD)</text>
+
+              <!-- swap-out (left) -->
+              <line x1="124" y1="114" x2="124" y2="168" stroke="#ff8a7a" stroke-width="5"
+                    marker-end="url(#arrowDown)"/>
+              <text x="156" y="162" font-size="13" fill="#ff8a7a" font-weight="800">swap-out</text>
+
+              <!-- swap-in (right) -->
+              <line x1="396" y1="176" x2="396" y2="118" stroke="#78ef97" stroke-width="5"
+                    marker-end="url(#arrowUp)"/>
+              <text x="418" y="162" font-size="13" fill="#78ef97" font-weight="800">swap-in</text>
+
+              <!-- fragmentation caption (moved below, no overlap with arrows) -->
+              <text x="260" y="142" text-anchor="middle" font-size="10"
+                    fill="#9fb1d6">Тасралтгүй блокоор багтахгүй (fragmentation)</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="margin-top:18px">3.Б) 7K RAM — 3 процесс (A=4K ×3, B=2K ×4, C=3K ×2) — FIFO</h2>
+    <p class="warn" style="color:var(--muted)">
+      Шаардлага: RAM=7K, блок=1K. Дараалал (нийт давталт): <b>A:4,B:2,C:3,A:4,B:2,C:3,A:4,B:2,B:2</b>.
+    </p>
+    <div class="row">
+      <button class="btn" id="btnScenarioRun">3.б-ийн сценари — 1 удаа</button>
+      <button class="btn" id="btnScenarioReset">Сценарийн Reset</button>
+    </div>
+
+    <div style="margin-top:10px;border:1px dashed #2b4c82;border-radius:12px;padding:10px">
+      <b>Тайлбарын хүснэгт:</b>
+      <table class="matrix" style="margin-top:8px">
+        <thead><tr><th>Процесс</th><th>Хэмжээ</th><th>Давталт</th></tr></thead>
+        <tbody>
+          <tr><td>A</td><td>4K</td><td>3 удаа</td></tr>
+          <tr><td>B</td><td>2K</td><td>4 удаа</td></tr>
+          <tr><td>C</td><td>3K</td><td>2 удаа</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== 4) EMAT — Нэг түвшний кэшийн үр дүнтэй хугацаа ===================== -->
+  <section class="card" id="section4">
+    <h2>4) EMAT — Нэг түвшний кэшийн үр дүнтэй хандалтын хугацаа</h2>
+
+    <div class="row">
+      <div>
+        <label>Кэшид хандах хугацаа t<sub>cache</sub> (ns)</label>
+        <input id="tc" type="number" min="0" value="10">
+      </div>
+      <div>
+        <label>Санах ойд хандах хугацаа t<sub>mem</sub> (ns)</label>
+        <input id="tm" type="number" min="0" value="200">
+      </div>
+      <div>
+        <label>Hit rate: <span id="hShow">70</span>%</label>
+        <input id="h" type="range" min="0" max="100" value="70">
+      </div>
+      <div style="align-self:flex-end">
+        <button class="btn" id="btnSample">Жишээгээр бөглөх</button>
+      </div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:1fr .95fr; margin-top:14px; gap:18px">
+      <div class="mem-info">
+        <div class="mem-info-head">
+          <span class="mem-pill mem-pill--main">EMAT</span>
+          <span class="mem-pill">Нэг түвшин</span>
+        </div>
+        <div class="mem-info-body">
+          <p id="eqText" style="margin-bottom:8px"></p>
+          <div class="row">
+            <div>
+              <label>Дундаж EMAT</label>
+              <div style="font-size:28px;font-weight:800"><span id="ematVal">—</span> ns</div>
+            </div>
+            <div>
+              <label>Кэш байгаа үед дундаж хандалт кэшгүй байснаасаа</label>
+              <div style="font-size:22px;font-weight:700"><span id="speedup">—</span> дахин хурдан ажиллаж байна.</div>
+            </div>
+          </div>
+          <div class="emat-bar" style="margin-top:12px">
+            <span id="barHit" class="emat-hit" title="Hit contribution"></span>
+            <span id="barMiss" class="emat-miss" title="Miss contribution"></span>
+          </div>
+          <div class="legend" style="margin-top:6px">
+            <span class="dot" style="background:#2e7dff55"></span> Hit хувь нэмэр = <span id="hitPart">—</span> ns
+            <span class="dot" style="background:#ff8a7a55"></span> Miss хувь нэмэр = <span id="missPart">—</span> ns
+          </div>
+        </div>
+      </div>
+
+      <div class="mem-info">
+        <div class="mem-info-head">
+          <span class="mem-pill">Томьёоны сануулга</span>
+        </div>
+        <div class="mem-info-body">
+          <ul>
+            <li><b>EMAT</b> = h·t<sub>cache</sub> + (1 − h)·(t<sub>cache</sub> + t<sub>mem</sub>)</li>
+            <li>Ажиллах зарчим: <i>Hit</i> үед зөвхөн кэш (<code>t_cache</code>), <i>Miss</i> үед кэш + үндсэн ой (<code>t_cache + t_mem</code>).</li>
+            <li>Жишээ (h = 70%, t<sub>cache</sub> = 10&nbsp;ns, t<sub>mem</sub> = 200&nbsp;ns): EMAT = 0.7&nbsp;·&nbsp;10 + 0.3&nbsp;·&nbsp;(10 + 200) = <b>70&nbsp;ns</b>.</li>
+            <li><b>Speedup</b> (vs. t<sub>mem</sub>) = t<sub>mem</sub> / EMAT — кэшгүй (main memory (RAM/DRAM)) хувилбартай харьцуулсан хурд.</li>
+            <li>Кэш бодитоор ашигтай байх доод нөхцөл: h &gt; t<sub>cache</sub> / t<sub>mem</sub>. Манай жишээнд 10/200 = <b>5%</b> ⇒ h &gt; 5% байхад л ашигтай.</li>
+            <li><b>1 second</b> = 1,000,000,000 nanoseconds (ns) = 10<sup>9</sup>&nbsp;ns = 1,000,000,000,000 picoseconds (ps) = 10<sup>12</sup>&nbsp;ps.</li>
+            <li><b>1 ns</b> = 10<sup>&minus;9</sup>&nbsp;seconds (s) = 0.001&nbsp;microseconds (&micro;s) = 1,000&nbsp;ps.</li>
+            <li><b>1 ps</b> = 10<sup>&minus;12</sup>&nbsp;seconds (s) = 0.001&nbsp;ns = 1,000&nbsp;femtoseconds (fs).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ===== 1: таб агуулга ===== */
+const memData = {
+  ram: { head:['Primary (RAM)','Latency: ~60–100ns','Volatile'], body: `
+    <p>CPU-д ажиллах өгөгдөл, програм шууд RAM дээр байрлана. Цахилгаан унтарвал
+    алга болдог (volatile). Хэмжээ их, кэшээс удаан ч дискоос хэдэн зуун дахин хурдан.</p>
+    <ul><li>CPU өгөгдлийг RAM-аас авцгааж эсвэл шинээр хадгална</li>
+    <li>Олон програмыг зэрэг хадгалж, ажиллуулна</li>
+    <li>Зүйрлэл: “далд ухамсар”</li></ul>` },
+  cache: { head:['Cache','Latency: ~1–10ns','Very small'], body: `
+    <p>CPU ба RAM хооронд түр зуур хадгалдаг жижиг, маш хурдан санах ой.
+       Ойрын үед дахин хэрэглэх магадлалтай өгөгдлийг барьж,
+       <strong>hit</strong> өсгөж, дундаж хандалтын хугацааг бууруулдаг.</p>
+    <ul><li>L1/L2/L3 шаталсан</li><li>LRU, FIFO гэх дүрмүүд</li><li>Зүйрлэл: “халаасны дурсамж”</li></ul>` },
+  sec: { head:['Secondary (SSD/HDD)','Latency: μs–ms','Persistent'], body: `
+    <p>SSD/HDD нь байнгын хадгалалт бөгөөд багтаамж ихтэй ч RAM-аас удаан.
+       Файлын системээр дамжин RAM руу ачаалсны дараа CPU ашиглана.</p>
+    <ul><li>Дараалсан/санамсаргүй хандалт</li>
+    <li>RAM хүрэлцэхгүй үед paging, swapping</li>
+    <li>Зүйрлэл: “архив”</li></ul>` }
+};
+document.querySelectorAll('#mem-intro .mem-chip').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#mem-intro .mem-chip').forEach(b=>b.classList.toggle('mem-active', b===btn));
+    const d = memData[btn.dataset.tab];
+    document.getElementById('mem-head').innerHTML =
+      `<span class="mem-pill mem-pill--main">${d.head[0]}</span>
+       <span class="mem-pill">${d.head[1]}</span>
+       <span class="mem-pill">${d.head[2]}</span>`;
+    document.getElementById('mem-body').innerHTML = d.body;
+  });
+});
+
+/* ===== 2.А: exact two-process (PATCHED, robust) ===== */
+(function(){
+  const stackAEl = document.getElementById('stackA');
+  const stackBEl = document.getElementById('stackB');
+  const noteAEl  = document.getElementById('noteA');
+  const noteBEl  = document.getElementById('noteB');
+  const btnShowA = document.getElementById('btnShowA');
+
+  function buildCol(targetEl, base, limit, jmp){
+    if(!targetEl) return;
+    targetEl.innerHTML = '';
+    const step = 4;
+    const cells = Math.max(0, (limit|0) / step|0);
+    for(let i=0;i<cells;i++){
+      const L = i*step;
+      const d = document.createElement('div');
+      d.className = 'cellA';
+      d.innerHTML = `<span class="addr">${L}</span>${L}`;
+      if(L === jmp) d.classList.add('jmp');
+      targetEl.appendChild(d);
+    }
+    const nodes = targetEl.querySelectorAll('.cellA');
+    if(nodes.length){
+      const b=document.createElement('div'); b.className='tag base';  b.textContent=`base → ${base}`;  nodes[0].appendChild(b);
+      const l=document.createElement('div'); l.className='tag limit'; l.textContent=`limit → ${limit}`; nodes[nodes.length-1].appendChild(l);
+    }
+  }
+
+  window.showA = function(){
+    buildCol(stackAEl, 0,   32, 24);
+    if(noteAEl) noteAEl.innerHTML = `JMP 24 ⇒ physical = 0 + 24 = <b>24</b>. <span class="ok">✓</span>`;
+    buildCol(stackBEl, 500, 32, 28);
+    if(noteBEl) noteBEl.innerHTML = `JMP 28 ⇒ physical = 500 + 28 = <b>528</b>. <span class="ok">✓</span>`;
+  };
+
+  window.resetA = function(){
+    if(stackAEl) stackAEl.innerHTML = '';
+    if(stackBEl) stackBEl.innerHTML = '';
+    if(noteAEl)  noteAEl.textContent = '';
+    if(noteBEl)  noteBEl.textContent = '';
+  };
+
+  btnShowA?.addEventListener('click', window.showA);
+})();
+
+/* ===== 2.Б: FIFO simulator ===== */
+const q=s=>document.querySelector(s), qa=s=>Array.from(document.querySelectorAll(s));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const logTo=(msg,cls='')=>{const el=q('#logB'); const p=document.createElement('div'); p.textContent=msg; p.className=cls; el.appendChild(p); el.scrollTop=el.scrollHeight;};
+
+const SPEED={low:{preview:520,batch:240,between:140},med:{preview:220,batch:110,between:80},high:{preview:60,batch:30,between:30}};
+let speedMode='med';
+function setSpeed(mode){speedMode=mode; qa('#speedGroup .segBtn').forEach(b=>b.classList.toggle('active',b.dataset.speed===mode));}
+qa('#speedGroup .segBtn').forEach(b=>b.addEventListener('click',()=>setSpeed(b.dataset.speed)));
+
+const getCellB=i=>document.querySelector(`#ramGridB .cellB[data-addr="${i}"]`);
+function buildGrid(cells=16){ const g=q('#ramGridB'); g.innerHTML=''; for(let i=0;i<cells;i++){ const d=document.createElement('div'); d.className='cellB'; d.dataset.addr=i; d.textContent=i; g.appendChild(d);} }
+
+let stateB=null, busy=false, runStamp=0; const bumpRun=()=>{runStamp++;return runStamp;};
+function hideTags(){q('#tagBaseB').style.display='none'; q('#tagLimitB').style.display='none';}
+function freeMap(){ const used=new Array(stateB.cells).fill(false); for(const p of stateB.placed){ for(let i=p.start;i<p.start+p.lenCells;i++) used[i]=true; } return used; }
+function findContiguous(len){ const used=freeMap(); let run=0,start=-1; for(let i=0;i<used.length;i++){ if(!used[i]){ if(run===0) start=i; run++; if(run===len) return start; } else { run=0; start=-1; } } return -1; }
+function hardResetToInitial(){ stateB=null; q('#ramGridB').innerHTML=''; q('#logB').innerHTML=''; q('#ramWrapB').scrollTop=0; q('#btnStepB').disabled=true; q('#btnPlayB').disabled=true; }
+
+function attachTags(start,len){
+  const baseCell=getCellB(start), limitCell=getCellB(start+len-1);
+  if(!baseCell||!limitCell){hideTags();return;}
+  const b=q('#tagBaseB'), l=q('#tagLimitB');
+  b.textContent=`base → ${start}`; l.textContent=`limit → ${len}`;
+  b.style.display='block'; l.style.display='block';
+  baseCell.appendChild(b); limitCell.appendChild(l);
+}
+function previewNextB(){
+  const my=runStamp;
+  if(!stateB||stateB.idx>=stateB.procs.length){ hideTags(); logTo('Дууслаа.','ok'); if(my!==runStamp) return; stateB.halted=true; return; }
+  const cur=stateB.procs[stateB.idx];
+  const len=Math.ceil(cur.k/stateB.allocQ)*stateB.allocQ;
+  const start=findContiguous(len);
+  if(my!==runStamp) return;
+  if(start===-1){ hideTags(); logTo(`Preview ${cur.name}: зай алга — FIFO шаардлагатай.`,'warn'); return; }
+  attachTags(start,len); logTo(`Preview: ${cur.name} (Base=${start}, Limit=${len})`,'ok');
+}
+async function placeCurrentB(){
+  if(busy) return; busy=true; const my=runStamp;
+  try{
+    const cur=stateB.procs[stateB.idx];
+    const len=Math.ceil(cur.k/stateB.allocQ)*stateB.allocQ;
+    let start=findContiguous(len);
+    const color=({A:'#2e7dff55',B:'#c58cff55',C:'#49e3b355',D:'#ffd16655',E:'#ff704355'}[cur.name]||'#66e3ff33');
+
+    if(my!==runStamp) return;
+    if(start===-1){
+      logTo('RAM хүрэлцэхгүй. FIFO swapping…','warn');
+      while(start===-1&&stateB.placed.length>0){
+        if(my!==runStamp) return;
+        const vic=stateB.placed.shift();
+        for(let i=vic.start;i<vic.start+vic.lenCells;i++){ const c=getCellB(i); if(c){ c.style.background=''; c.classList.remove('fill'); } }
+        start=findContiguous(len);
+      }
+    }
+    if(my!==runStamp) return;
+    if(start===-1){ logTo('⚠️ Оруулах боломжгүй.','bad'); stateB.idx++; stateB.phase='previewNext'; hideTags(); return; }
+
+    attachTags(start,len);
+    await sleep(SPEED[speedMode].preview);
+    if(my!==runStamp) return;
+
+    for(let i=0;i<len;i++){
+      const c=getCellB(start+i); if(c){ c.style.background=color; c.classList.add('fill'); }
+      if(((i+1)%stateB.allocQ)===0 || i===len-1){ await sleep(SPEED[speedMode].batch); }
+    }
+
+    if(my!==runStamp) return;
+    hideTags();
+    const pid=stateB.nextPid++; stateB.placed.push({pid,name:cur.name,start,lenCells:len});
+    logTo(`Placed: ${cur.name} [${start}..${start+len-1}]`,'ok');
+    stateB.idx++; stateB.phase='previewNext'; renderMatrixCalc();
+  } finally { busy=false; }
+}
+
+function renderMatrixCalc(){
+  const tbl=q('#matrixCalc'); if(!tbl) return;
+  const L=parseInt(q('#logicalAll').value||'0',10);
+  const placed=stateB?.placed||[];
+  if(!placed.length){ tbl.innerHTML=`<thead><tr><th>—</th></tr></thead><tbody><tr><td style="text-align:center;color:#9fb1d6">Процесс хараахан RAM дээр байрлаагүй.</td></tr></tbody>`; return; }
+  let thead='<thead><tr><th></th>'; for(const p of placed){ thead+=`<th>${p.name}#${p.pid}</th>`; } thead+='</tr></thead>';
+  let rowLimit='<tr><td><b>limit</b></td>'; for(const p of placed){ rowLimit+=`<td>${p.lenCells}</td>`; } rowLimit+='</tr>';
+  let rowBase='<tr><td><b>base</b></td>'; for(const p of placed){ rowBase+=`<td>${p.start}</td>`; } rowBase+='</tr>';
+  let rowPhys=`<tr><td><b>physical (L=${isNaN(L)?'—':L})</b></td>`;
+  for(const p of placed){ if(Number.isNaN(L)){ rowPhys+='<td>—</td>'; } else if(L<0||L>=p.lenCells){ rowPhys+='<td class="tag-trap">TRAP</td>'; } else { rowPhys+=`<td class="tag-ok">${p.start+L}</td>`; } }
+  rowPhys+='</tr>';
+  tbl.innerHTML=thead+`<tbody>${rowLimit}${rowBase}${rowPhys}</tbody>`;
+}
+q('#logicalAll')?.addEventListener('input',renderMatrixCalc);
+
+function buildB(){
+  const ramK=+q('#ramSizeB').value||16;
+  const allocQ=Math.max(1,+q('#blockSizeB').value||1);
+  const cells=ramK; buildGrid(cells);
+  const raw=(q('#procListB').value||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const procs=[]; for(const it of raw){ const [n,sz]=it.split(':'); const name=(n||'P').toUpperCase(); const k=+sz||0; if(k>0) procs.push({name,k}); }
+  stateB={ramK,allocQ,cells,procs,idx:0,placed:[],nextPid:1,phase:'preview',halted:false};
+  q('#logB').innerHTML=''; logTo(`RAM(B)=${ramK}K — 1K=1 нүд, allocQ=${allocQ}K`,'ok');
+  q('#btnStepB').disabled=false; q('#btnPlayB').disabled=false; hideTags(); renderMatrixCalc();
+}
+async function stepB(){ if(!stateB||stateB.halted||busy) return; const my=runStamp; if(stateB.phase==='preview'){ previewNextB(); if(my!==runStamp) return; stateB.phase='place'; return; } if(stateB.phase==='place'){ await placeCurrentB(); return; } if(stateB.phase==='previewNext'){ previewNextB(); if(my!==runStamp) return; stateB.phase='place'; return; } }
+
+q('#btnBuildB').addEventListener('click',()=>{ bumpRun(); buildB(); });
+q('#btnStepB').addEventListener('click',stepB);
+q('#btnPlayB').addEventListener('click', async ()=>{ if(!stateB) return; const my=bumpRun(); q('#btnPlayB').disabled=true; q('#btnStepB').disabled=true;
+  while(stateB && !stateB.halted && stateB.idx<stateB.procs.length && my===runStamp){
+    if(busy){ await sleep(30); if(my!==runStamp) break; continue; }
+    if(stateB.phase==='preview' || stateB.phase==='previewNext'){ previewNextB(); if(my!==runStamp) break; stateB.phase='place'; await sleep(SPEED[speedMode].preview); }
+    if(my!==runStamp) break;
+    await placeCurrentB(); await sleep(SPEED[speedMode].between);
+  }
+  q('#btnPlayB').disabled=false; q('#btnStepB').disabled=false;
+});
+
+/* ===== 3.Б: Scenario auto-run (ONE RUN) ===== */
+function runScenarioOnce(){
+  const seq = ['A:4','B:2','C:3','A:4','B:2','C:3','A:4','B:2','B:2']; // A:3, B:4, C:2 A:4 B:2
+  q('#ramSizeB').value = 7;
+  q('#blockSizeB').value = 1;
+  q('#procListB').value = seq.join(',');
+  document.getElementById('sectionB').scrollIntoView({behavior:'smooth',block:'start'});
+  stateB=null; bumpRun(); buildB();
+  setSpeed('low');
+  q('#btnPlayB').click();
+}
+document.getElementById('btnScenarioRun').addEventListener('click', runScenarioOnce);
+
+/* ===== 4) EMAT: interactive calculator ===== */
+function toNum(v,def=0){const n=parseFloat(v); return Number.isNaN(n)?def:Math.max(0,n);}
+function updateEMAT(){
+  const tc = toNum(q('#tc').value,10);
+  const tm = toNum(q('#tm').value,200);
+  const hPerc = toNum(q('#h').value,70);
+  const h = hPerc/100;
+
+  const emat = h*tc + (1-h)*(tc+tm);          // ns
+  const hitPart  = h*tc;
+  const missPart = (1-h)*(tc+tm);
+
+  q('#hShow').textContent = Math.round(hPerc);
+  q('#ematVal').textContent = emat.toFixed(2);
+  q('#hitPart').textContent = hitPart.toFixed(2);
+  q('#missPart').textContent = missPart.toFixed(2);
+  q('#speedup').textContent = (tm/emat).toFixed(2);
+
+  const total = emat || 1;
+  q('#barHit').style.width  = (hitPart/total*100)+'%';
+  q('#barMiss').style.width = (missPart/total*100)+'%';
+
+  q('#eqText').innerHTML =
+    `EMAT = h·t<sub>cache</sub> + (1−h)·(t<sub>cache</sub>+t<sub>mem</sub>) = ` +
+    `${h.toFixed(2)}·${tc} + ${(1-h).toFixed(2)}·(${tc}+${tm}) = <b>${emat.toFixed(2)} ns</b>`;
+}
+['#tc','#tm','#h'].forEach(sel=>q(sel).addEventListener('input', updateEMAT));
+q('#btnSample').addEventListener('click',()=>{ q('#tc').value=10; q('#tm').value=200; q('#h').value=70; updateEMAT();});
+updateEMAT();
+
+/* ===== HARD RELOAD for all Reset buttons ===== */
+function hardReload(){ window.location.reload(); }
+document.getElementById('btnResetA').addEventListener('click', hardReload);
+document.getElementById('btnResetB').addEventListener('click', hardReload);
+document.getElementById('btnScenarioReset').addEventListener('click', hardReload);
+
+/* ===== Ctrl/⌘ + Shift + R => true page reload ===== */
+window.addEventListener('keydown', (e) => {
+  if ((e.key||'').toLowerCase()==='r' && (e.ctrlKey||e.metaKey) && e.shiftKey){
+    e.preventDefault(); e.stopPropagation();
+    window.location.reload();
+  }
+}, {capture:true});
+</script>
+</body>
+</html>

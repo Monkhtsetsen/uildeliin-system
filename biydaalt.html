@@ -1,0 +1,3303 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Процесс ба Салбар процесс</title>
+  <link rel="stylesheet" href="/hergtei/styles.css" />
+  
+</head>
+<body>
+  <!-- Background -->
+  <div class="bg"></div>
+
+  <!-- Navigation bar -->
+  <header class="top card">
+    <div class="brand">
+      <div class="logo">⚛️</div>
+      <div>2-р баг</div>
+    </div>
+    <nav class="nav">
+      <a href="#" data-goto="home" class="active">Нүүр</a>
+      <a href="#" data-goto="about">Процесс</a>
+      <a href="#" data-goto="content">Салбар процесс</a>
+      <a href="#" data-goto="sim">Хэрэгжүүлэлт</a>
+    </nav>
+  </header>
+
+<!-- ====== HOME (Smooth & No Scroll Edition) ====== -->
+<section id="home" class="active">
+  <style>
+    html, body { overflow-x: hidden; }
+
+    /* Main hero section */
+    #home{
+      position:relative;
+      overflow:hidden;
+      isolation:isolate;
+    }
+    #home .hero{
+      position:relative;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding: clamp(28px, 6vw, 56px) 16px;
+      min-height: clamp(360px, 62vh, 720px);
+      border-radius: 24px;
+      background:
+        radial-gradient(1200px 600px at -10% -10%, rgba(34,211,238,.08), transparent 60%),
+        radial-gradient(1200px 600px at 110% 10%, rgba(167,139,250,.08), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+      box-shadow: 0 24px 80px rgba(0,0,0,.45);
+    }
+    #home .hero > *{ position:relative; z-index:2 }
+
+    #home .huge{
+      font-size: clamp(34px, 8vw, 78px);
+      line-height:1.05;
+      margin:.1em 0;
+      letter-spacing:.3px;
+      font-weight:900;
+      background: conic-gradient(from 0deg, #22d3ee, #60a5fa, #a78bfa, #22d3ee);
+      -webkit-background-clip:text;
+      background-clip:text;
+      -webkit-text-fill-color:transparent;
+      filter: drop-shadow(0 8px 28px rgba(96,165,250,.22));
+      animation: homeGlowSoft 7s ease-in-out infinite;
+    }
+    @keyframes homeGlowSoft{
+      0%,100%{ filter: drop-shadow(0 8px 28px rgba(34,211,238,.18)) }
+      50%{ filter: drop-shadow(0 10px 36px rgba(96,165,250,.26)) }
+    }
+
+    #home .muted{ color:#bcd3ff; opacity:.95; font-size:clamp(14px,2.2vw,18px) }
+    #home .chip{
+      display:inline-grid;
+      place-items:center;
+      padding:10px 14px;
+      border-radius:999px;
+      font:800 12px ui-sans-serif,system-ui;
+      background:linear-gradient(135deg,#0ea5e9,#22d3ee);
+      color:#07131b;
+      box-shadow:0 8px 28px rgba(34,211,238,.35);
+      margin-top:8px;
+    }
+
+    /* Background SVG */
+    #home .hero-art{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      opacity:.22;
+      pointer-events:none;
+      transform:translateZ(0);
+      filter:saturate(1.05) contrast(1.02);
+    }
+
+    #home svg .blob{ transform-origin:center; animation: float 18s ease-in-out infinite }
+    #home svg .b2 { animation-duration: 22s }
+    #home svg .b3 { animation-duration: 26s }
+
+    #home svg .ring{ stroke-linecap:round; animation: dash 11s linear infinite; opacity:.85 }
+    #home svg .cpu rect{ filter: drop-shadow(0 8px 30px rgba(0,0,0,.45)) }
+    #home svg .cpu circle{ transform-origin:center; animation:pulse 2.8s ease-in-out infinite }
+    #home svg .orbit-a{ animation: spin 15s linear infinite }
+    #home svg .orbit-b{ animation: spin 18s linear infinite reverse }
+    #home svg .orbit-c{ animation: spin 22s linear infinite }
+
+    #home svg .sheen{ mix-blend-mode:screen; animation:sweep 8.5s ease-in-out infinite; x:-180; width:360; }
+
+    @keyframes float{
+      0%{transform:translate(0,0) scale(1)}
+      50%{transform:translate(0,-18px) scale(1.05)}
+      100%{transform:translate(0,0) scale(1)}
+    }
+    @keyframes dash{ to{ stroke-dashoffset:-540 } }
+    @keyframes spin{ to{ transform: rotate(360deg) } }
+    @keyframes pulse{ 0%,100%{transform:scale(1);opacity:.88} 50%{transform:scale(1.22);opacity:1} }
+    @keyframes sweep{
+      0%{ transform:translateX(-35%); opacity:0 }
+      12%{ opacity:.06 }
+      45%{ transform:translateX(135%) }
+      100%{ transform:translateX(135%); opacity:0 }
+    }
+
+    /* entry anim */
+    #home .hero h1, #home .hero p, #home .chip{
+      opacity:0; transform:translateY(6px);
+      animation: fadeUp .55s cubic-bezier(.2,.8,.2,1) forwards;
+    }
+    #home .hero h1{ animation-delay:.05s }
+    #home .hero p{ animation-delay:.18s }
+    #home .chip{ animation-delay:.28s }
+    @keyframes fadeUp{ to{ opacity:1; transform:none } }
+
+    /* responsive */
+    @media (max-width:960px){
+      #home .hero-art{ opacity:.2 }
+      #home .muted{ opacity:.95 }
+    }
+
+    /* motion reduce */
+    @media (prefers-reduced-motion:reduce){
+      #home .hero h1, #home .hero p, #home .chip,
+      #home svg .blob, #home svg .ring, #home svg .cpu circle,
+      #home svg .orbit-a, #home svg .orbit-b, #home svg .orbit-c, #home svg .sheen{
+        animation:none !important; opacity:1; transform:none;
+      }
+    }
+  </style>
+
+  <div class="card hero">
+    <div>
+      <span class="chip">ҮС — F.CSM302</span>
+      <h1 class="huge">Процесс<br>болон Салбар процесс</h1>
+      <p class="muted">Үйлдлийн системийн хичээл | 2-р баг</p>
+    </div>
+
+    <!-- 🎨 Background SVG -->
+    <svg class="hero-art" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <filter id="blur10" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="28"/>
+        </filter>
+        <filter id="goo">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="blur"/>
+          <feColorMatrix in="blur" mode="matrix"
+            values="1 0 0 0 0
+                    0 1 0 0 0
+                    0 0 1 0 0
+                    0 0 0 28 -14" result="goo"/>
+          <feBlend in="SourceGraphic" in2="goo"/>
+        </filter>
+        <radialGradient id="g1" cx="50%" cy="50%" r="0.6">
+          <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="g2" cx="50%" cy="50%" r="0.6">
+          <stop offset="0%" stop-color="#f472b6" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#f472b6" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="g3" cx="50%" cy="50%" r="0.6">
+          <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#22d3ee"/>
+          <stop offset="50%" stop-color="#60a5fa"/>
+          <stop offset="100%" stop-color="#a78bfa"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Gooey blobs -->
+      <g filter="url(#goo)">
+        <g filter="url(#blur10)">
+          <circle class="blob b1" cx="260" cy="320" r="190" fill="url(#g1)"/>
+          <circle class="blob b2" cx="980" cy="180" r="220" fill="url(#g2)"/>
+          <circle class="blob b3" cx="820" cy="480" r="170" fill="url(#g3)"/>
+        </g>
+      </g>
+
+      <!-- CPU cluster -->
+      <g class="tilt">
+        <g class="cluster" transform="translate(600,300)">
+          <circle class="ring" r="195" fill="none" stroke="url(#ringGrad)" stroke-width="3.5" stroke-dasharray="34 18"/>
+          <g class="cpu">
+            <rect x="-70" y="-70" width="140" height="140" rx="18" fill="#0b1220" stroke="#3b82f6" stroke-width="2.2"/>
+            <g stroke="#1f2937" stroke-width="6">
+              <line x1="-86" y1="-40" x2="-70" y2="-40"/>
+              <line x1="-86" y1="-14" x2="-70" y2="-14"/>
+              <line x1="-86" y1="14"  x2="-70" y2="14"/>
+              <line x1="-86" y1="40"  x2="-70" y2="40"/>
+              <line x1="70" y1="-40" x2="86" y2="-40"/>
+              <line x1="70" y1="-14" x2="86" y2="-14"/>
+              <line x1="70" y1="14"  x2="86" y2="14"/>
+              <line x1="70" y1="40"  x2="86" y2="40"/>
+            </g>
+            <circle r="10" fill="#22d3ee" opacity="0.92"/>
+          </g>
+
+          <g class="orbit orbit-a"><circle class="node" r="12" fill="#60a5fa"/></g>
+          <g class="orbit orbit-b"><circle class="node" r="12" fill="#a78bfa"/></g>
+          <g class="orbit orbit-c"><circle class="node" r="12" fill="#22d3ee"/></g>
+        </g>
+      </g>
+
+      <rect class="sheen" x="-180" y="0" width="360" height="600" fill="white" opacity="0.06"/>
+    </svg>
+  </div>
+
+  <script>
+    // Smooth tilt
+    (() => {
+      const root = document.querySelector('#home .tilt .cluster');
+      const hero = document.querySelector('#home .hero');
+      if (!root || !hero) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      let rect = hero.getBoundingClientRect();
+      const update = () => rect = hero.getBoundingClientRect();
+      window.addEventListener('resize', update, {passive:true});
+
+      let raf=null, rx=0, ry=0, tx=0, ty=0;
+      function onMove(e){
+        const c = e.touches?.[0] ?? e;
+        const px = (c.clientX - rect.left) / rect.width - 0.5;
+        const py = (c.clientY - rect.top) / rect.height - 0.5;
+        const MAX = 6;
+        const TR  = 8;
+        rx = py * MAX;  ry = -px * MAX;
+        tx = -px * TR;  ty = -py * TR;
+        if (!raf) raf = requestAnimationFrame(() => {
+          raf = null;
+          root.style.transform =
+            `translate3d(${tx}px, ${ty}px, 0) rotateX(${rx}deg) rotateY(${ry}deg)`;
+        });
+      }
+      function reset(){
+        root.style.transition = 'transform .45s cubic-bezier(.2,.8,.2,1)';
+        root.style.transform  = 'translate3d(0,0,0) rotateX(0) rotateY(0)';
+        setTimeout(() => root.style.transition = '', 450);
+      }
+      hero.addEventListener('mousemove', onMove);
+      hero.addEventListener('touchmove', onMove, {passive:true});
+      hero.addEventListener('mouseleave', reset);
+      hero.addEventListener('touchend',  reset);
+    })();
+  </script>
+</section>
+
+<!-- ====== ABOUT 1 — Q/A + Image ====== -->
+<section id="about">
+  <style>
+    /* Visual refresh for #about — no text/content changes, only styling/visuals */
+    #about .card{
+      display:grid;
+      grid-template-columns: 1fr 480px;
+      gap:32px;
+      align-items:center;
+      padding:36px;
+      border-radius:24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 24px 60px rgba(2,6,23,0.6);
+      border:1px solid rgba(255,255,255,0.04);
+      overflow:visible;
+    }
+
+    #about .qa-title{
+      font-size:40px;
+      font-weight:900;
+      margin:0 0 12px;
+      line-height:1.02;
+      background: linear-gradient(90deg,#22d3ee,#60a5fa,#a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 8px 24px rgba(96,165,250,0.12));
+    }
+
+    #about .qa-body{
+      font-size:20px;
+      color:rgba(219,234,254,0.95);
+      line-height:1.6;
+      max-width:760px;
+    }
+
+    #about .bullets{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:12px 20px;
+      padding:0;
+      margin:18px 0;
+      list-style:none;
+      color:#cfe6ff;
+      font-size:18px;
+    }
+    #about .bullets li{ display:flex; gap:10px; align-items:flex-start; }
+    #about .bullets li::before{
+      content:'';
+      width:10px;height:10px;border-radius:50%;
+      background:linear-gradient(180deg,#60a5fa,#22d3ee);
+      margin-top:6px;flex:0 0 10px;
+      box-shadow:0 4px 12px rgba(34,211,238,0.12);
+    }
+
+    #about .callout{
+      margin-top:12px;
+      padding:14px 16px;
+      border-radius:12px;
+      background:linear-gradient(120deg, rgba(34,211,238,0.04), rgba(167,139,250,0.03));
+      border:1px solid rgba(255,255,255,0.02);
+      color:#dfefff;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+
+    /* Media card */
+    #about .media-right{ display:grid; place-items:center; min-width:280px; }
+    #about .media-card{
+      width:100%;
+      border-radius:16px;
+      overflow:hidden;
+      position:relative;
+      border:1px solid rgba(255,255,255,0.04);
+      box-shadow:0 12px 40px rgba(2,8,29,0.6);
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+    }
+    #about .media-card img{
+      display:block;
+      width:100%;
+      height:320px;
+      object-fit:cover;
+      transition:transform .5s ease;
+      filter: saturate(1.02) contrast(1.02);
+    }
+    #about .media-card:hover img{ transform:scale(1.03); }
+
+    /* small decorative overlay (purely visual) */
+    #about .media-card .art{
+      position:absolute;
+      inset:auto 12px 12px 12px;
+      height:72px;
+      border-radius:10px;
+      background:linear-gradient(90deg, rgba(34,211,238,0.06), rgba(167,139,250,0.06));
+      backdrop-filter: blur(6px);
+      pointer-events:none;
+    }
+
+    @media (max-width:980px){
+      #about .card{ grid-template-columns:1fr; padding:20px; gap:18px; }
+      #about .bullets{ grid-template-columns:1fr; }
+      #about .media-card img{ height:220px; }
+      #about .qa-title{ font-size:32px; }
+      #about .qa-body{ font-size:18px; }
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      #about *{ transition:none!important; animation:none!important; }
+    }
+  </style>
+
+  <div class="card qa-slide">
+    <div class="qa">
+      <h2 class="qa-title">Процесс гэж юу вэ?</h2>
+      <div class="qa-body">
+        <p>Үйлдлийн системд программ ажиллаж эхлэх агшинд төв процессорт хийгдэж буй <b>идэвхтэй</b> ажил.</p>
+        <ul class="bullets">
+          <li><b>PID</b>тусгаарлагдсан хаягийн орон зай (code/data/stack/heap)</li>
+          <li>Нээлттэй файлууд, descriptor-ууд, төлөвийн мэдээлэл</li>
+        </ul>
+        <p class="muted small">Товчоор: <b>Програм</b> = диск дээрх код, <b>Процесс</b> = RAM дээрх гүйж буй төлөв.</p>
+      </div>
+    </div>
+
+    <figure class="media-right" aria-hidden="true">
+      <div class="media-card" role="img" aria-label="Процессийн визуал">
+        <img src="/assets/10.webp" alt="Процессийн үндсэн ойлголт 1">
+        <div class="art" aria-hidden="true"></div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<!-- ====== ABOUT 2 ====== -->
+<section id="about-2">
+  <style>
+    /* Scoped visual refresh for #about-2 (match #about style) */
+    #about-2 .card{
+      display:grid;
+      grid-template-columns: 1fr 480px;
+      gap:28px;
+      align-items:center;
+      padding:36px;
+      border-radius:20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 18px 50px rgba(3,8,23,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+      overflow:visible;
+    }
+
+    /* Text column */
+    #about-2 .qa{ padding:8px 6px 8px 2px }
+    #about-2 .qa-title{
+      font-size:40px;
+      font-weight:900;
+      margin:0 0 12px;
+      line-height:1.02;
+      background: linear-gradient(90deg,#22d3ee,#60a5fa,#a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 10px 26px rgba(16,185,129,0.08));
+    }
+    #about-2 .lead{
+      font-size:20px;
+      color: #dbeafe;
+      margin: 12px 0 18px 0;
+      line-height:1.6;
+      max-width:760px;
+    }
+    
+    #about-2 .bullets{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:12px 24px;
+      margin:0 0 20px 0;
+      padding:0;
+      list-style:none;
+      font-size:18px;
+      color:#bcd3ff;
+    }
+    #about-2 .bullets li{
+      display:flex; gap:12px; align-items:flex-start;
+    }
+    #about-2 .bullets li::before{
+      content: "●";
+      color: #60a5fa;
+      margin-top:4px;
+      font-size:12px;
+      opacity:.95;
+    }
+
+    /* media column */
+    #about-2 .media-right{
+      justify-self:end;
+      display:grid;
+      place-items:center;
+      min-width:320px;
+    }
+    #about-2 .media-card{
+      width:100%;
+      border-radius:16px;
+      overflow:hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      border:1px solid rgba(255,255,255,0.04);
+      box-shadow:0 14px 40px rgba(2,8,29,0.6);
+      position:relative;
+    }
+    #about-2 .media-card img{
+      display:block;
+      width:100%;
+      height:auto;
+      max-height:720px;
+      object-fit:contain;
+      transition: transform .45s ease;
+      border-radius:12px;
+    }
+    #about-2 .media-card:hover img{ transform:scale(1.02) }
+
+    /* remove any decorative blur if present */
+    #about-2 .media-card::after,
+    #about-2 .media-card .art{ display:none !important; backdrop-filter:none !important; background:transparent !important }
+
+    /* Responsive */
+    @media (max-width:980px){
+      #about-2 .card{ grid-template-columns:1fr; padding:22px; gap:18px }
+      #about-2 .bullets{ grid-template-columns:1fr }
+      #about-2 .qa-title{ font-size:32px }
+      #about-2 .lead{ font-size:18px }
+      #about-2 .media-card img{ max-height:360px }
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      #about-2 *{ transition:none !important; animation:none !important }
+    }
+  </style>
+
+  <div class="card qa-slide">
+    <div class="qa">
+      <h2 class="qa-title">Процесс хаана явагддаг вэ?</h2>
+
+      <div class="lead">
+        <p>Input → CPU/Memory → Output урсгал дээр явагдана. CPU гүйцэтгэж, санах ой төлөвийг хадгална.</p>
+      </div>
+
+      <ul class="bullets">
+        <li>Secondary storage-оос ачаалж RAM руу</li>
+        <li>CPU дээр <strong>instruction cycle</strong> (fetch–decode–execute)</li>
+        <li>Оролт/Гаралтын холболтууд (I/O)</li>
+        <li>Үйлдлийн системийн ээлжит төлөвлөлт</li>
+      </ul>
+    </div>
+
+    <figure class="media-right" aria-hidden="true">
+      <div class="media-card" role="img" aria-label="CPU/Memory визуал">
+        <img src="/assets/12.webp" alt="CPU/Memory төвтэй урсгал">
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="about-3">
+  <style>
+    /* Scoped styles for modern look */
+    #about-3 .card {
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      gap: 32px;
+      align-items: center;
+      padding: 40px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 24px 60px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Title styling */
+    #about-3 .qa-title {
+      font-size: 40px;
+      font-weight: 900;
+      margin: 0 0 24px;
+      line-height: 1.1;
+      background: linear-gradient(90deg, #22d3ee, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 8px 24px rgba(96,165,250,0.12));
+    }
+
+    /* Content area */
+    #about-3 .qa-body {
+      font-size: 28px;
+      color: #e5eefc;
+      line-height: 1.6;
+    }
+
+    /* Bullet points */
+    #about-3 .bullets {
+      margin: 24px 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 16px;
+    }
+
+    #about-3 .bullets li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.04);
+      transition: transform 0.3s ease;
+    }
+
+    #about-3 .bullets li:hover {
+      transform: translateX(8px);
+      background: rgba(255,255,255,0.05);
+    }
+
+    #about-3 .bullets li::before {
+      content: "•";
+      color: #60a5fa;
+      font-size: 24px;
+      line-height: 1;
+      margin-top: 4px;
+    }
+
+    /* Image container */
+    #about-3 .media-right {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    #about-3 .media-right img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.3);
+      transition: transform 0.5s ease;
+    }
+
+    #about-3 .media-right:hover img {
+      transform: scale(1.02);
+    }
+
+    /* Decorative elements */
+    #about-3 .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 0% 0%, rgba(34,211,238,0.08), transparent 60%),
+                  radial-gradient(circle at 100% 100%, rgba(167,139,250,0.08), transparent 60%);
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 980px) {
+      #about-3 .card {
+        grid-template-columns: 1fr;
+        padding: 24px;
+        gap: 24px;
+      }
+      #about-3 .qa-title { font-size: 32px; }
+      #about-3 .qa-body { font-size: 20px; }
+      #about-3 .bullets li { font-size: 18px; }
+    }
+  </style>
+
+  <div class="card qa-slide">
+    <div class="qa">
+      <h2 class="qa-title">Компьютерийн бүрэлдэхүүн?</h2>
+      <div class="qa-body">
+        <p>Motherboard, CPU, RAM, BUS, I/O төхөөрөмжүүдийн уялдаа.</p>
+        <ul class="bullets">
+          <li><b>CPU</b> — CU/ALU, регистрүүд</li>
+          <li><b>RAM</b> — ажиллах өгөгдөл/код</li>
+          <li><b>BUS</b> — өгөгдөл/хаяг/удирдлагын шугам</li>
+        </ul>
+      </div>
+    </div>
+    <figure class="media-right">
+      <img src="/assets/13.webp" alt="Motherboard • RAM • BUS • I/O">
+    </figure>
+  </div>
+</section>
+
+<!-- ====== ABOUT 5 ====== -->
+<section id="about-5">
+  <style>
+    /* Scoped visual refresh for #about-5 — different color palette (green → amber → pink) */
+    #about-5 .card{
+      display:grid;
+      grid-template-columns: 1fr 460px;
+      gap:28px;
+      align-items:center;
+      padding:36px;
+      border-radius:20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+      box-shadow: 0 20px 60px rgba(2,8,23,0.55);
+      border:1px solid rgba(255,255,255,0.03);
+      overflow:visible;
+    }
+
+    #about-5 .qa { padding:8px 6px 8px 2px; }
+    #about-5 .qa-title{
+      font-size:40px;
+      font-weight:900;
+      margin:0 0 12px;
+      line-height:1.02;
+      background: linear-gradient(90deg,#10b981,#f59e0b,#f472b6);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      filter: drop-shadow(0 10px 26px rgba(16,185,129,0.08));
+    }
+
+    #about-5 .qa-body{
+      font-size:22px;
+      color:#e6f9f0;
+      line-height:1.6;
+      max-width:720px;
+    }
+
+    /* bullets with subtle cards */
+    #about-5 .bullets{
+      margin:14px 0 12px;
+      padding:0;
+      display:grid;
+      grid-template-columns: repeat(1, minmax(0,1fr));
+      gap:12px;
+      list-style:none;
+    }
+    #about-5 .bullets li{
+      background: linear-gradient(180deg, rgba(16,185,129,0.03), rgba(245,158,11,0.02));
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.02);
+      color:#dfffe9;
+      font-size:20px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    #about-5 .bullets li::before{
+      content:'';
+      width:10px;height:10px;border-radius:50%;
+      background: linear-gradient(90deg,#10b981,#f59e0b);
+      box-shadow:0 6px 14px rgba(16,185,129,0.08);
+      margin-top:6px;
+      flex:0 0 10px;
+    }
+
+    .muted.small{ font-size:18px; color:#bfe8d2; opacity:0.95; }
+
+    /* media */
+    #about-5 .media-right{
+      display:grid;
+      place-items:center;
+      min-width:300px;
+    }
+    #about-5 .media-right img{
+      width:100%;
+      height:auto;
+      max-width:420px;
+      border-radius:14px;
+      object-fit:contain;
+      box-shadow: 0 12px 40px rgba(2,8,23,0.6);
+      border:1px solid rgba(255,255,255,0.04);
+      transition: transform .35s ease;
+    }
+    #about-5 .media-right img:hover{ transform: translateY(-6px) scale(1.02); }
+
+    /* subtle decorative accents */
+    #about-5 .card::before{
+      content:'';
+      position:absolute;
+      inset:auto 12% 12% 2%;
+      height:180px;border-radius:120px;
+      background: radial-gradient(closest-side, rgba(16,185,129,0.06), transparent 60%),
+                  radial-gradient(closest-side, rgba(245,158,11,0.04), transparent 60%);
+      pointer-events:none; opacity:0.6;
+    }
+
+    @media (max-width:980px){
+      #about-5 .card{ grid-template-columns: 1fr; padding:22px; gap:18px; }
+      #about-5 .qa-title{ font-size:32px; }
+      #about-5 .qa-body{ font-size:18px; }
+      #about-5 .bullets li{ font-size:16px; }
+      #about-5 .media-right img{ max-width:100%; height:auto; }
+      #about-5 .card::before{ display:none; }
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      #about-5 img{ transition:none !important; transform:none !important; }
+    }
+  </style>
+
+  <div class="card qa-slide">
+    <div class="qa">
+      <h2 class="qa-title">Program vs Process vs Thread</h2>
+      <div class="qa-body">
+        <ul class="bullets">
+          <li><b>Program</b> — диск дээрх статик код</li>
+          <li><b>Process</b> — RAM дээрх гүйж буй нэгж, нөөцийн эзэмшигч</li>
+          <li><b>Thread</b> — процесс доторх гүйцэтгэлийн хамгийн жижиг урсгал</li>
+        </ul>
+        <p class="muted small">Зорилго: нөөцийг зөв хуваарилж throughput, latency-г тэнцвэржүүлэх.</p>
+      </div>
+    </div>
+
+    <figure class="media-right" aria-hidden="true">
+      <img src="/assets/15.webp" alt="Program vs Process vs Thread харьцуулалт">
+    </figure>
+  </div>
+</section>
+<section id="content">
+  <div class="card content-slide">
+    <div class="title-wrap">
+      <h2 class="section-title" style="font-size: 55px; text-align: center; margin-bottom: 40px;">
+        Салбар процессын хэрэглээний жишээнүүд
+        <div class="title-underline"></div>
+      </h2>
+    </div>
+
+    <div class="examples-grid">
+      <!-- Web Server Example -->
+      <div class="example-card">
+        <div class="card-header">
+          <div class="icon">🌐</div>
+          <h3>Вэб серверүүд</h3>
+        </div>
+        <div class="card-content">
+          <img src="/assets/web1.png" alt="Web server example">
+          <p>Олон client request-ийг зэрэг удирдах</p>
+        </div>
+      </div>
+
+      <!-- App Server Example -->
+      <div class="example-card">
+        <div class="card-header">
+          <div class="icon">📱</div>
+          <h3>Апп серверүүд</h3>
+        </div>
+        <div class="card-content">
+          <img src="/assets/app1.png" alt="App server example">
+          <p>UI, Network, Database үйлдлүүдийг тусад нь ажиллуулах</p>
+        </div>
+      </div>
+
+      <!-- Multiplayer Example -->
+      <div class="example-card">
+        <div class="card-header">
+          <div class="icon">🎮</div>
+          <h3>Multiplayer тоглоомууд</h3>
+        </div>
+        <div class="card-content">
+          <img src="/assets/multiplayer.png" alt="Multiplayer example">
+          <p>Тоглогчдын синхрон холболт, төлөв удирдах</p>
+        </div>
+      </div>
+
+      <!-- Video Processing Example -->
+      <div class="example-card">
+        <div class="card-header">
+          <div class="icon">🎥</div>
+          <h3>Өндөр гүйцэтгэлтэй програмууд</h3>
+        </div>
+        <div class="card-content">
+          <img src="/assets/videocode.png" alt="Video processing example">
+          <p>Видео кодчилол, физик симуляци, тооцоолол</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    #content .card {
+      background: linear-gradient(180deg, #0a1628 0%, #0f172a 100%);
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .title-underline {
+      height: 4px;
+      width: 180px;
+      margin: 15px auto;
+      background: linear-gradient(90deg, #22d3ee, #60a5fa, #a78bfa);
+      border-radius: 4px;
+    }
+
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 32px;
+      padding: 20px 0;
+    }
+
+    .example-card {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 16px;
+      padding: 24px;
+      transition: transform 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .example-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .icon {
+      font-size: 32px;
+      margin-right: 15px;
+      padding: 10px;
+      background: rgba(34, 211, 238, 0.1);
+      border-radius: 12px;
+    }
+
+    .card-header h3 {
+      font-size: 24px;
+      color: #e2e8f0;
+      margin: 0;
+    }
+
+    .card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-content img {
+      width: 100%;
+      border-radius: 12px;
+      height: 180px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-content p {
+      font-size: 16px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* Hover effects and animations */
+    .example-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .example-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #22d3ee, #60a5fa);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .example-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .examples-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      
+      #content .card {
+        padding: 24px;
+      }
+    }
+  </style>
+</section>
+<!-- ====== CONTENT 1 — Thread process intro + table ====== -->
+<section id="content-1">
+  <div class="card content-slide">
+    <div class="moving-line" style="animation-delay: 1s;"></div>
+    <h2 style="font-size: 40px; margin-bottom: 30px; color: #ffffff;"> Процесс </h2>
+
+    <!-- Процессийн тодорхойлолт -->
+    <div class="info-card" style="display: flex; gap: 15px; padding: 20px; background: #08223b; border-radius: 12px; margin-top: 20px;">
+      <div class="info-icon" style="font-size: 40px; color: #04bfe0;"></div>
+      <div>
+        <h3 style="margin: 0 0 10px 0; color: #8e9dea;">Процесс нь ажиллаж буй программын жишээ юм</h3>
+        <p style="margin: 0; line-height: 1.6; color: #fafbfc;">
+          Процесс нь код, өгөгдөл, стек, регистр зэрэг нөөцүүдийг багтаасан байдаг.
+          Үйлдлийн систем процесс бүрт тусдаа санах ойн зай, PID (Process ID) өгдөг.
+        </p>
+      </div>
+    </div>
+
+    <!-- Диаграмууд -->
+    <div class="diagram-container" style="display: flex; flex-wrap: wrap; gap: 30px; margin-top: 30px;">
+
+      <!-- Процессийн бүтэц -->
+      <div class="diagram" style="flex: 1; min-width: 300px; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <h3 style="color: #253169;">Процессийн бүтэц</h3>
+        <div class="memory-diagram" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+          <div class="memory-block os-block" style="padding: 10px; background: #2c3e50; color: white; border-radius: 8px;"> Үйлдлийн систем</div>
+          <div class="memory-block process-block" style="padding: 10px; background: #3498db; color: white; border-radius: 8px;"> Процесс P1</div>
+          <div class="memory-block process-block" style="padding: 10px; background: #2ecc71; color: white; border-radius: 8px;"> Процесс P2</div>
+          <div class="memory-block process-block" style="padding: 10px; background: #e74c3c; color: white; border-radius: 8px;"> Процесс P3</div>
+          <div class="memory-block process-block" style="padding: 10px; background: #f39c12; color: white; border-radius: 8px;"> Процесс P4</div>
+        </div>
+        <p class="explanation" style="margin-top: 10px; color: #2c3e50;">
+          Процессууд нь санах ойд тусдаа байршилтай байдаг. Үйлдлийн систем процессуудыг зохицуулж, CPU хуваарилдаг.
+        </p>
+      </div>
+
+      <!-- Процессийн бүрэлдэхүүн -->
+      <div class="diagram" style="flex: 1; min-width: 300px; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <h3 style="color: #253169;">Процессийн бүрэлдэхүүн хэсгүүд</h3>
+        <div class="memory-diagram" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+          <div class="memory-block pulse" style="padding: 10px; border-radius: 8px; color: white; background: linear-gradient(135deg, #3498db, #2980b9);"> Код (Code)</div>
+          <div class="memory-block pulse" style="padding: 10px; border-radius: 8px; color: white; background: linear-gradient(135deg, #2ecc71, #27ae60);"> Өгөгдөл (Data)</div>
+          <div class="memory-block pulse" style="padding: 10px; border-radius: 8px; color: white; background: linear-gradient(135deg, #e74c3c, #c0392b);"> Файл (Files)</div>
+          <div class="memory-block pulse" style="padding: 10px; border-radius: 8px; color: white; background: linear-gradient(135deg, #f39c12, #d35400);"> Регистр (Registers)</div>
+          <div class="memory-block pulse" style="padding: 10px; border-radius: 8px; color: white; background: linear-gradient(135deg, #9b59b6, #8e44ad);"> Стек (Stack)</div>
+        </div>
+        <p class="explanation" style="margin-top: 10px; color: #2c3e50;">
+          Процесс бүр код, өгөгдөл, файл, регистр, стек зэрэг хэсгүүдээс бүрдэнэ. Эдгээр нь процессын ажиллагаанд зайлшгүй шаардлагатай.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ====== CONTENT 2 — Single vs Multi-threaded ====== -->
+<section id="content-2" style="padding: 40px; font-family: 'Segoe UI', sans-serif; background: #070735; color: #2c3e50;">
+  
+  <!-- Animation line -->
+  <div class="moving-line" style="
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #04bfe0, #253169);
+    border-radius: 4px;
+    animation: move 3s infinite;
+    animation-delay: 2s;
+    margin-bottom: 20px;
+  "></div>
+
+  <!-- Title -->
+  <div class="title-chip" style="
+    font-size: 40px;
+    font-weight: bold;
+    text-align: left;
+    color: #253169;
+    margin-bottom: 20px;
+  ">
+
+  </div>
+  
+    <h2 style="font-size: 40px; margin-bottom: 30px; color: #ffffff;">Thread төрөл</h2>
+  <!-- Diagram container -->
+  <div class="diagram-container" style="display: flex; flex-wrap: wrap; gap: 30px;">
+
+    <!-- User Level Thread -->
+    <div class="diagram" style="
+      flex: 1;
+      min-width: 320px;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    ">
+      <h3 style="color: #2c3e50;"> User Level Thread</h3>
+
+      <div class="thread-diagram" style="margin-top: 10px;">
+        <div class="process" style="background: #eaf2ff; border-radius: 10px; padding: 15px;">
+          <div class="thread user-thread" style="
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+          ">User Thread 1</div>
+          <div class="thread user-thread" style="
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+          ">User Thread 2</div>
+          <div class="thread user-thread" style="
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+          ">User Thread 3</div>
+
+          <div style="
+            margin-top: 10px;
+            padding: 10px;
+            background: linear-gradient(135deg, #2c3e50, #1a2530);
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+          ">
+            Kernel Space
+            <div class="thread kernel-thread" style="
+              background: linear-gradient(135deg, #04bfe0, #027a8d);
+              margin-top: 5px;
+              padding: 8px;
+              border-radius: 6px;
+              font-weight: bold;
+            "> Kernel Thread</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="explanation" style="margin-top: 15px; line-height: 1.5;">
+        User level thread-үүд нь kernel-ийн дэмжлэггүйгээр user space-д удирдуулдаг. Эдгээр нь хурдан үүсгэгдэх, устгагдах боломжтой боловч нэг thread block хийвэл бүх process block хийгдэнэ.
+      </p>
+    </div>
+
+    <!-- Kernel Level Thread -->
+    <div class="diagram" style="
+      flex: 1;
+      min-width: 320px;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    ">
+      <h3 style="color: #2c3e50;"> Kernel Level Thread</h3>
+
+      <div class="thread-diagram" style="margin-top: 10px;">
+        <div class="process">
+          <div style="
+            padding: 10px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+          ">
+            User Space
+            <div class="thread user-thread" style="
+              background: rgba(255,255,255,0.2);
+              margin-top: 5px;
+              padding: 8px;
+              border-radius: 6px;
+              font-weight: bold;
+            ">User Thread 1</div>
+            <div class="thread user-thread" style="
+              background: rgba(255,255,255,0.2);
+              margin-top: 5px;
+              padding: 8px;
+              border-radius: 6px;
+              font-weight: bold;
+            ">User Thread 2</div>
+          </div>
+
+          <div style="
+            margin-top: 10px;
+            padding: 10px;
+            background: linear-gradient(135deg, #2c3e50, #1a2530);
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+          ">
+            Kernel Space
+            <div class="thread kernel-thread" style="
+              background: linear-gradient(135deg, #04bfe0, #027a8d);
+              margin-top: 5px;
+              padding: 8px;
+              border-radius: 6px;
+              font-weight: bold;
+            ">Kernel Thread 1</div>
+            <div class="thread kernel-thread" style="
+              background: linear-gradient(135deg, #04bfe0, #027a8d);
+              margin-top: 5px;
+              padding: 8px;
+              border-radius: 6px;
+              font-weight: bold;
+            ">Kernel Thread 2</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="explanation" style="margin-top: 15px; line-height: 1.5;">
+        Kernel level thread-үүд нь операцийн системийн kernel-ээр удирдуулдаг. Эдгээр нь олон процессортой системд зэрэгцээ ажиллуулах боломжтой. Нэг thread block хийвэл бусад thread үргэлжлүүлэн ажиллана.
+      </p>
+    </div>
+  </div>
+
+  <!-- Comparison Table -->
+  <table class="comparison-table" style="
+    width: 100%;
+    margin-top: 40px;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin-bottom: 50px;
+  ">
+    <thead style="background: #253169; color: white;">
+      <tr>
+        <th style="padding: 12px;">Шинж чанар</th>
+        <th style="padding: 12px;">User Level Thread</th>
+        <th style="padding: 12px;">Kernel Level Thread</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="text-align: center;">
+        <td style="padding: 10px;">Үүсгэх, устгах</td>
+        <td style="padding: 10px;">Хурдан (User space-д)</td>
+        <td style="padding: 10px;">Удаан (Kernel дуудалт шаарддаг)</td>
+      </tr>
+      <tr style="background: #f5f7fb; text-align: center;">
+        <td style="padding: 10px;">Удирдлага</td>
+        <td style="padding: 10px;">User level library (Thread library)</td>
+        <td style="padding: 10px;">Kernel (OS)</td>
+      </tr>
+      <tr style="text-align: center;">
+        <td style="padding: 10px;">Зэрэгцээ ажиллагаа</td>
+        <td style="padding: 10px;">Олон процессортой системд боломжгүй</td>
+        <td style="padding: 10px;">Боломжтой</td>
+      </tr>
+      <tr style="background: #f5f7fb; text-align: center;">
+        <td style="padding: 10px;">⏸ Blocking асуудал</td>
+        <td style="padding: 10px;">Нэг thread block хийвэл бүх process block хийгдэнэ</td>
+        <td style="padding: 10px;">Нэг thread block хийвэл бусад thread үргэлжлүүлэн ажиллана</td>
+      </tr>
+      <tr style="text-align: center;">
+        <td style="padding: 10px;">Хэрэгжүүлэлт</td>
+        <td style="padding: 10px;">Хялбар</td>
+        <td style="padding: 10px;">Төвөгтэй</td>
+      </tr>
+      <tr style="background: #f5f7fb; text-align: center;">
+        <td style="padding: 10px;">Масштабчлал</td>
+        <td style="padding: 10px;">Хязгаарлагдмал</td>
+        <td style="padding: 10px;">Сайн</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Animation keyframes -->
+  <style>
+    @keyframes move {
+      0% { transform: translateX(0); }
+      50% { transform: translateX(20px); }
+      100% { transform: translateX(0); }
+    }
+  </style>
+</section>
+
+
+<!-- ====== CONTENT 3 — Multithreading models (Many↔Many) ====== -->
+<section id="content-3" style="padding: 50px 10%; background: linear-gradient(180deg, #11223d, #112434); font-family: 'Segoe UI', sans-serif; color: #2c3e50;">
+
+  <div class="moving-line" style="width: 100px; height: 4px; background: linear-gradient(90deg, #04bfe0, #253169); border-radius: 2px; animation: moveLine 2s infinite alternate; margin-bottom: 25px;"></div>
+
+  <h2 style="font-size: 40px; margin-bottom: 30px; color: #ffffff;"> Thread гэж юу вэ?</h2>
+
+  <div class="info-card" style="display: flex; align-items: center; background: rgb(25, 17, 90); border-radius: 15px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 40px;">
+      <div class="info-icon" style="font-size: 45px; margin-right: 20px;"></div>
+      <div>
+          <h3 style="margin: 0; color: #a5b2ea;">Thread нь процесс доторх ажиллагааны нэгж</h3>
+          <p style="margin-top: 10px; font-size: 17px; color: #ffffff;">Thread нь процессын нөөцүүдийг хуваалцдаг боловч өөрийн регистр, стектэй байдаг. Нэг процесс олон thread-тэй байж болно.</p>
+      </div>
+  </div>
+
+  <div class="diagram-container" style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 30px;">
+
+      <!-- Нэг Thread-тэй процесс -->
+      <div class="diagram" style="flex: 1 1 45%; background: white; border-radius: 15px; padding: 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); transition: transform 0.3s; text-align: center;">
+          <h3 style="color: #253169; margin-bottom: 15px;"> Нэг Thread-тэй процесс</h3>
+          <div class="process" style="border: 2px dashed #253169; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+              
+              <div class="memory-block" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; padding: 10px 20px; border-radius: 10px; width: 80%;"> Код</div>
+              <div class="memory-block" style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; padding: 10px 20px; border-radius: 10px; width: 80%;"> Өгөгдөл</div>
+              <div class="memory-block" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; padding: 10px 20px; border-radius: 10px; width: 80%;"> Файл</div>
+
+              <div class="thread" style="margin-top: 15px; background: #f7f9fc; border: 2px solid #04bfe0; border-radius: 10px; padding: 15px; width: 90%;">
+                   <b>Thread</b>
+                  <div class="memory-block" style="margin-top: 8px; background: linear-gradient(135deg, #f39c12, #d35400); color: white; padding: 8px 20px; border-radius: 8px;"> Регистр</div>
+                  <div class="memory-block" style="margin-top: 5px; background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 8px 20px; border-radius: 8px;"> Стек</div>
+              </div>
+          </div>
+          <p class="explanation" style="margin-top: 15px; color: #555; font-size: 16px;">Нэг thread-тэй процессууд нь энгийн боловч нэг зэрэг олон ажил гүйцэтгэх боломжгүй. Thread блоклосон үед бүх процесс блоклогдоно.</p>
+      </div>
+
+      <!-- Олон Thread-тэй процесс -->
+      <div class="diagram" style="flex: 1 1 45%; background: rgb(255, 255, 255); border-radius: 15px; padding: 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); transition: transform 0.3s; text-align: center;">
+          <h3 style="color: #253169; margin-bottom: 15px;"> Олон Thread-тэй процесс</h3>
+          <div class="process" style="border: 2px dashed #253169; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+
+              <div class="memory-block" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; padding: 10px 20px; border-radius: 10px; width: 80%;"> Код</div>
+              <div class="memory-block" style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; padding: 10px 20px; border-radius: 10px; width: 80%;"> Өгөгдөл</div>
+              <div class="memory-block" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; padding: 10px 20px; border-radius: 10px; width: 80%;"> Файл</div>
+
+              <div class="thread" style="margin-top: 10px; background: #f7f9fc; border: 2px solid #04bfe0; border-radius: 10px; padding: 12px; width: 90%;">
+                   <b>Thread 1</b>
+                  <div style="margin-top: 8px; background: linear-gradient(135deg, #f39c12, #d35400); color: white; padding: 8px 20px; border-radius: 8px;"> Регистр</div>
+                  <div style="margin-top: 5px; background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 8px 20px; border-radius: 8px;"> Стек</div>
+              </div>
+
+              <div class="thread" style="margin-top: 10px; background: #f7f9fc; border: 2px solid #04bfe0; border-radius: 10px; padding: 12px; width: 90%;">
+                   <b>Thread 2</b>
+                  <div style="margin-top: 8px; background: linear-gradient(135deg, #f39c12, #d35400); color: white; padding: 8px 20px; border-radius: 8px;"> Регистр</div>
+                  <div style="margin-top: 5px; background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 8px 20px; border-radius: 8px;"> Стек</div>
+              </div>
+
+              <div class="thread" style="margin-top: 10px; background: #f7f9fc; border: 2px solid #04bfe0; border-radius: 10px; padding: 12px; width: 90%;">
+                   <b>Thread 3</b>
+                  <div style="margin-top: 8px; background: linear-gradient(135deg, #f39c12, #d35400); color: white; padding: 8px 20px; border-radius: 8px;"> Регистр</div>
+                  <div style="margin-top: 5px; background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 8px 20px; border-radius: 8px;"> Стек</div>
+              </div>
+          </div>
+          <p class="explanation" style="margin-top: 15px; color: #555; font-size: 16px;">Олон thread-тэй процессууд нь нэг зэрэг олон ажил гүйцэтгэх боломжтой. Thread бүр өөрийн регистр, стектэй боловч код, өгөгдөл, файлуудыг хуваалцдаг.</p>
+      </div>
+  </div>
+
+  <!-- Simple animation -->
+  <style>
+  @keyframes moveLine {
+    from { transform: translateX(0); opacity: 0.7; }
+    to { transform: translateX(20px); opacity: 1; }
+  }
+  </style>
+
+</section>
+
+
+<!-- ====== CONTENT 4 — Scheduling overview (visual) ====== -->
+<section id="content-4" style="padding: 60px 10%; background: linear-gradient(180deg, #091e2f, #091a2c); font-family: 'Segoe UI', sans-serif; color: #2c3e50;">
+
+  <div class="moving-line" style="width: 100px; height: 4px; background: linear-gradient(90deg, #04bfe0, #253169); border-radius: 2px; animation: moveLine 2s infinite alternate; margin-bottom: 25px; animation-delay: 3s;"></div>
+
+  <h2 style="font-size: 40px; margin-bottom: 30px; color: #d8d9dd;"> Multiprogramming vs Multithreading</h2>
+
+  <div class="highlight-box" style="background: rgb(17, 22, 69); border-left: 6px solid #04bfe0; border-radius: 12px; padding: 25px 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 40px;">
+      <h3 style="color: #abb3d5;"> Ялгаа нь юу вэ?</h3>
+      <p style="font-size: 17px; color: #f8f8f8; line-height: 1.6;">
+          <strong>Multiprogramming</strong> нь олон процессыг нэгэн зэрэг ажиллуулах боловч нэг процессор дээр зөвхөн нэг процесс л ажиллана. 
+          <strong>Multithreading</strong> нь нэг процесс доторх олон thread-ийг зэрэгцээ ажиллуулах боломжийг олгодог.
+      </p>
+  </div>
+
+  <div class="model-diagram" style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 30px;">
+
+      <!-- Multiprogramming -->
+      <div class="model-box multiprogramming" style="flex: 1 1 45%; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); padding: 25px; transition: transform 0.3s; text-align: center;">
+          <div class="model-title" style="font-size: 22px; font-weight: 600; color: #253169; margin-bottom: 15px;"> Multiprogramming</div>
+          <div class="model-visual" style="position: relative; width: 100%; height: 200px; background: #f7f9fc; border: 2px dashed #04bfe0; border-radius: 10px; margin-bottom: 15px;">
+
+              <div class="model-process" style="position: absolute; width: 80px; height: 80px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; top: 30px; left: 30px;">P1</div>
+
+              <div class="model-process" style="position: absolute; width: 80px; height: 80px; background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; top: 30px; right: 30px;">P2</div>
+
+              <div class="model-process" style="position: absolute; width: 80px; height: 80px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; bottom: 30px; left: 30px;">P3</div>
+
+              <div class="model-process" style="position: absolute; width: 80px; height: 80px; background: linear-gradient(135deg, #f39c12, #d35400); color: white; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; bottom: 30px; right: 30px;">P4</div>
+
+              <div class="cpu-core" style="position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #04bfe0, #253169); color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 3px 10px rgba(0,0,0,0.2);">CPU</div>
+          </div>
+
+          <p style="margin: 5px 0; color: #444;"><strong> Давуу тал:</strong> CPU ашиглалтыг сайжруулдаг</p>
+          <p style="margin: 0; color: #444;"><strong> Сул тал:</strong> Контекст солилтоос үүсэх зардал их</p>
+      </div>
+
+      <!-- Multithreading -->
+      <div class="model-box multithreading" style="flex: 1 1 45%; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); padding: 25px; transition: transform 0.3s; text-align: center;">
+          <div class="model-title" style="font-size: 22px; font-weight: 600; color: #253169; margin-bottom: 15px;"> Multithreading</div>
+          <div class="model-visual" style="position: relative; width: 100%; height: 200px; background: #f7f9fc; border: 2px dashed #04bfe0; border-radius: 10px; margin-bottom: 15px;">
+
+              <div class="model-process" style="position: absolute; width: 90px; height: 90px; background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 30px; left: 50%; transform: translateX(-50%);">P1</div>
+
+              <div class="model-thread" style="position: absolute; width: 60px; height: 60px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 120px; left: 30px;">T1</div>
+
+              <div class="model-thread" style="position: absolute; width: 60px; height: 60px; background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 120px; left: 100px;">T2</div>
+
+              <div class="model-thread" style="position: absolute; width: 60px; height: 60px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 120px; left: 170px;">T3</div>
+
+              <div class="cpu-core" style="position: absolute; top: 80px; left: 25%; background: linear-gradient(135deg, #04bfe0, #253169); color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 3px 10px rgba(0,0,0,0.2);">CPU1</div>
+
+              <div class="cpu-core" style="position: absolute; top: 80px; right: 25%; background: linear-gradient(135deg, #04bfe0, #253169); color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 3px 10px rgba(0,0,0,0.2);">CPU2</div>
+          </div>
+
+          <p style="margin: 5px 0; color: #444;"><strong> Давуу тал:</strong> Хариу үйлдлийн хугацааг сайжруулдаг</p>
+          <p style="margin: 0; color: #444;"><strong> Сул тал:</strong> Синхрончлолын асуудал үүсгэж болно</p>
+      </div>
+  </div>
+
+  <div class="info-card" style="display: flex; align-items: flex-start; background: rgb(19, 29, 54); border-radius: 15px; padding: 25px 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-top: 50px;">
+      <div class="info-icon" style="font-size: 40px; margin-right: 20px;"></div>
+      <div>
+          <h3 style="color: #a0a6c0;">Multithreading-ийн гол давуу талууд:</h3>
+          <ul style="margin-top: 10px; color: #f4f4f4; font-size: 17px; line-height: 1.6;">
+              <li><strong> Хурдны өсөлт:</strong> Олон CPU/core дээр thread-үүдийг зэрэгцээ ажиллуулж болно</li>
+              <li><strong> Нөөцийн хэмнэлт:</strong> Thread-үүд нөөцүүдээ хуваалцдаг тул санах ой, процессор цаг хэмнэдэг</li>
+              <li><strong> Хариу үйлдлийн сайжрал:</strong> Нэг thread блоклосон үед бусад thread үргэлжлүүлэн ажиллана</li>
+          </ul>
+      </div>
+  </div>
+
+  <!-- animation -->
+  <style>
+  @keyframes moveLine {
+    from { transform: translateX(0); opacity: 0.7; }
+    to { transform: translateX(20px); opacity: 1; }
+  }
+  </style>
+
+</section>
+
+
+<!-- ====== CONTENT 5 — IPC & Safety (visual) ====== -->
+<section class="content-5" style="padding: 60px 10%; font-family: Arial, sans-serif; background-color: #0f0936; position: relative;">
+    <div class="moving-line" style="position:absolute;top:0;left:0;width:100%;height:4px;background:#04bfe0;animation:move-line 2s linear infinite; animation-delay:4s;"></div>
+    <h2 style="font-size:28px; margin-bottom:20px;"> Интерактив Демо: Процесс ба Thread-ийн Ажиллагаа</h2>
+
+    <div class="interactive-demo" style="background:#110935; border-radius:12px; padding:20px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+        <p>Энэ демо нь процессууд болон thread-үүдийн CPU-д хэрэгжүүлэгдэх үйл явцыг харуулж байна. Дараах товчнуудыг ашиглан процесс, thread нэмж үзээрэй.</p>
+
+        <div class="demo-controls" style="margin:15px 0; display:flex; flex-wrap:wrap; gap:10px;">
+            <button id="add-process" style="padding:8px 12px; background:#04bfe0; border:none; color:#fff; border-radius:6px; cursor:pointer;"> Процесс нэмэх</button>
+            <button id="add-thread" style="padding:8px 12px; background:#9b59b6; border:none; color:#fff; border-radius:6px; cursor:pointer;"> Thread нэмэх</button>
+            <button id="remove-process" style="padding:8px 12px; background:#e74c3c; border:none; color:#fff; border-radius:6px; cursor:pointer;"> Процесс хасах</button>
+            <button id="clear-all" style="padding:8px 12px; background:#f39c12; border:none; color:#fff; border-radius:6px; cursor:pointer;"> Бүгдийг арилгах</button>
+            <button id="start-demo" style="padding:8px 12px; background:#2ecc71; border:none; color:#fff; border-radius:6px; cursor:pointer;"> Демо эхлүүлэх</button>
+        </div>
+
+        <div class="demo-visualization" id="demo-area" style="position:relative; width:100%; height:400px; background:#ffffff; border-radius:12px; overflow:hidden;">
+            <div class="cpu-core" style="position:absolute; top:50px; left:50px; width:80px; height:50px; background:#3498db; color:#fff; display:flex; align-items:center; justify-content:center; border-radius:8px;">CPU 1</div>
+            <div class="cpu-core" style="position:absolute; top:50px; right:50px; width:80px; height:50px; background:#3498db; color:#fff; display:flex; align-items:center; justify-content:center; border-radius:8px;">CPU 2</div>
+            <div class="memory-io" style="position:absolute; bottom:50px; left:50px; width:80px; height:50px; background:#1abc9c; color:#fff; display:flex; align-items:center; justify-content:center; border-radius:8px;">RAM</div>
+            <div class="memory-io" style="position:absolute; bottom:50px; right:50px; width:80px; height:50px; background:#1abc9c; color:#fff; display:flex; align-items:center; justify-content:center; border-radius:8px;">I/O</div>
+            <div class="explanation-box" id="demo-explanation" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.7); color:#fff; padding:10px 15px; border-radius:8px; max-width:90%; text-align:center;">
+                Демо эхлээгүй байна. Дээрх товчнуудыг ашиглан процесс, thread нэмнэ үү.
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const demoArea = document.getElementById('demo-area');
+    const demoExplanation = document.getElementById('demo-explanation');
+    const addProcessBtn = document.getElementById('add-process');
+    const addThreadBtn = document.getElementById('add-thread');
+    const removeProcessBtn = document.getElementById('remove-process');
+    const clearAllBtn = document.getElementById('clear-all');
+    const startDemoBtn = document.getElementById('start-demo');
+    
+    let processCount = 0;
+    let threadCount = 0;
+    const processes = [];
+    const colors = [
+        'linear-gradient(135deg, #3498db, #2980b9)',
+        'linear-gradient(135deg, #2ecc71, #27ae60)',
+        'linear-gradient(135deg, #e74c3c, #c0392b)',
+        'linear-gradient(135deg, #f39c12, #d35400)',
+        'linear-gradient(135deg, #9b59b6, #8e44ad)',
+        'linear-gradient(135deg, #1abc9c, #16a085)'
+    ];
+    
+    function getRandomPosition(max) { return Math.floor(Math.random() * max); }
+    
+    function createProcess() {
+        processCount++;
+        const processId = `process-${processCount}`;
+        const color = colors[processCount % colors.length];
+        
+        const process = document.createElement('div');
+        process.id = processId;
+        process.className = 'process-visual';
+        process.style.background = color;
+        process.style.position = 'absolute';
+        process.style.width = '60px';
+        process.style.height = '60px';
+        process.style.borderRadius = '8px';
+        process.style.display = 'flex';
+        process.style.alignItems = 'center';
+        process.style.justifyContent = 'center';
+        process.style.color = '#fff';
+        process.style.left = `${getRandomPosition(demoArea.offsetWidth - 90)}px`;
+        process.style.top = `${getRandomPosition(demoArea.offsetHeight - 90)}px`;
+        process.textContent = `P${processCount}`;
+        
+        demoArea.appendChild(process);
+        processes.push({ id: processId, element: process, threads: [], state: 'running' });
+        
+        const label = document.createElement('div');
+        label.className = 'floating-label';
+        label.textContent = `Шинэ процесс P${processCount}`;
+        label.style.position='absolute';
+        label.style.color='#000';
+        label.style.left = `${parseInt(process.style.left)+30}px`;
+        label.style.top = `${parseInt(process.style.top)-25}px`;
+        demoArea.appendChild(label);
+        setTimeout(()=>{label.remove();},3000);
+        
+        demoExplanation.textContent = ` Шинэ процесс P${processCount} үүслээ! Процесс нь код, өгөгдөл, файл, регистр, стек зэрэг хэсгүүдээс бүрдэнэ.`;
+        return processId;
+    }
+
+    function createThread(processId) {
+        if(processes.length===0){demoExplanation.textContent=' Эхлээд процесс үүсгэнэ үү! Thread нь процесс дотор ажиллах нэгж юм.'; return;}
+        let process = processId ? processes.find(p=>p.id===processId) : processes[processes.length-1];
+        if(!process) return;
+        threadCount++;
+        const threadId=`thread-${threadCount}`;
+        const thread=document.createElement('div');
+        thread.id=threadId;
+        thread.className='thread-visual';
+        thread.style.background='linear-gradient(135deg, #e74c3c, #c0392b)';
+        thread.style.position='absolute';
+        thread.style.width='40px';
+        thread.style.height='40px';
+        thread.style.borderRadius='8px';
+        thread.style.display='flex';
+        thread.style.alignItems='center';
+        thread.style.justifyContent='center';
+        thread.style.color='#fff';
+
+        const processRect=process.element.getBoundingClientRect();
+        const demoRect=demoArea.getBoundingClientRect();
+        const processLeft=processRect.left-demoRect.left;
+        const processTop=processRect.top-demoRect.top;
+
+        thread.style.left=`${processLeft + 30 + (process.threads.length*40)}px`;
+        thread.style.top=`${processTop + 60}px`;
+        thread.textContent=`T${threadCount}`;
+        demoArea.appendChild(thread);
+        process.threads.push({id:threadId,element:thread,state:'running'});
+
+        const label=document.createElement('div');
+        label.className='floating-label';
+        label.textContent=`Шинэ thread T${threadCount}`;
+        label.style.position='absolute';
+        label.style.color='#000';
+        label.style.left=`${parseInt(thread.style.left)+17}px`;
+        label.style.top=`${parseInt(thread.style.top)-25}px`;
+        demoArea.appendChild(label);
+        setTimeout(()=>{label.remove();},3000);
+        
+        demoExplanation.textContent=` Процесс P${processes.indexOf(process)+1}-д шинэ thread T${threadCount} нэмэгдлээ! Thread нь процессын нөөцүүдийг хуваалцдаг боловч өөрийн регистр, стектэй байдаг.`;
+    }
+
+    function removeProcess() {
+        if(processes.length===0){demoExplanation.textContent=' Устгах процесс байхгүй байна.'; return;}
+        const process=processes.pop();
+        process.threads.forEach(t=>t.element.remove());
+        process.element.remove();
+        demoExplanation.textContent=` Процесс P${processCount} устгагдлаа. Түүний бүх thread-үүд мөн устгагдсан.`;
+        processCount--;
+    }
+
+    function clearAll() {
+        while(processes.length>0){removeProcess();}
+        processCount=0; threadCount=0;
+        demoExplanation.textContent=' Бүх процесс, thread устгагдлаа.';
+    }
+
+    function animateProcesses() {
+        processes.forEach((process,index)=>{
+            const newX=getRandomPosition(demoArea.offsetWidth-90);
+            const newY=getRandomPosition(demoArea.offsetHeight-90);
+            process.element.style.transition='all 2s ease';
+            process.element.style.left=`${newX}px`;
+            process.element.style.top=`${newY}px`;
+            process.threads.forEach((thread,threadIndex)=>{
+                thread.element.style.transition='all 2s ease';
+                thread.element.style.left=`${newX+30+(threadIndex*40)}px`;
+                thread.element.style.top=`${newY+60}px`;
+            });
+            if(Math.random()<0.1){
+                process.element.style.opacity='0.5'; process.element.style.transform='scale(0.9)'; process.state='blocked';
+                process.element.style.transition='all 1s ease';
+                process.element.style.left='70%'; process.element.style.top='80%';
+                demoExplanation.textContent=`⏸ Процесс P${index+1} блоклогдлоо (I/O үйлдэл хийж байна)...`;
+                setTimeout(()=>{process.element.style.opacity='1'; process.element.style.transform='scale(1)'; process.state='running'; demoExplanation.textContent=`✅ Процесс P${index+1} блоклосноос гарлаа!`;},2000);
+            }
+            process.threads.forEach((thread,threadIndex)=>{
+                if(Math.random()<0.15 && process.state!=='blocked'){thread.element.style.opacity='0.5'; thread.state='blocked'; setTimeout(()=>{thread.element.style.opacity='1'; thread.state='running';},1500);}
+            });
+        });
+    }
+
+    function startDemo(){
+        clearAll();
+        demoExplanation.textContent=' Демо эхлэв! Процессууд CPU-д ажиллаж байна. Зарим процессууд санамсаргүй блоклогдож болно...';
+        setTimeout(()=>{
+            createProcess(); createThread(); createThread();
+            setTimeout(()=>{createProcess(); createThread(); setTimeout(()=>{createProcess(); createThread(); createThread(); createThread();},2000);},1500);
+        },500);
+    }
+
+    addProcessBtn.addEventListener('click',()=>{createProcess();});
+    addThreadBtn.addEventListener('click',()=>{createThread();});
+    removeProcessBtn.addEventListener('click',()=>{removeProcess();});
+    clearAllBtn.addEventListener('click',()=>{clearAll();});
+    startDemoBtn.addEventListener('click',()=>{startDemo();});
+    setInterval(animateProcesses,3000);
+});
+</script>
+
+
+<!-- ===== TASK SLIDES: PROCESS SCHEDULING ===== -->
+
+<!-- Slide 1 — 4 algorithms overview (pro) -->
+<section id="task-1">
+  <div class="card content-slide">
+    <!-- LEFT: copy clear explanation -->
+    <div class="left reveal" style="font-size: 30px;padding-left: 30px;">
+      <h2 style="color: rgba(255, 238, 0, 0.756);">Процессын 4 хэрэгжүүлэлт</h2>
+      <ul class="bullets" style="font-size: 20px;">
+        <li><b>First In First Out (FIFO)</b></li>
+        <li><b>Shortest Job First (SJF)</b></li>
+        <li><b>Round Robin (RR)</b></li>
+        <li><b>Priority</b></li>
+      </ul>
+      <p class="muted"  style="font-size: 20px;">Эдгээр нь CPU-гийн шугалан нөөцийг шударга, үр ашигтай хуваарилах үндсэн аргууд.</p>
+    </div>
+
+    <!-- RIGHT: animated, self-contained SVG (legend + orbits + mini Gantt) -->
+    <figure class="media-right">
+      <svg viewBox="0 0 640 420" role="img" style="font-size: 28px" aria-label="CPU ба 4 төрлийн төлөвлөлтийн үзүүлэн" style="width:100%;height:auto;display:block">
+        <defs>
+          <!-- Gradients -->
+          <linearGradient id="gFIFO" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#22d3ee"/>
+          </linearGradient>
+          <linearGradient id="gSJF"  x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#10b981"/>
+          </linearGradient>
+          <linearGradient id="gRR"   x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f472b6"/><stop offset="1" stop-color="#db2777"/>
+          </linearGradient>
+          <linearGradient id="gPR"   x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#d97706"/>
+          </linearGradient>
+
+          <!-- Styles scoped to this SVG -->
+          <style>
+            .title   { font: 800 28px ui-sans-serif, system-ui, Segoe UI, Roboto; fill:#dbeafe }
+            .muted   { font: 600 20px ui-sans-serif, system-ui, Segoe UI, Roboto; fill:#9fb1d6 }
+            .chipTxt { font: 800 18px ui-sans-serif, system-ui, Segoe UI, Roboto; fill:#0b1220 }
+            .ring    { stroke:#20314f; stroke-width:1.5; fill:none; opacity:.65 }
+            .subring { stroke:#2a3d66; stroke-width:1; fill:none; opacity:.35 }
+            .pulse   { animation:pulse 2.2s ease-in-out infinite; transform-box:fill-box; transform-origin:center }
+            .spinA   { animation:spin 10s linear infinite }
+            .spinB   { animation:spin 13s linear infinite reverse }
+            .spinC   { animation:spin 16s linear infinite }
+            .dash    { stroke-dasharray:10 10; animation:march 12s linear infinite; opacity:.6 }
+            .barFill { height:14px; rx:8; ry:8 }
+            @keyframes pulse{ 0%,100%{transform:scale(1);opacity:.9} 50%{transform:scale(1.25);opacity:1} }
+            @keyframes spin { to { transform:rotate(360deg) } }
+            @keyframes march{ to { stroke-dashoffset:-500 } }
+            @keyframes grow { 0%{width:0} 40%{width:60%} 100%{width:60%} }
+          </style>
+        </defs>
+
+        <!-- LEGEND -->
+        <g transform="translate(24,16)">
+          <text class="title" x="0" y="0"></text>
+          <g transform="translate(0,10)">
+            <g transform="translate(0,14)">
+              <rect x="0" y="0" width="16" height="16" rx="4" fill="url(#gFIFO)"/><text class="muted" x="24" y="13">FIFO</text>
+            </g>
+            <g transform="translate(90,14)">
+              <rect x="0" y="0" width="16" height="16" rx="4" fill="url(#gSJF)"/><text class="muted" x="24" y="13">SJF</text>
+            </g>
+            <g transform="translate(170,14)">
+              <rect x="0" y="0" width="16" height="16" rx="4" fill="url(#gRR)"/><text class="muted" x="24" y="13">RR</text>
+            </g>
+            <g transform="translate(240,14)">
+              <rect x="0" y="0" width="16" height="16" rx="4" fill="url(#gPR)"/><text class="muted" x="24" y="13">Priority</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- CPU block (right side) -->
+        <g transform="translate(380,60)">
+          <circle class="ring"    cx="140" cy="140" r="120"/>
+          <circle class="subring" cx="140" cy="140" r="70"/>
+          <rect x="100" y="100" width="80" height="80" rx="18" fill="#0b1220" stroke="#134e4a" stroke-width="2"/>
+          <circle class="pulse" cx="140" cy="140" r="10" fill="#22d3ee"/>
+          <text class="muted" x="140" y="200" text-anchor="middle">CPU</text>
+
+          <!-- Orbiting "process chips" -->
+          <g class="spinA" transform="translate(140,140)">
+            <g transform="translate(0,-120)">
+              <rect x="-24" y="-12" width="48" height="24" rx="8" fill="url(#gFIFO)"/>
+              <text class="chipTxt" text-anchor="middle" x="0" y="4">FIFO</text>
+            </g>
+          </g>
+          <g class="spinB" transform="translate(140,140)">
+            <g transform="translate(85,0)">
+              <rect x="-22" y="-11" width="44" height="22" rx="8" fill="url(#gSJF)"/>
+              <text class="chipTxt" text-anchor="middle" x="0" y="4">SJF</text>
+            </g>
+          </g>
+          <g class="spinC" transform="translate(140,140)">
+            <g transform="translate(-90,90)">
+              <rect x="-22" y="-11" width="44" height="22" rx="8" fill="url(#gRR)"/>
+              <text class="chipTxt" text-anchor="middle" x="0" y="4">RR</text>
+            </g>
+          </g>
+          <g class="spinB" transform="translate(140,140)">
+            <g transform="translate(-120,-10)">
+              <rect x="-26" y="-12" width="52" height="24" rx="8" fill="url(#gPR)"/>
+              <text class="chipTxt" text-anchor="middle" x="0" y="4">PRIO</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- Mini Gantt comparisons (left bottom) -->
+        <g transform="translate(24,220)">
+          <text class="muted" x="0" y="-10">Жишээ дараалал (conceptual)</text>
+
+          <!-- FIFO -->
+          <g transform="translate(0,0)">
+            <text class="muted" x="0" y="12">FIFO</text>
+            <rect x="52" y="0" width="240" height="14" rx="8" ry="8" fill="#0b152a" stroke="#2b4c82"/>
+            <rect class="barFill" x="52" y="0" width="240" fill="url(#gFIFO)" style="animation:grow 5s ease-in-out infinite"/>
+          </g>
+
+          <!-- SJF -->
+          <g transform="translate(0,28)">
+            <text class="muted" x="0" y="12">SJF</text>
+            <rect x="52" y="0" width="240" height="14" rx="8" ry="8" fill="#0b152a" stroke="#2b4c82"/>
+            <rect class="barFill" x="52" y="0" width="72"  fill="url(#gSJF)"/>
+            <rect class="barFill" x="126" y="0" width="96"  fill="url(#gPR)" opacity=".9"/>
+            <rect class="barFill" x="226" y="0" width="66"  fill="url(#gRR)" opacity=".85"/>
+          </g>
+
+          <!-- RR -->
+          <g transform="translate(0,56)">
+            <text class="muted" x="0" y="12">RR</text>
+            <rect x="52" y="0" width="240" height="14" rx="8" ry="8" fill="#0b152a" stroke="#2b4c82"/>
+            <!-- ук-сегментүүд -->
+            <rect class="barFill" x="52"  y="0" width="32" fill="url(#gRR)"/>
+            <rect class="barFill" x="88"  y="0" width="32" fill="url(#gRR)" opacity=".85"/>
+            <rect class="barFill" x="124" y="0" width="32" fill="url(#gRR)" opacity=".7"/>
+            <rect class="barFill" x="160" y="0" width="32" fill="url(#gRR)" opacity=".55"/>
+            <rect class="barFill" x="196" y="0" width="32" fill="url(#gRR)" opacity=".4"/>
+            <rect class="barFill" x="232" y="0" width="32" fill="url(#gRR)" opacity=".25"/>
+          </g>
+
+          <!-- Priority -->
+          <g transform="translate(0,84)">
+            <text class="muted" x="0" y="12">Priority</text>
+            <rect x="52" y="0" width="240" height="14" rx="8" ry="8" fill="#0b152a" stroke="#2b4c82"/>
+            <rect class="barFill" x="52" y="0" width="120" fill="url(#gPR)"/>
+            <rect class="barFill" x="174" y="0" width="60"  fill="url(#gFIFO)" opacity=".9"/>
+            <rect class="barFill" x="238" y="0" width="54"  fill="url(#gSJF)"  opacity=".85"/>
+          </g>
+        </g>
+
+        <!-- Flow hint line -->
+        <path d="M 24 180 H 356" class="dash" stroke="#88a5ff" stroke-width="3" fill="none"/>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+
+<section id="task-2">
+  <style>
+    #task-2{
+      --accent1:#f59e0b; /* amber */
+      --accent2:#ef4444; /* red */
+    }
+    /* Title chip keeps your inline font-size, just add gradient skin */
+    #task-2 .title-chip{
+      display:inline-block; padding:10px 14px; border-radius:999px;
+      font-weight:800; letter-spacing:.2px;
+      background:linear-gradient(135deg,var(--accent1),var(--accent2));
+      color:#0b0f1a;
+      box-shadow:0 6px 16px rgba(245,158,11,.25);
+    }
+
+    /* ===== Scope: #task-2 only ===== */
+    #task-2{
+      --bg:#0b0f1a; --card:#101628; --border:rgba(255,255,255,.08);
+      --fg:#e5eefc; --muted:#9fb1d6;
+      --glow:0 8px 32px rgba(34,211,238,.25),0 0 0 1px rgba(255,255,255,.06);
+      --ring:drop-shadow(0 4px 12px rgba(34,211,238,.35));
+      position:relative;
+      overflow-x:clip; /* block horizontal scroll */
+    }
+    html,body{overflow-x:hidden;}
+
+    #task-2::before{
+      content:"";position:absolute;inset:-2px;
+      background:
+        radial-gradient(transparent 60%,rgba(34,211,238,.08))0 0/220px 220px,
+        linear-gradient(transparent 98%,rgba(255,255,255,.06))0 0/100% 32px;
+      mask:linear-gradient(#000,transparent 85%);
+      pointer-events:none;z-index:0;animation:gridMove 14s linear infinite;
+    }
+    @keyframes gridMove{to{background-position:220px 0,0 -32px}}
+
+
+    .card{
+      position:relative;z-index:1;display:grid;align-items:center;gap:24px;
+      grid-template-columns:minmax(320px,0.7fr) 1.3fr;
+      background:var(--card);border:1px solid var(--border);
+      border-radius:16px;padding:24px;box-shadow:var(--glow);
+      overflow:clip;
+      opacity:.001;transform:translateY(12px)scale(.995);
+      animation:fadeUp .7s cubic-bezier(.22,.78,.26,1) forwards .08s;
+    }
+    @keyframes fadeUp{to{opacity:1;transform:translateY(0)scale(1)}}
+
+    .title-chip{
+      display:inline-block;padding:8px 12px;border-radius:999px;
+      font-weight:800;font-size:14px;letter-spacing:.2px;
+      background:linear-gradient(135deg,#0ea5e9,#22d3ee);color:#07131b;
+      margin-bottom:12px;filter:saturate(1.1)brightness(1.02);
+      box-shadow:0 4px 16px rgba(14,165,233,.25);
+      animation:chipFloat 5.5s ease-in-out infinite;
+    }
+    @keyframes chipFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+    #task-2 p{
+      margin:0;color:var(--fg);line-height:1.6;
+      opacity:.001;transform:translateY(6px);
+      animation:textIn .7s .18s cubic-bezier(.22,.78,.22,1) forwards,shimmer 4.5s ease-in-out .3s infinite;
+      background:linear-gradient(90deg,#e5eefc 20%,#bcd3ff 40%,#e5eefc 60%)0 0/200% 100%;
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+    @keyframes textIn{to{opacity:1;transform:translateY(0)}}
+    @keyframes shimmer{50%{background-position:100% 0}}
+
+    #task-2 p b{
+      position:relative;color:#e5eefc;-webkit-text-fill-color:#e5eefc;
+    }
+    #task-2 p b::after{
+      content:"";position:absolute;left:-2px;right:-2px;bottom:0;height:.55em;
+      background:linear-gradient(90deg,rgba(96,165,250,.25),rgba(34,211,238,.25));
+      border-radius:6px;z-index:-1;transform-origin:left;
+      transform:scaleX(0);animation:underline .9s .5s cubic-bezier(.2,.8,.2,1) forwards;
+    }
+    @keyframes underline{to{transform:scaleX(1)}}
+
+    .media-right{display:flex;justify-content:center;}
+    .svg-wrap{
+      position:relative;width:100%;aspect-ratio:1200/420;
+      border-radius:14px;overflow:hidden;background:#081326;
+      outline:1px solid rgba(255,255,255,.06);box-shadow:var(--glow);
+      transform:translateZ(0);transition:transform .6s cubic-bezier(.2,.8,.2,1);
+    }
+    .svg-wrap::before{
+      content:"";position:absolute;inset:-1px;border-radius:16px;
+      background:conic-gradient(from 90deg,#22d3ee,#60a5fa,#22d3ee);
+      -webkit-mask:linear-gradient(#000 0 0)content-box,linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor;mask-composite:exclude;
+      padding:1px;opacity:.25;filter:blur(.4px);
+      animation:spin 12s linear infinite;pointer-events:none;
+    }
+    @keyframes spin{to{transform:rotate(1turn)}}
+    svg{width:100%;height:100%;display:block;filter:var(--ring);}
+
+    svg .march{stroke-linecap:round;stroke-width:4;stroke-dasharray:14 10;animation:march 7s linear infinite;filter:drop-shadow(0 0 6px rgba(136,165,255,.35));}
+    @keyframes march{to{stroke-dashoffset:-600}}
+    svg .pulse{transform-origin:center;animation:pulse 2.2s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(34,211,238,.65));}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+    svg .grow{animation:bar 4.2s cubic-bezier(.22,.78,.22,1) infinite;}
+    @keyframes bar{0%{width:0}38%{width:64%}100%{width:64%}}
+    .svg-wrap:has(.grow)::after{
+      content:"";position:absolute;inset:0;pointer-events:none;
+      background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.08)50%,transparent 70%)0 0/220% 100%;
+      mix-blend-mode:screen;opacity:.45;animation:sheen 3.8s ease-in-out infinite;
+    }
+    @keyframes sheen{50%{background-position:100% 0}}
+
+    /* === Image entrance from right === */
+    #task-2 img[alt="SJF concept image"]{
+      max-width:700px;margin-left:490px;
+      opacity:0;transform:translateX(40px);
+      animation:imgInFromRight .9s cubic-bezier(.22,.78,.22,1) .2s forwards;
+      border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.35);
+    }
+    @keyframes imgInFromRight{
+      to{opacity:1;transform:translateX(0);}
+    }
+    @media (pointer:fine){
+      #task-2 img[alt="SJF concept image"]:hover{
+        transform:translateX(0)translateY(-2px)scale(1.01);
+        transition:transform .35s cubic-bezier(.2,.8,.2,1);
+      }
+    }
+
+    @media (max-width:900px){
+      .card{grid-template-columns:1fr;}
+      .svg-wrap{aspect-ratio:1200/520;}
+      #task-2 img[alt="SJF concept image"]{margin:16px auto;max-width:90%;display:block;}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .march,.pulse,.grow{animation:none!important;}
+      *{animation:none!important;}
+    }
+  </style>
+
+  <div class="card content-slide stack-bottom">
+    <div class="left">
+      <div class="title-chip"  style="font-size: 25px;" >FIRST IN FIRST OUT гэж юу вэ?</div>
+      <p  style="font-size: 20px;">
+        Процессууд ирсэн дарааллаараа CPU-г ашиглана.  
+        Энгийн боловч <b>эхэнд ирсэн урт процесс</b> удаан ажиллавал
+        дараагийн богино процессууд бүгд хүлээж,
+        системийн дундаж хүлээлт ихэсдэг.
+      </p>
+    </div>
+
+    <figure class="media-right lg" aria-label="FIFO queue → CPU">
+      <div class="svg-wrap">
+        <!-- your SVG unchanged -->
+        <svg viewBox="0 0 1200 360" role="img" aria-label="FIFO queue to CPU with image">
+          <defs>
+            <linearGradient id="fifoCPU" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#22d3ee"/>
+            </linearGradient>
+            <linearGradient id="gMed" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#d97706"/>
+            </linearGradient>
+            <linearGradient id="gShort" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#10b981"/>
+            </linearGradient>
+            <linearGradient id="gLong" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f472b6"/><stop offset="1" stop-color="#db2777"/>
+            </linearGradient>
+            <clipPath id="imgRound"><rect x="860" y="24" width="316" height="216" rx="22" ry="22"/></clipPath>
+            <style>
+              .lbl{font:700 16px ui-sans-serif,system-ui,Segoe UI,Roboto;fill:#dbeafe}
+              .muted{font:600 12px ui-sans-serif,system-ui,Segoe UI,Roboto;fill:#9fb1d6}
+              .chipTxt{font:800 14px ui-sans-serif,system-ui,Segoe UI,Roboto;fill:#0b1220}
+              .march{stroke-dasharray:10 10;animation:march 8s linear infinite}
+              @keyframes march{to{stroke-dashoffset:-500}}
+              .pulse{animation:pulse 2.2s ease-in-out infinite}
+              @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+              .grow{animation:bar 5s ease-in-out infinite}
+              @keyframes bar{0%{width:0}45%{width:60%}100%{width:60%}}
+            </style>
+          </defs>
+          <g transform="translate(24,36)">
+            <rect x="0" y="0" width="520" height="96" rx="18" ry="18" fill="#0b152a" stroke="#274274"/>
+            <g transform="translate(18,20)" >
+              <rect rx="12" ry="12" width="86" height="38" fill="url(#gMed)"/><text class="chipTxt" x="43" y="24" text-anchor="middle" style="font-size: 28px;">P4</text>
+            </g>
+            <g transform="translate(118,20)" opacity=".95">
+              <rect rx="12" ry="12" width="86" height="38" fill="#a78bfa"/><text class="chipTxt" x="43" y="24" text-anchor="middle" style="font-size: 28px;">P2</text>
+            </g>
+            <g transform="translate(218,20)" opacity=".95">
+              <rect rx="12" ry="12" width="86" height="38" fill="#93c5fd"/><text class="chipTxt" x="43" y="24" text-anchor="middle" style="font-size: 28px;">P1</text>
+            </g>
+          </g>
+          <path d="M 560 84 H 820" class="march" stroke="#88a5ff" stroke-width="4" fill="none" opacity=".8"/>
+          <g transform="translate(640,24)">
+            <rect x="0" y="0" width="180" height="180" rx="24" ry="24" fill="url(#fifoCPU)"/>
+            <rect x="14" y="14" width="152" height="152" rx="18" ry="18" fill="#0e2730" opacity=".88" stroke="#134e4a"/>
+            <circle cx="90" cy="90" r="13" fill="#22d3ee" class="pulse"/>
+            <text class="lbl" x="90" y="208" text-anchor="middle">CPU</text>
+          </g>
+          <g transform="translate(24,220)">
+            <text class="muted" x="0" y="-10"style="font-size: 28px; >Gantt (FIFO)</text>
+            <rect x="0" y="0" width="780" height="22" rx="12" ry="12" fill="#0b152a" stroke="#2b4c82"/>
+            <rect x="0" y="0" height="22" rx="12" ry="12" fill="url(#fifoCPU)" class="grow"/>
+          </g>
+        </svg>
+      </div>
+    </figure>
+
+    <img src="/assets/23.webp" alt="SJF concept image" style="max-width:700px;margin-left:490px;">
+  </div>
+</section>
+
+<section id="task-3">
+  <style>
+    #task-3{
+      --accent1:#f59e0b; /* amber */
+      --accent2:#ef4444; /* red */
+    }
+    /* Title chip keeps your inline font-size, just add gradient skin */
+    #task-3 .title-chip{
+      display:inline-block; padding:10px 14px; border-radius:999px;
+      font-weight:800; letter-spacing:.2px;
+      background:linear-gradient(135deg,var(--accent1),var(--accent2));
+      color:#0b0f1a;
+      box-shadow:0 6px 16px rgba(245,158,11,.25);
+    }
+
+    /* ===== Scope: #task-3 only ===== */
+    #task-3{
+      --bg:#0b0f1a; --card:#101628; --border:rgba(255,255,255,.08);
+      --fg:#e5eefc; --muted:#9fb1d6;
+      --glow:0 8px 32px rgba(34,211,238,.25),0 0 0 1px rgba(255,255,255,.06);
+      --ring:drop-shadow(0 4px 12px rgba(34,211,238,.35));
+      position:relative;
+      overflow-x:clip; /* ← хэвтээ скроллгүй */
+    }
+    html,body{overflow-x:hidden;}
+
+    /* subtle moving grid background */
+    #task-3::before{
+      content:""; position:absolute; inset:-2px;
+      background:
+        radial-gradient(transparent 60%, rgba(34,211,238,.08)) 0 0/220px 220px,
+        linear-gradient(transparent 98%, rgba(255,255,255,.06)) 0 0/100% 32px;
+      mask: linear-gradient(#000, transparent 85%);
+      pointer-events:none; z-index:0;
+      animation:gridMove3 14s linear infinite;
+    }
+    @keyframes gridMove3{to{background-position:220px 0, 0 -32px}}
+
+
+    #task-3 .card{
+      position:relative; z-index:1;
+      display:grid; grid-template-columns:minmax(320px,0.7fr) 1.3fr;
+      align-items:center; gap:24px;
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; padding:24px; box-shadow:var(--glow);
+      overflow:clip;
+
+      opacity:.001; transform:translateY(12px) scale(.995);
+      animation:fadeUp3 .7s cubic-bezier(.22,.78,.26,1) forwards .08s;
+    }
+    @keyframes fadeUp3{to{opacity:1; transform:translateY(0) scale(1)}}
+
+
+
+    /* progressive enhancement: scroll-driven reveal */
+    @supports (animation-timeline:view()){
+      #task-3 .card{
+        animation:reveal3 both ease;
+        animation-timeline:view();
+        animation-range:entry 0% cover 30%;
+      }
+      @keyframes reveal3{
+        from{opacity:.001; transform:translateY(18px) scale(.985)}
+        to  {opacity:1;    transform:translateY(0)    scale(1)}
+      }
+    }
+
+    @keyframes chipFloat3{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+    /* Text: soft reveal + shimmer, bold highlight underline */
+    #task-3 p{
+      color:var(--fg); line-height:1.6; margin:0;
+      opacity:.001; transform:translateY(6px);
+      background:linear-gradient(90deg,#e5eefc 20%,#bcd3ff 40%,#e5eefc 60%) 0 0/200% 100%;
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      animation:textIn3 .7s .18s cubic-bezier(.22,.78,.22,1) forwards,
+               shimmer3 4.5s ease-in-out .3s infinite;
+    }
+    @keyframes textIn3{to{opacity:1; transform:translateY(0)}}
+    @keyframes shimmer3{50%{background-position:100% 0}}
+    #task-3 p b{
+      position:relative; color:#e5eefc; -webkit-text-fill-color:#e5eefc;
+    }
+    #task-3 p b::after{
+      content:""; position:absolute; left:-2px; right:-2px; bottom:0; height:.55em;
+      background:linear-gradient(90deg,rgba(96,165,250,.25),rgba(34,211,238,.25));
+      border-radius:6px; z-index:-1; transform-origin:left; transform:scaleX(0);
+      animation:underline3 .9s .5s cubic-bezier(.2,.8,.2,1) forwards;
+    }
+    @keyframes underline3{to{transform:scaleX(1)}}
+
+    #task-3 .media-right{display:flex; justify-content:center}
+    #task-3 .svg-wrap{
+      width:100%; aspect-ratio:1200/420;
+      border-radius:14px; overflow:hidden; background:#081326;
+      box-shadow:0 8px 32px rgba(0,0,0,.35); outline:1px solid rgba(255,255,255,.05);
+      position:relative; transform:translateZ(0);
+    }
+
+    /* animated ring */
+    #task-3 .svg-wrap::before{
+      content:""; position:absolute; inset:-1px; border-radius:16px;
+      background:conic-gradient(from 90deg,#22d3ee,#60a5fa,#22d3ee);
+      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor; mask-composite:exclude;
+      padding:1px; opacity:.25; filter:blur(.4px);
+      animation:spin3 12s linear infinite; pointer-events:none;
+    }
+    @keyframes spin3{to{transform:rotate(1turn)}}
+
+    /* sheen + sparkle-in-flight (2 layers in one pseudo) */
+    #task-3 .svg-wrap::after{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      /* layer1: sparkle (radial), layer2: sheen (linear) */
+      background-image:
+        radial-gradient(circle 6px, rgba(255,255,255,.85), rgba(255,255,255,0) 60%),
+        linear-gradient(120deg, transparent 30%, rgba(255,255,255,.08) 50%, transparent 70%);
+      background-size: 12px 12px, 220% 100%;
+      background-repeat: no-repeat, no-repeat;
+      /* initial positions get animated below */
+      background-position: 260px 60px, 0 0;
+      mix-blend-mode: screen;
+      animation:
+        sparkle3 3s ease-in-out infinite,
+        sheen3 3.8s ease-in-out infinite;
+      opacity:.95; /* sparkle is bright but tiny */
+    }
+    /* Sparkle path approx: from picked P1 (~260,60) → CPU center (~740,128) */
+    @keyframes sparkle3{
+      0%   { background-position: 260px 60px, 0 0; }
+      55%  { background-position: 260px 60px, 0 0; }  /* wait until pick “moves” */
+      100% { background-position: 740px 128px, 100% 0; }
+    }
+    @keyframes sheen3{ 50%{ background-position: 260px 60px, 100% 0 } }
+
+    #task-3 svg{width:100%; height:100%; display:block; filter:var(--ring)}
+
+    /* --- SVG animation polish without altering markup --- */
+    /* Picked job glow */
+    #task-3 svg .pick{ animation: pick 3s ease-in-out infinite, glowPick 3s ease-in-out infinite }
+    @keyframes glowPick{50%{filter:drop-shadow(0 0 10px rgba(16,185,129,.6))}}
+
+    /* Gantt easing (reuse existing seg keyframes) */
+    #task-3 svg .seg1{ animation: seg1 3s cubic-bezier(.22,.78,.22,1) infinite }
+    #task-3 svg .seg2{ animation: seg2 3s cubic-bezier(.22,.78,.22,1) infinite }
+    #task-3 svg .seg3{ animation: seg3 3s cubic-bezier(.22,.78,.22,1) infinite }
+
+    /* CPU center gentle pulse */
+    #task-3 svg circle[fill="#34d399"]{
+      filter:drop-shadow(0 0 10px rgba(16,185,129,.7));
+      transform-origin: center; animation: pulseCPU3 2.4s ease-in-out infinite;
+    }
+    @keyframes pulseCPU3{50%{transform:scale(1.12)}}
+
+    /* === Image entrance from right (keep your inline size/pos) === */
+    #task-3 img[alt="SJF concept image"]{
+      /* keep your inline size & margin-left from HTML */
+      opacity:0; transform:translateX(40px);
+      animation:imgInRight3 .9s cubic-bezier(.22,.78,.22,1) .2s forwards;
+      border-radius:14px; box-shadow:0 8px 32px rgba(0,0,0,.35);
+      will-change:transform,opacity;
+    }
+    @keyframes imgInRight3{to{opacity:1; transform:translateX(0)}}
+    @media (pointer:fine){
+      #task-3 img[alt="SJF concept image"]:hover{
+        transform:translateX(0) translateY(-2px) scale(1.01);
+        transition:transform .35s cubic-bezier(.2,.8,.2,1);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width:900px){
+      #task-3 .card{ grid-template-columns:1fr }
+      #task-3 .svg-wrap{ aspect-ratio:1200/520 }
+      #task-3 img[alt="SJF concept image"]{ margin:16px auto !important; max-width:90%; display:block }
+    }
+
+    /* Motion accessibility */
+    @media (prefers-reduced-motion:reduce){
+      #task-3 *{ animation:none !important }
+      #task-3 .card{ opacity:1; transform:none }
+    }
+  </style>
+
+  <div class="card content-slide">
+    <!-- Left side text -->
+    <div class="left">
+      <div class="title-chip"  style="font-size: 23px;">SHORTEST JOB FIRST гэж юу вэ?</div>
+      <p style="font-size: 20px;">
+        CPU-г хамгийн бага хугацаанд ашиглах процессыг түрүүлж ажиллуулна.
+        Иймээс нийт хүлээлт багасдаг ч, урт процессууд дарааллын хойно удаан хүлээж болзошгүй.
+      </p>
+    </div>
+
+    <!-- Right side SVG -->
+    <figure class="media-right" aria-label="SJF visual">
+      <div class="svg-wrap">
+        <svg viewBox="0 0 1200 380" role="img" aria-labelledby="sjfTitle">
+          <title id="sjfTitle"  style="font-size: 40px;">SJF — хамгийн богино ажлыг түрүүлж сонгох жишээ</title>
+          <defs>
+            <linearGradient id="sjfCPU" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#10b981" />
+              <stop offset="1" stop-color="#34d399" />
+            </linearGradient>
+            <linearGradient id="cShort" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#34d399" />
+              <stop offset="1" stop-color="#10b981" />
+            </linearGradient>
+            <linearGradient id="cMed" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f59e0b" />
+              <stop offset="1" stop-color="#d97706" />
+            </linearGradient>
+            <linearGradient id="cLong" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f472b6" />
+              <stop offset="1" stop-color="#db2777" />
+            </linearGradient>
+            <style>
+              .lbl { font:700 16px ui-sans-serif,system-ui,Segoe UI,Roboto; fill:#d1fae5; }
+              .muted { font:600 12px ui-sans-serif,system-ui,Segoe UI,Roboto; fill:#9fb1d6; }
+              .chip { font:800 14px ui-sans-serif,system-ui,Segoe UI,Roboto; fill:#0b1220; }
+              .pick { animation: pick 3s ease-in-out infinite; }
+              @keyframes pick{
+                0%,55%{ transform: translate(0,0) scale(1) }
+                70%,100%{ transform: translate(240px,8px) scale(1.06) }
+              }
+              .seg1 { animation: seg1 3s ease-in-out infinite; }
+              .seg2 { animation: seg2 3s ease-in-out infinite; }
+              .seg3 { animation: seg3 3s ease-in-out infinite; }
+              @keyframes seg1 { 0%{width:0} 55%{width:28%} 100%{width:28%} }
+              @keyframes seg2 { 0%{width:0} 55%{width:0} 85%{width:62%} 100%{width:62%} }
+              @keyframes seg3 { 0%{width:0} 85%{width:0} 100%{width:100%} }
+            </style>
+          </defs>
+
+          <!-- ready set -->
+          <g transform="translate(24,36)">
+            <rect x="0" y="0" width="520" height="110" rx="18" ry="18" fill="#0b1730" stroke="#274274"/>
+            <g transform="translate(16,22)">
+              <rect rx="12" ry="12" width="86" height="38" fill="url(#cLong)"/>
+              <text class="chipTxt" x="43" y="24" text-anchor="middle">P4</text>
+              <text class="muted" x="-2" y="64">burst: 9</text>
+            </g>
+            <g transform="translate(116,22)">
+              <rect rx="12" ry="12" width="86" height="38" fill="url(#cMed)"/>
+              <text class="chipTxt" x="43" y="24" text-anchor="middle">P2</text>
+              <text class="muted" x="-2" y="64">burst: 5</text>
+            </g>
+            <g class="pick" transform="translate(216,22)">
+              <rect rx="12" ry="12" width="86" height="38" fill="url(#cShort)"/>
+              <text class="chipTxt" x="43" y="24" text-anchor="middle">P1</text>
+              <text class="muted" x="-2" y="64">burst: 2</text>
+            </g>
+          </g>
+
+          <!-- CPU -->
+          <g transform="translate(640,28)">
+            <rect x="0" y="0" width="200" height="200" rx="26" ry="26" fill="url(#sjfCPU)"/>
+            <rect x="14" y="14" width="172" height="172" rx="20" ry="20" fill="#0e2a23" opacity=".92" stroke="#065f46"/>
+            <circle cx="100" cy="100" r="14" fill="#22d3ee"/>
+            <text class="lbl" x="100" y="226" text-anchor="middle" fill="#d1fae5">CPU</text>
+          </g>
+
+          <!-- Gantt -->
+          <g transform="translate(470,240)">
+            <text class="muted" x="0" y="-12"  style="font-size: 28px;">Gantt (SJF): P1 → P2 → P4</text>
+            <rect x="0" y="0" width="700" height="22" rx="12" ry="12" fill="#0b152a" stroke="#2b4c82"/>
+            <rect x="0" y="0" height="22" rx="12" ry="12" fill="url(#cShort)" class="seg1"/>
+            <rect x="0" y="0" height="22" rx="12" ry="12" fill="url(#cMed)" class="seg2" opacity=".9"/>
+            <rect x="0" y="0" height="22" rx="12" ry="12" fill="url(#cLong)" class="seg3" opacity=".85"/>
+          </g>
+        </svg>
+      </div>
+    </figure>
+
+    <img src="/assets/24.webp" alt="SJF concept image" style="max-width: 700px; margin-left: 490px;">
+  </div>
+</section>
+
+
+<!-- Slide 4 — RR concept (final, same structure) -->
+<section id="task-4">
+  <div class="card content-slide">
+    <div class="left">
+      <div class="title-chip" style="font-size: 25px;">ROUND ROBIN гэж юу вэ?</div>
+      <p style="font-size: 20px;">
+        CPU цагийг ижил хэмжээтэй <b>quantum</b>-аар хуваарилна.
+        <br>Fairness сайтай, <b>interactive</b> системд тохиромжтой.
+      </p>
+    </div>
+    <figure class="media-right lg">
+      <img src="/assets/25.webp" alt="Round Robin concept">
+    </figure>
+  </div>
+
+  <style>
+    /* --- Scoped only to #task-4 --- */
+    #task-4{
+      --accent1:#f59e0b; /* amber */
+      --accent2:#ef4444; /* red */
+    }
+
+
+    #task-4 .content-slide{
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      align-items: center;
+      gap: 24px;
+      background: #101628;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      padding: 28px;
+      color: #e5eefc;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    /* Title chip keeps your inline font-size, just add gradient skin */
+    #task-4 .title-chip{
+      display:inline-block; padding:10px 14px; border-radius:999px;
+      font-weight:800; letter-spacing:.2px;
+      background:linear-gradient(135deg,var(--accent1),var(--accent2));
+      color:#0b0f1a;
+      box-shadow:0 6px 16px rgba(245,158,11,.25);
+    }
+
+
+    /* --- glow layer --- */
+    #task-4 .media-right{
+      position: relative;
+      overflow: visible;
+    }
+
+    #task-4 .media-right::after{
+      content:"";
+      position:absolute;
+      inset:auto;
+      width:90%; height:70%;
+      bottom:-8%; left:5%;
+      border-radius:24px;
+      background:
+        radial-gradient(60% 60% at 40% 50%, color-mix(in oklab, var(--accent1) 70%, transparent), transparent 70%),
+        radial-gradient(60% 60% at 70% 40%, color-mix(in oklab, var(--accent2) 70%, transparent), transparent 70%);
+      filter:blur(30px);
+      opacity:0;
+      transform:translateX(-20px);
+      transition:all .7s cubic-bezier(.2,.8,.2,1);
+      z-index:-1;
+    }
+
+    #task-4 .media-right img{
+      display:block;
+      max-width:100%;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      box-shadow:0 12px 28px rgba(0,0,0,.35);
+      transform:translateX(-24px);
+      opacity:0;
+      will-change:transform,opacity;
+      transition:all .7s cubic-bezier(.2,.8,.2,1);
+    }
+
+    /* --- active state when visible --- */
+    #task-4.in-view .media-right img{
+      transform:translateX(0);
+      opacity:1;
+      animation:floatY 6s ease-in-out 1s infinite alternate;
+    }
+    #task-4.in-view .media-right::after{
+      opacity:.9;
+      transform:translateX(0);
+      animation:glowPulse 4s ease-in-out 1s infinite alternate;
+    }
+
+    @keyframes floatY{
+      from{transform:translateY(0);}
+      to{transform:translateY(-6px);}
+    }
+    @keyframes glowPulse{
+      from{filter:blur(26px); opacity:.75;}
+      to{filter:blur(34px); opacity:.95;}
+    }
+
+    @media(max-width:900px){
+      #task-4 .content-slide{
+        grid-template-columns:1fr;
+      }
+      #task-4 .media-right{order:-1;}
+    }
+  </style>
+
+  <script>
+    // trigger animation once when visible
+    (() => {
+      const sec = document.getElementById('task-4');
+      if (!sec) return;
+      const io = new IntersectionObserver((entries, obs)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){
+            sec.classList.add('in-view');
+            obs.disconnect();
+          }
+        });
+      },{threshold:0.4});
+      io.observe(sec);
+    })();
+  </script>
+</section>
+
+
+<!-- Slide 5 — RR execution (with full SVG) -->
+<section id="task-5">
+  <style>
+    /* ---- Scoped only to #task-5 ---- */
+    #task-5{
+      --card:#101628; --border:rgba(255,255,255,.08); --fg:#e5eefc; --muted:#9fb1d6;
+    }
+    #task-5 .card{
+      display:grid; align-items:center; gap:24px;
+      grid-template-columns: minmax(320px,0.7fr) 1.3fr; /* left text, right big SVG */
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; padding:24px;
+    }
+    #task-5 .title-chip{
+      display:inline-block; padding:8px 12px; border-radius:999px;
+      font:800 14px ui-sans-serif,system-ui; letter-spacing:.2px;
+      background:linear-gradient(135deg,#0ea5e9,#22d3ee); color:#07131b; margin-bottom:12px;
+    }
+    #task-5 p{ margin:0; color:var(--fg); line-height:1.6 }
+
+    #task-5 .media-right{ display:flex; justify-content:center }
+    #task-5 .svg-wrap{
+      width:100%; aspect-ratio:1200/420; /* big, responsive */
+      border-radius:14px; overflow:hidden; background:#0b1224;
+      box-shadow:0 8px 32px rgba(0,0,0,.35); outline:1px solid rgba(255,255,255,.06);
+    }
+    #task-5 svg{ width:100%; height:100%; display:block }
+
+    @media (max-width:900px){
+      #task-5 .card{ grid-template-columns:1fr }
+      #task-5 .svg-wrap{ aspect-ratio:1200/520 }
+    }
+    @media (prefers-reduced-motion:reduce){
+      #task-5 .march, #task-5 .pulse, #task-5 .sliceMove{ animation:none !important }
+    }
+        /* Title chip keeps your inline font-size, just add gradient skin */
+    #task-5 .title-chip{
+      display:inline-block; padding:10px 14px; border-radius:999px;
+      font-weight:800; letter-spacing:.2px;
+      background:linear-gradient(135deg,var(--accent1),var(--accent2));
+      color:#0b0f1a;
+      box-shadow:0 6px 16px rgba(245,158,11,.25);
+    }
+    #task-5{
+      --accent1:#f59e0b; /* amber */
+      --accent2:#ef4444; /* red */
+    }
+
+
+  </style>
+
+  <div class="card content-slide">
+    <div class="left">
+      <div class="title-chip"  style="font-size: 25px;">ROUND ROBIN-ийн ажиллагаа</div>
+      <p  style="font-size: 20px;">
+        Бүх процесс тогтмол <em>time quantum (q)</em>-аар ээлжилж CPU авч, хугацаа дуусахад дараагийнх руу шилжинэ.
+        Тэгш хуваарилалттай, урт ажилд дарагдахгүй. Доор <strong>q=1</strong> жишээг үзүүлэв.
+      </p>
+    </div>
+
+    <figure class="media-right lg" aria-label="Round Robin demo SVG">
+      <div class="svg-wrap">
+        <svg viewBox="0 0 1200 420" role="img" aria-labelledby="rrTitle">
+          <title id="rrTitle"  style="font-size: 40px;">Round Robin — q=1, эргэлдэх ээлжлэл</title>
+          <defs>
+            <!-- Palettes -->
+            <linearGradient id="cpuGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#60a5fa"/>
+            </linearGradient>
+            <linearGradient id="p1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#10b981"/>
+            </linearGradient>
+            <linearGradient id="p2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#7c3aed"/>
+            </linearGradient>
+            <linearGradient id="p3" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#93c5fd"/><stop offset="1" stop-color="#3b82f6"/>
+            </linearGradient>
+            <linearGradient id="p4" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#d97706"/>
+            </linearGradient>
+
+            <!-- text styles inside SVG -->
+            <style>
+              .lbl{font:700 16px ui-sans-serif,system-ui,Segoe UI,Roboto;fill:#dbeafe}
+              .muted{font:600 12px ui-sans-serif,system-ui,Segoe UI,Roboto;fill:#9fb1d6}
+              .chip{font:800 14px ui-sans-serif,system-ui,Segoe UI,Roboto;fill:#0b1220}
+              .march{stroke-dasharray:10 10;animation:march 7s linear infinite}
+              @keyframes march{to{stroke-dashoffset:-460}}
+              .pulse{animation:pulse 2.2s ease-in-out infinite}
+              @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+            </style>
+          </defs>
+
+          <!-- Queue (left) -->
+          <g transform="translate(28,32)">
+            <text class="lbl" x="0" y="-10" >RR — q = 1</text>
+            <rect x="0" y="0" width="520" height="106" rx="18" ry="18" fill="#0b1730" stroke="#274274"/>
+            <g transform="translate(18,22)" >
+              <rect rx="12" ry="12" width="86" height="40" fill="url(#p1)"/>
+              <text class="chip" x="43" y="26" text-anchor="middle">P1</text>
+              <text class="muted" x="0" y="66">burst: 4</text>
+            </g>
+            <g transform="translate(118,22)">
+              <rect rx="12" ry="12" width="86" height="40" fill="url(#p2)"/><text class="chip" x="43" y="26" text-anchor="middle">P2</text>
+              <text class="muted" x="0" y="66">burst: 3</text>
+            </g>
+            <g transform="translate(218,22)">
+              <rect rx="12" ry="12" width="86" height="40" fill="url(#p3)"/><text class="chip" x="43" y="26" text-anchor="middle">P3</text>
+              <text class="muted" x="0" y="66">burst: 5</text>
+            </g>
+            <g transform="translate(318,22)">
+              <rect rx="12" ry="12" width="86" height="40" fill="url(#p4)"/><text class="chip" x="43" y="26" text-anchor="middle">P4</text>
+              <text class="muted" x="0" y="66">burst: 2</text>
+            </g>
+          </g>
+
+          <!-- Flow to CPU -->
+          <path d="M 560 85 H 840" class="march" stroke="#88a5ff" stroke-width="4" fill="none" opacity=".85"/>
+
+          <!-- CPU box -->
+          <g transform="translate(700,28)">
+            <rect x="0" y="0" width="200" height="200" rx="26" ry="26" fill="url(#cpuGrad)"/>
+            <rect x="14" y="14" width="172" height="172" rx="20" ry="20" fill="#0e2730" opacity=".92" stroke="#065f46"/>
+            <circle cx="100" cy="100" r="14" fill="#22d3ee" class="pulse"/>
+            <text class="lbl" x="100" y="226" text-anchor="middle">CPU</text>
+          </g>
+
+          <!-- Gantt timeline (RR order P1→P2→P3→P4→P1→...) -->
+          <g transform="translate(28,240)">
+            <text class="muted" x="0" y="-12">Gantt (RR, q=1): P1 | P2 | P3 | P4 | P1 | P3 | P3</text>
+            <!-- bar bg -->
+            <rect x="0" y="0" width="820" height="30" rx="12" ry="12" fill="#0b152a" stroke="#2b4c82"/>
+            <!-- unit width = 820 / 14 ≈ 58.57 -->
+            <!-- P1: 4u -->
+            <rect x="0"    y="0" width="90"  height="26" fill="url(#p1)" rx="12" ry="12"/>
+            <!-- P2: 3u -->
+            <rect x="90"   y="0" width="90"  height="26" fill="url(#p2)"/>
+            <!-- P3: 5u -->
+            <rect x="180"  y="0" width="90"  height="26" fill="url(#p3)"/>
+            <!-- P4: 2u -->
+            <rect x="270"  y="0" width="90"  height="26" fill="url(#p4)"/>
+            <!-- Параллель секцүүд -->
+            <rect x="360"  y="0" width="90"  height="26" fill="url(#p1)"/>
+            <rect x="450"  y="0" width="90"  height="26" fill="url(#p3)"/>
+            <rect x="540"  y="0" width="90"  height="26" fill="url(#p3)"/>
+            <!-- moving translucent slice to explain quantum -->
+            <rect x="0" y="0" height="26" rx="12" ry="12" fill="#ffffff" opacity=".08" class="sliceMove"/>
+          </g>
+
+          <!-- Legend -->
+          <g transform="translate(900,252)">
+            <text class="lbl" x="0" y="0"></text>
+            <g transform="translate(0,12)">
+              <rect width="18" height="12" rx="3" ry="3" fill="url(#p1)"/><text class="muted" x="26" y="11">P1</text>
+            </g>
+            <g transform="translate(0,32)">
+              <rect width="18" height="12" rx="3" ry="3" fill="url(#p2)"/><text class="muted" x="26" y="11">P2</text>
+            </g>
+            <g transform="translate(0,52)">
+              <rect width="18" height="12" rx="3" ry="3" fill="url(#p3)"/><text class="muted" x="26" y="11">P3</text>
+            </g>
+            <g transform="translate(0,72)">
+              <rect width="18" height="12" rx="3" ry="3" fill="url(#p4)"/><text class="muted" x="26" y="11">P4</text>
+            </g>
+            <g transform="translate(0,96)">
+              <rect width="18" height="12" rx="3" ry="3" fill="url(#cpuGrad)"/><text class="muted" x="26" y="11">CPU/flow</text>
+            </g>
+            <g transform="translate(0,120)">
+              <rect width="18" height="12" rx="3" ry="3" fill="#fff" opacity=".15"/><text class="muted" x="26" y="11">time quantum (q=1)</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </figure>
+    <img src="/assets/26.webp" alt="SJF concept image" style="max-width: 700px; margin-left: 490px;">
+  </div>
+</section>
+
+
+<!-- Slide 6 — PRIORITY (final, same structure) -->
+<section id="task-6">
+  <div class="card content-slide">
+    <div class="left">
+      <div class="title-chip" style="font-size: 25px;">PRIORITY гэж юу вэ?</div>
+      <p style="font-size: 20px;">
+        Процесс бүрт эрхийн түвшин өгч, өндөр эрхтэй нь түрүүлж гүйцэтгэнэ.
+        <br>Starvation-ыг багасгахын тулд <b>aging</b> ашигладаг.
+      </p>
+    </div>
+
+    <figure class="media-right lg">
+      <img src="/assets/unnamed.webp" alt="Priority concept">
+    </figure>
+  </div>
+
+  <style>
+    /* ===== Scoped to #task-6 only ===== */
+    #task-6{
+      --accent1:#f59e0b; /* amber */
+      --accent2:#ef4444; /* red */
+    }
+
+    #task-6 .content-slide{
+      position:relative;
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      align-items:center;
+      gap:24px;
+      background:#101628;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:20px;
+      padding:28px;
+      color:#e5eefc;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+
+    /* Title chip keeps your inline font-size, just add gradient skin */
+    #task-6 .title-chip{
+      display:inline-block; padding:10px 14px; border-radius:999px;
+      font-weight:800; letter-spacing:.2px;
+      background:linear-gradient(135deg,var(--accent1),var(--accent2));
+      color:#0b0f1a;
+      box-shadow:0 6px 16px rgba(245,158,11,.25);
+    }
+
+    /* Right media + glow */
+    #task-6 .media-right{ position:relative; overflow:visible; }
+
+    #task-6 .media-right img{
+      display:block; max-width:100%; height:auto;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      box-shadow:0 12px 28px rgba(0,0,0,.35);
+      transform:translateX(28px); /* starts off to the right */
+      opacity:0;
+      transition:transform .72s cubic-bezier(.2,.8,.2,1), opacity .72s cubic-bezier(.2,.8,.2,1);
+      will-change:transform, opacity, filter;
+    }
+
+    /* Glow sheet behind image */
+    #task-6 .media-right::after{
+      content:"";
+      position:absolute; z-index:-1;
+      width:92%; height:72%;
+      bottom:-8%; right:5%;
+      border-radius:26px;
+      background:
+        radial-gradient(60% 60% at 35% 45%, color-mix(in oklab, var(--accent1) 70%, transparent), transparent 70%),
+        radial-gradient(60% 60% at 75% 40%, color-mix(in oklab, var(--accent2) 70%, transparent), transparent 70%);
+      filter:blur(30px);
+      opacity:0;
+      transform:translateX(20px);
+      transition:all .72s cubic-bezier(.2,.8,.2,1);
+    }
+
+    /* Entrance + subtle alive motion */
+    #task-6.in-view .media-right img{
+      transform:translateX(0);
+      opacity:1;
+      animation:prioFloat 6s ease-in-out .9s infinite alternate;
+    }
+    #task-6.in-view .media-right::after{
+      opacity:.9;
+      transform:translateX(0);
+      animation:prioGlow 4.2s ease-in-out .9s infinite alternate;
+    }
+
+    @keyframes prioFloat{
+      from{ transform:translateY(0); filter:saturate(.95) brightness(.98); }
+      to  { transform:translateY(-6px); filter:none; }
+    }
+    @keyframes prioGlow{
+      from{ filter:blur(26px); opacity:.75; }
+      to  { filter:blur(34px); opacity:.95; }
+    }
+
+    /* Responsive: stack cleanly */
+    @media (max-width:900px){
+      #task-6 .content-slide{ grid-template-columns:1fr; padding:22px; }
+      #task-6 .media-right{ order:-1; }
+    }
+
+    /* Respect users who prefer less motion */
+    @media (prefers-reduced-motion: reduce){
+      #task-6 *{ animation:none !important; transition:none !important; }
+      #task-6 .media-right img{ transform:none; opacity:1; }
+      #task-6 .media-right::after{ opacity:.6; }
+    }
+  </style>
+
+  <script>
+    // One-shot animation when slide enters view
+    (() => {
+      const sec = document.getElementById('task-6');
+      if (!sec) return;
+      const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(e => {
+          if (e.isIntersecting){
+            sec.classList.add('in-view');
+            obs.disconnect();
+          }
+        });
+      }, { threshold: 0.38 });
+      io.observe(sec);
+    })();
+  </script>
+</section>
+
+
+<!-- Slide 7 — Priority execution -->
+<section id="task-7">
+  <style>
+    #task-7{
+      --accent1:#f59e0b; /* amber */
+      --accent2:#ef4444; /* red */
+    }
+    /* Title chip keeps your inline font-size, just add gradient skin */
+    #task-7 .title-chip{
+      display:inline-block; padding:10px 14px; border-radius:999px;
+      font-weight:800; letter-spacing:.2px;
+      background:linear-gradient(135deg,var(--accent1),var(--accent2));
+      color:#0b0f1a;
+      box-shadow:0 6px 16px rgba(245,158,11,.25);
+    }
+
+    /* ---- Scoped only to #task-7 ---- */
+    #task-7{
+      --card:#101628; --border:rgba(255,255,255,.10);
+      --fg:#e5eefc; --muted:#a7b4d8;
+    }
+    #task-7 .card{
+      display:grid; align-items:center; gap:24px;
+      grid-template-columns: minmax(320px,0.7fr) 1.3fr; /* left text, right big SVG */
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; padding:24px;
+    }
+    #task-7 p{ margin:0; color:var(--fg); line-height:1.6 }
+
+    #task-7 .media-right{ display:flex; justify-content:center }
+    #task-7 .svg-wrap{
+      width:100%; aspect-ratio:1200/420; /* big, responsive */
+      border-radius:14px; overflow:hidden; background:#0b1224;
+      box-shadow:0 8px 32px rgba(0,0,0,.35); outline:1px solid rgba(255,255,255,.06);
+    }
+    #task-7 svg{ width:100%; height:100%; display:block }
+
+    @media (max-width:900px){
+      #task-7 .card{ grid-template-columns:1fr }
+      #task-7 .svg-wrap{ aspect-ratio:1200/520 }
+    }
+    @media (prefers-reduced-motion:reduce){
+      #task-7 .pulse{ animation:none !important }
+    }
+  </style>
+
+  <div class="card content-slide">
+    <div class="left">
+      <div class="title-chip"  style="font-size: 25px;">PRIORITY-ийн үйл ажиллагаа</div>
+      <p style="font-size: 20px;">
+        <strong>Non-preemptive Priority</strong>: <em>бага тоо = өндөр эрх</em>. Өндөр эрхтэй процесс эхэлж гүйцэтгэгдэнэ.
+        Давуу тал — чухал ажлыг түрүүлнэ. Сул тал — урт/бага эрхтэй ажил <em>starvation</em>-д өртөж магадгүй (aging тустай).
+      </p>
+    </div>
+
+    <figure class="media-right lg" aria-label="Priority Scheduling SVG">
+      <div class="svg-wrap">
+        <svg viewBox="0 0 1200 420" role="img" aria-labelledby="prioTitle">
+          <title id="prioTitle">Priority Scheduling — lower number = higher priority</title>
+          <defs>
+            <!-- Color scales -->
+            <linearGradient id="cpuGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#60a5fa"/>
+            </linearGradient>
+            <linearGradient id="p1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#10b981"/>
+            </linearGradient>
+            <linearGradient id="p2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#7c3aed"/>
+            </linearGradient>
+            <linearGradient id="p3" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#93c5fd"/><stop offset="1" stop-color="#3b82f6"/>
+            </linearGradient>
+            <linearGradient id="p4" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#d97706"/>
+            </linearGradient>
+
+            <!-- Typography inside SVG -->
+            <style>
+              .lbl{font:700 16px ui-sans-serif,system-ui,Segoe UI,Roboto;fill:#dbeafe}
+              .muted{font:600 12px ui-sans-serif,system-ui,Segoe UI,Roboto;fill:#a7b4d8}
+              .chip{font:800 14px ui-sans-serif,system-ui,Segoe UI,Roboto;fill:#0b1220}
+              .sub{font:700 12px ui-sans-serif,system-ui,Segoe UI,Roboto;fill:#a7b4d8}
+              .tick{font:700 11px ui-sans-serif,system-ui,Segoe UI,Roboto;fill:#9fb1d6}
+              .pulse{animation:pulse 2.2s ease-in-out infinite}
+              @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+            </style>
+          </defs>
+
+          <!-- Ready queue -->
+          <g transform="translate(28,28)">
+            <rect x="0" y="0" width="540" height="138" rx="18" ry="18" fill="#0b1730" stroke="#274274"/>
+            <!-- P2 (prio 1, burst 3) -->
+            <g transform="translate(16,22)">
+              <rect rx="12" ry="12" width="108" height="48" fill="url(#p2)"/>
+              <text class="chip" x="54" y="30" text-anchor="middle">P2</text>
+              <text class="sub" x="0" y="70">prio: 1 • burst: 3</text>
+            </g>
+            <!-- P1 (prio 2, burst 4) -->
+            <g transform="translate(144,22)">
+              <rect rx="12" ry="12" width="108" height="48" fill="url(#p1)"/>
+              <text class="chip" x="54" y="30" text-anchor="middle">P1</text>
+              <text class="sub" x="0" y="70">prio: 2 • burst: 4</text>
+            </g>
+            <!-- P3 (prio 3, burst 2) -->
+            <g transform="translate(272,22)">
+              <rect rx="12" ry="12" width="108" height="48" fill="url(#p3)"/>
+              <text class="chip" x="54" y="30" text-anchor="middle">P3</text>
+              <text class="sub" x="0" y="70">prio: 3 • burst: 2</text>
+            </g>
+            <!-- P4 (prio 4, burst 5) -->
+            <g transform="translate(400,22)">
+              <rect rx="12" ry="12" width="108" height="48" fill="url(#p4)"/>
+              <text class="chip" x="54" y="30" text-anchor="middle">P4</text>
+              <text class="sub" x="0" y="70">prio: 4 • burst: 5</text>
+            </g>
+          </g>
+
+          <!-- Flow arrow -->
+          <g transform="translate(590,78)">
+            <path d="M 0 14 H 180" stroke="#7fb2ff" stroke-width="4" fill="none"/>
+            <polygon points="180,14 168,8 168,20" fill="#7fb2ff"/>
+          </g>
+
+          <!-- CPU block -->
+          <g transform="translate(780,24)">
+            <rect x="0" y="0" width="200" height="200" rx="26" ry="26" fill="url(#cpuGrad)"/>
+            <rect x="14" y="14" width="172" height="172" rx="20" ry="20" fill="#0e2730" opacity=".92" stroke="#065f46"/>
+            <circle cx="100" cy="100" r="14" fill="#22d3ee" class="pulse"/>
+            <text class="lbl" x="100" y="226" text-anchor="middle">CPU</text>
+          </g>
+
+          <!-- Gantt timeline (exact ticks: 0,3,7,9,14) -->
+          <g transform="translate(28,248)">
+            <text class="muted" x="0" y="-12">Gantt (Priority, non-preemptive): P2 → P1 → P3 → P4</text>
+            <!-- bar bg -->
+            <rect x="0" y="0" width="820" height="30" rx="12" ry="12" fill="#0b152a" stroke="#2b4c82"/>
+            <!-- unit width = 820 / 14 ≈ 58.57 -->
+            <!-- P2: 3u -->
+            <rect x="0"   y="0" width="176" height="30" fill="url(#p2)" rx="12" ry="12"/>
+            <!-- P1: 4u -->
+            <rect x="176" y="0" width="234" height="30" fill="url(#p1)"/>
+            <!-- P3: 2u -->
+            <rect x="410" y="0" width="118" height="30" fill="url(#p3)"/>
+            <!-- P4: 5u -->
+            <rect x="528" y="0" width="292" height="30" fill="url(#p4)"/>
+            <!-- ticks -->
+            <g>
+              <line x1="0"   y1="34" x2="0"   y2="48" stroke="#3a558a"/>
+              <text class="tick" x="0"   y="62">0</text>
+
+              <line x1="176" y1="34" x2="176" y2="48" stroke="#3a558a"/>
+              <text class="tick" x="176" y="62">3</text>
+
+              <line x1="410" y1="34" x2="410" y2="48" stroke="#3a558a"/>
+              <text class="tick" x="410" y="62">7</text>
+
+              <line x1="528" y1="34" x2="528" y2="48" stroke="#3a558a"/>
+              <text class="tick" x="528" y="62">9</text>
+
+              <line x1="820" y1="34" x2="820" y2="48" stroke="#3a558a"/>
+              <text class="tick" x="820" y="62" text-anchor="end">14</text>
+            </g>
+          </g>
+
+          <!-- Legend -->
+          <g transform="translate(900,252)">
+            <text class="lbl" x="0" y="0"></text>
+            <g transform="translate(0,12)">
+              <rect width="18" height="12" rx="3" ry="3" fill="url(#p2)"/><text class="muted" x="26" y="11">P2 (prio 1, 3)</text>
+            </g>
+            <g transform="translate(0,32)">
+              <rect width="18" height="12" rx="3" ry="3" fill="url(#p1)"/><text class="muted" x="26" y="11">P1 (prio 2, 4)</text>
+            </g>
+            <g transform="translate(0,52)">
+              <rect width="18" height="12" rx="3" ry="3" fill="url(#p3)"/><text class="muted" x="26" y="11">P3 (prio 3, 2)</text>
+            </g>
+            <g transform="translate(0,72)">
+              <rect width="18" height="12" rx="3" ry="3" fill="url(#p4)"/><text class="muted" x="26" y="11">P4 (prio 4, 5)</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </figure>
+    <img src="/assets/28.webp" alt="SJF concept image" style="max-width: 700px; margin-left: 490px;">
+  </div>
+</section>
+
+
+<!-- ================= CPU Scheduler — FINAL, FITS VIEWPORT ================= -->
+<section id="sim" class="slide">
+  <div class="vp">
+    <!-- top bar (title + form) -->
+    <div class="card sim-head stack">
+      <div class="stack-xs">
+        <h2>CPU Төлөвлөлтийн Симуляци</h2>
+        <p class="muted">
+          Процессуудыг оруулж, алгоритмаа сонгоод <b>Run</b> дар. (arrival=орсон дарааллаараа,
+          burst=ажиллах хугацаа, priority бага байх тусам өндөр эрх)
+        </p>
+      </div>
+
+      <form id="procForm" class="row row-end" onsubmit="return false;">
+        <div class="field"><label>ID</label><input id="pid" placeholder="P1"/></div>
+        <div class="field"><label>Arrival</label><input id="arrival" type="number" min="0" step="1" placeholder="0"/></div>
+        <div class="field"><label>Burst</label><input id="burst" type="number" min="1" step="1" placeholder="5"/></div>
+        <div class="field"><label>Priority</label><input id="priority" type="number" min="0" step="1" placeholder="1"/></div>
+        <div class="actions">
+          <button id="add" class="btn">Нэмэх</button>
+          <button id="seed" class="btn ghost" type="button">Жишээ</button>
+          <button id="clear" class="btn ghost" type="button">Цэвэрлэх</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- scrollable body (controls+viz+table+gantt) -->
+    <div class="body card">
+      <!-- sticky controls -->
+      <div class="controls">
+      <div class="segmented list" id="algos" role="tablist">
+        <ul class="algo-list">
+          <li><button class="segBtn active" data-a="fcfs">FCFS</button></li>
+          <li><button class="segBtn" data-a="sjf">SJF</button></li>
+          <li><button class="segBtn" data-a="priority">Priority</button></li>
+          <li><button class="segBtn" data-a="rr">Round-Robin</button></li>
+        </ul>
+      </div>
+
+        <div class="ctrl-right">
+          <div class="field w-sm" style="padding-left: 100px;">
+            <label>Quantum</label>
+            <input id="quantum" type="number" min="1" step="1" value="2"/>
+          </div>
+          <div class="btns" style="padding-left: 300px;">
+            <button class="btn" id="run">Run</button>
+            <button class="btn ghost" id="pause" type="button">Pause</button>
+            <button class="btn ghost" id="step" type="button">Step</button>
+          </div>
+          <div class="field range w-md">
+            <label class="muted">Speed</label>
+            <input type="range" id="speed" min="50" max="800" value="220"/>
+          </div>
+        </div>
+
+        <!-- cool subtle SVG animation -->
+        <svg class="ctrl-aurora" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="gradMove" x1="0%" x2="100%" y1="0%" y2="0%">
+              <stop offset="0%" stop-color="#22d3ee"/>
+              <stop offset="50%" stop-color="#60a5fa"/>
+              <stop offset="100%" stop-color="#a78bfa"/>
+              <animate attributeName="x1" values="0%;-50%;0%" dur="8s" repeatCount="indefinite"/>
+              <animate attributeName="x2" values="100%;50%;100%" dur="8s" repeatCount="indefinite"/>
+            </linearGradient>
+          </defs>
+          <path d="M0,80 C200,120 400,40 600,80 C800,120 1000,40 1200,80 L1200,120 L0,120 Z"
+                fill="url(#gradMove)" opacity=".15">
+            <animateTransform attributeName="transform" type="translate"
+                              values="0 0; -60 0; 0 0" dur="10s" repeatCount="indefinite"/>
+          </path>
+        </svg>
+      </div>
+    </div>
+
+<div class="content" style="margin-bottom: 60px;">
+  <div class="pane rq stack-xs">
+    <h4>Ready Queue</h4>
+    <div id="readyQ" class="chips"></div>
+  </div>
+
+  <div class="pane cpuCtx stack-xs">
+    <h4>CPU / Context</h4>
+    <div class="cpu-box">
+      <div class="cpu">CPU</div>
+      <div class="cpuState">
+        <div class="tag" id="cpuNow">—</div>
+        <div class="tag" id="qLeft" style="display:none">q: —</div>
+        <div class="tag" id="ctxState" style="display:none">context switch…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pane done stack-xs">
+    <h4>Done</h4>
+    <div id="doneQ" class="chips"></div>
+  </div>
+
+  <div class="pane events stack-xs">
+    <h4>Events</h4>
+    <div id="elog" class="elog"></div>
+  </div>
+
+  <!-- Table -->
+  <div class="table wide" id="list">
+    <div class="trow head"><div>ID</div><div>Arrival</div><div>Burst</div><div>Priority</div><div>Del</div></div>
+  </div>
+
+  <div class="legend wide">
+    <span class="dot" style="background:#60a5fa55"></span> Idle
+    <span class="dot" style="background:#a78bfa55"></span> Context
+  </div>
+
+  <!-- Gantt (fits width) -->
+  <div class="card result wide stack-xs" id="result" style="display:none">
+    <div class="sim-title">
+      <h3>Gantt диаграмм</h3>
+      <div class="pill algo-pill" id="algoShow"></div>
+    </div>
+
+    <div class="gantt-fit">
+      <div id="gantt" class="gantt"></div>
+      <div id="ticks" class="tick"></div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+  </div>
+</div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== OUTRO (centered stack) ===== -->
+<section id="outro" class="slide">
+  <!-- ambient glow -->
+  <div class="rays" aria-hidden="true"></div>
+
+  <!-- floating particles -->
+  <canvas class="fx" aria-hidden="true"></canvas>
+
+  <!-- confetti burst container -->
+  <div class="confetti" aria-hidden="true"></div>
+
+  <!-- main content -->
+  <div class="outro-stage">
+    <div id="outroCard" class="card">
+      <h1 class="title">
+        <span class="stroke">Баярлалаа!</span>
+        <span class="text">Баярлалаа!</span>
+      </h1>
+      <p class="sub">
+        <b>2-р багийнхан</b> байлаа.<br/>
+        Анхаарал хандуулсанд баярлалаа <span class="spark">💡</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+/* ===== Outro-only scoped styles ===== */
+#outro.slide{
+  /* 🔧 Хэзээ ч идэвхгүй үед харагдахгүй */
+  display: none;
+  position: relative;
+  place-items: center;
+  min-height: calc(100vh - var(--nav-h, 0px));
+  padding: clamp(16px, 2vw, 32px);
+  background: radial-gradient(circle at 50% 50%, #0b1220 0%, #060910 100%);
+  color: #e5eefc;
+  overflow: hidden;
+}
+#outro.slide.active{ display:grid; }
+
+#outro .outro-stage{
+  width: min(1100px, 92vw);
+  margin: auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* ambient rays */
+#outro .rays{
+  position:absolute; inset:-25% -15%;
+  background:
+    conic-gradient(from 0deg at 50% 120%,
+      rgba(96,165,250,.22), transparent 40%,
+      rgba(34,211,238,.18), transparent 70%,
+      rgba(167,139,250,.22), transparent 100%);
+  filter: blur(42px);
+  opacity:.25;
+  animation:o-raysSpin 30s linear infinite;
+  pointer-events:none;
+  z-index:0;
+}
+@keyframes o-raysSpin{  to{ transform:rotate(360deg) }  }
+
+/* particles canvas */
+#outro .fx{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  filter:saturate(115%);
+  opacity:.65; z-index:1;
+}
+
+/* glass / neon card */
+#outro .card{
+  position:relative;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:clamp(10px,1.6vw,16px);
+  text-align:center;
+
+  width:min(940px, 92vw);
+  margin:0 auto;
+  padding:clamp(22px, 4.2vw, 48px);
+  border-radius:28px;
+  background:rgba(17,24,39,.52);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 20px 70px rgba(0,0,0,.55),
+             inset 0 1px 0 rgba(255,255,255,.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+#outro .card::before{
+  content:"";
+  position:absolute; inset:-1px;
+  border-radius:30px;
+  padding:1px;
+  background:linear-gradient(135deg,#22d3ee,#60a5fa 45%,#a78bfa);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:.35; pointer-events:none;
+}
+
+/* title layered neon */
+#outro .title{ position:relative; margin:0 0 .2em 0; line-height:1.02; }
+#outro .title .text,
+#outro .title .stroke{
+  display:block; font-weight:900;
+  font-size:clamp(44px, 7.5vw, 88px); /* хэт томроод скрол үүсгэхгүй */
+  letter-spacing:.5px;
+}
+#outro .title .text{
+  background: conic-gradient(from 10deg,#22d3ee,#60a5fa,#a78bfa,#22d3ee);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent;
+  filter: drop-shadow(0 8px 28px rgba(96,165,250,.22));
+  animation:o-glow 6s ease-in-out infinite;
+  position:relative;
+}
+#outro .title .text::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(100deg, transparent 0 40%,
+            rgba(255,255,255,.18) 50%, transparent 60% 100%);
+  background-size:220% 100%;
+  mix-blend-mode:screen;
+  animation:o-shine 3.2s ease-in-out infinite .6s;
+}
+#outro .title .stroke{
+  position:absolute; inset:0; z-index:-1;
+  color:#7aa2ff; opacity:.12; filter:blur(18px);
+  animation:o-breath 7.5s ease-in-out infinite;
+}
+
+@keyframes o-shine{ 0%{background-position:120% 0} 100%{background-position:-40% 0} }
+@keyframes o-glow{ 0%,100%{ filter: drop-shadow(0 8px 28px rgba(34,211,238,.18))}
+                   50%{ filter: drop-shadow(0 12px 44px rgba(96,165,250,.30))} }
+@keyframes o-breath{ 0%,100%{transform:scale(1);opacity:.12} 50%{transform:scale(1.04);opacity:.2} }
+
+/* sub text */
+#outro .sub{
+  margin:8px 0 0 0;
+  font-size:clamp(16px, 2.2vw, 22px);
+  color:#b6c7e6; line-height:1.65;
+}
+#outro .spark{ filter:drop-shadow(0 0 10px rgba(250,204,21,.5)); }
+
+/* confetti */
+#outro .confetti{ position:absolute; inset:0; pointer-events:none; z-index:3; }
+#outro .confetti i{
+  position:absolute; width:10px; height:16px; border-radius:2px;
+  opacity:0; transform:translate3d(0,-20px,0) rotate(0);
+  animation:o-drop 900ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+@keyframes o-drop{
+  0%{ opacity:0; transform:translate3d(0,-20px,0) rotate(0) }
+  12%{ opacity:1 }
+  100%{ transform:translate3d(var(--dx),var(--dy),0) rotate(var(--rot)) }
+}
+
+/* motion-safe */
+@media (prefers-reduced-motion: reduce){
+  #outro .rays,
+  #outro .title .text::after,
+  #outro .title .text,
+  #outro .title .stroke,
+  #outro .confetti i,
+  #outro .card{ animation:none !important; transition:none !important; }
+}
+</style>
+
+<script>
+(() => {
+  const root = document.getElementById('outro');
+  const card = document.getElementById('outroCard');
+  const canvas = root.querySelector('.fx');
+  const conf = root.querySelector('.confetti');
+
+  let particles = []; let ctx; let raf; let initialized = false;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* canvas size */
+  function resize() {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+  }
+
+  /* tiny particle system */
+  function initParticles() {
+    if (reduceMotion) return;
+    ctx = canvas.getContext('2d', { alpha: true });
+    resize(); particles = [];
+    const count = Math.round((canvas.width * canvas.height) / 38000);
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2.2 + 0.8,
+        s: Math.random() * 0.6 + 0.2,
+        c: ['#22d3ee','#60a5fa','#a78bfa'][Math.floor(Math.random()*3)]
+      });
+    }
+  }
+  function step() {
+    if (!ctx) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for (const p of particles) {
+      p.y -= p.s * 0.6;
+      p.x += Math.sin((p.y + p.r) * 0.004) * 0.6;
+      if (p.y < -10) { p.y = canvas.height + 10; p.x = Math.random()*canvas.width; }
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = p.c; ctx.globalAlpha = 0.55; ctx.fill(); ctx.globalAlpha = 1;
+    }
+    raf = requestAnimationFrame(step);
+  }
+
+  /* parallax tilt */
+  function bindParallax() {
+    if (reduceMotion) return;
+    const rect = () => card.getBoundingClientRect();
+    card.addEventListener('mousemove', (e) => {
+      const r = rect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      const rx = (py * -8).toFixed(2);
+      const ry = (px * 10).toFixed(2);
+      card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'rotateX(0) rotateY(0)';
+    });
+  }
+
+  /* one-shot confetti */
+  function burstConfetti() {
+    if (reduceMotion) return;
+    conf.innerHTML = '';
+    const colors = ['#22d3ee','#60a5fa','#a78bfa','#34d399','#f472b6','#fde047'];
+    const N = 26;
+    for (let i=0; i<N; i++) {
+      const el = document.createElement('i');
+      el.style.left = '50%';
+      el.style.top  = '50%';
+      el.style.background = colors[i % colors.length];
+      const ang = (i / N) * Math.PI * 2 + (Math.random()*0.6-0.3);
+      const dist = 220 + Math.random()*180;
+      const dx = Math.cos(ang) * dist;
+      const dy = Math.sin(ang) * dist;
+      const rot = (Math.random()*720 - 360) + 'deg';
+      el.style.setProperty('--dx', dx + 'px');
+      el.style.setProperty('--dy', dy + 'px');
+      el.style.setProperty('--rot', rot);
+      el.style.animationDelay = (Math.random()*0.08)+'s';
+      conf.appendChild(el);
+    }
+  }
+
+  /* watch .active */
+  const obs = new MutationObserver(() => {
+    const active = root.classList.contains('active');
+    if (active && !initialized) {
+      initialized = true;
+      if (!reduceMotion) {
+        initParticles(); step(); bindParallax(); burstConfetti();
+        addEventListener('resize', () => { cancelAnimationFrame(raf); initParticles(); step(); }, { passive:true });
+      }
+      card.animate(
+        [{ opacity:0, transform:'translateY(10px) scale(.992)' }, { opacity:1, transform:'none' }],
+        { duration:550, easing:'cubic-bezier(.2,.8,.2,1)', fill:'forwards' }
+      );
+    }
+    if (!active && raf) { cancelAnimationFrame(raf); raf = null; }
+  });
+  obs.observe(root, { attributes:true, attributeFilter:['class'] });
+
+})();
+</script>
+
+<footer class="foot">
+  <div class="row">
+    <button id="prev" class="btn">← Prev</button>
+    <button id="next" class="btn">Next →</button>
+  </div>
+  <div class="progress">
+    <span id="ctr">1</span> / <span id="tot">4</span>
+    <div class="bar"><div class="bar-fill" id="bar"></div></div>
+  </div>
+  <div class="muted">Keyboard: ← → • F for fullscreen</div>
+</footer>
+<script src="/hergtei/script.js"></script>
+</body>
+</html>

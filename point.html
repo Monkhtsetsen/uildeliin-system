@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Swapping — Pro симуляци + Хичээл + Quiz (final)</title>
+<style>
+:root{
+  --bg:#0b1220; --panel:#0b1426; --card:#0f1b2f;
+  --ink:#eef5ff; --muted:#9fb1d6; --line:#244472;
+  --brand:#3d6fe8; --accent:#47ffa8; --warn:#ffd166; --violet:#3a2a66;
+  --shadow:0 18px 46px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#0b1220;color:var(--ink);
+  font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+h1{margin:16px 0 6px;text-align:center;font-size:22px}
+.sub{margin:0 0 12px;text-align:center;color:var(--muted);font-size:13px}
+
+.container{max-width:1150px;margin:0 auto 18px;padding:0 14px;
+  display:grid;grid-template-columns:340px 1fr;gap:14px}
+.panel{background:var(--panel);border:1px solid #16233f;border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.controls .row{display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap}
+label{font-size:12px;color:var(--muted)}
+select,button,input[type="range"]{
+  background:#0b1730;border:1px solid #1b2a45;color:var(--ink);
+  padding:8px 12px;border-radius:10px;font-size:13px
+}
+button{cursor:pointer;transition:.2s;font-weight:600}
+button:hover{background:#0e1932}
+button.primary{background:linear-gradient(180deg,#2d4f88,#153063);border-color:#1e325d}
+.status{font-size:12px;color:var(--muted);background:#0b1730;border:1px solid #1e2a48;padding:8px;border-radius:8px}
+
+.stage{background:var(--card);border:1px solid #16233f;border-radius:14px;box-shadow:var(--shadow);padding:16px}
+.grid{display:grid;grid-template-columns:1fr 58px 340px;gap:14px;align-items:start}
+
+/* RAM & Disk */
+.ram,.disk{padding:12px;border:1px dashed #244472;border-radius:12px;background:#0c1630}
+.ram{box-shadow: inset 0 0 12px rgba(61,111,232,.12)}
+.disk{background:linear-gradient(180deg,#0c1630,#0b1328); box-shadow: inset 0 0 10px rgba(179,137,255,.10)}
+.title{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:8px}
+.ram-slots{display:grid;gap:10px}
+.slot{
+  position:relative;height:70px;border:1px solid #244472;border-radius:10px;
+  background:linear-gradient(180deg,#0c1630,#0b1426);overflow:hidden;
+  box-shadow: inset 0 0 12px rgba(61,111,232,.12);
+}
+.slot-index{position:absolute;right:8px;bottom:6px;color:#7fa0d8;font-size:11px}
+
+/* process card */
+.proc{
+  --c:#3d6fe8;
+  position:absolute;inset:6px;border-radius:10px;border:1px solid color-mix(in lab, var(--c) 60%, #16325a);
+  background:linear-gradient(180deg, color-mix(in lab, var(--c) 18%, #0a1429), #0a1326);
+  display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px 10px;
+  box-shadow:0 8px 20px rgba(0,0,0,.35);transition:transform .35s ease,opacity .35s ease,filter .35s ease
+  ;will-change:transform,opacity
+}
+.proc .name{font-weight:700;font-size:14px}
+.proc .meta{font-size:12px;color:#b5c7ee}
+.proc .badge{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid #274877;background:#0b1730;color:#b7c9f0}
+.proc.running{filter: drop-shadow(0 0 12px rgba(61,111,232,.55));transform:scale(1.04)}
+/* progress bar inside process card */
+.progress{grid-column:1/-1;height:6px;border-radius:999px;background:#0b1730;border:1px solid #203a66;overflow:hidden;margin-top:4px}
+.progress .fill{height:100%;background:linear-gradient(90deg,var(--accent),#66e3ff)}
+
+.color-A{--c:#66e3ff} .color-B{--c:#47ffa8} .color-C{--c:#ffd166}
+.color-D{--c:#ff8a7a} .color-E{--c:#b389ff} .color-F{--c:#70e3c5}
+
+/* queue */
+.queue{display:flex;flex-direction:column;gap:8px}
+.qslot{height:54px;border:1px solid #244472;border-radius:10px;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#0b1730}
+.qslot .badge{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid #274877;background:#0c1734;color:#b7c9f0}
+.qslot .meta{color:#b7c9f0;font-size:12px}
+
+/* center pipe */
+.pipe{display:flex;align-items:center;justify-content:center;height:100%}
+.pipe .arrow{width:30px;height:30px;border-right:4px solid var(--brand);border-top:4px solid transparent;border-bottom:4px solid transparent;animation:pulse 1.1s infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+.banner{display:none;gap:8px;align-items:center;border:1px solid #244472;background:#0b1730;color:#dce6ff;border-radius:10px;padding:8px 10px;margin-bottom:10px}
+.banner.show{display:flex}
+.banner .tag{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid #274877;background:#0c1630}
+
+/* fly animation (GPU-friendly) */
+.fly{
+  position:fixed; left:0; top:0; pointer-events:none; z-index:9999;
+  transition:transform .8s cubic-bezier(.25,.8,.25,1), opacity .8s;
+  transform:translate3d(0,0,0);
+  will-change:transform,opacity;
+  filter:drop-shadow(0 0 18px rgba(100,200,255,.35))
+}
+
+/* summary */
+.summary{margin-top:8px;font-size:13px;color:#9fb1d6;text-align:center}
+
+/* ------- Slides (fixed container) ------- */
+.slides-wrap{max-width:1150px;margin:10px auto 24px;padding:0 14px}
+.slides{
+  position:relative; overflow:hidden; border:1px solid #16233f;
+  background:#0b1428; border-radius:14px;
+  height:260px;
+}
+.slide{
+  position:absolute; inset:0; padding:16px;
+  display:grid; grid-template-columns:280px 1fr; gap:16px;
+  opacity:0; transform:translateX(120%);
+  transition:transform .6s ease, opacity .6s ease;
+  pointer-events:none;
+}
+.slide.active{opacity:1; transform:translateX(0)}
+.slide.exit-left{opacity:0; transform:translateX(-120%)}
+.slide svg{width:100%; height:200px}
+.slide h3{margin:0 0 8px}
+.slide p{margin:0 8px 0 0;color:#cfe3ff; line-height:1.45}
+.slide .extra{margin-top:8px}
+.snav{display:flex;justify-content:space-between;align-items:center;padding:8px 10px}
+.snav .dots{display:flex;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:#2a3b60}
+.dot.on{background:#79a6ff}
+
+@media (max-width:1000px){
+  .container{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .pipe{display:none}
+  .slide{grid-template-columns:1fr}
+  .slides{height:320px}
+}
+</style>
+</head>
+<body>
+  <h1>Солилцоо (Swapping)</h1>
+  <p class="sub">RAM дүүрэх үед аль процесс <b>swap-out</b>, алин нь <b>swap-in</b> болж байгааг анимэйшнтайгаар үзүүлнэ.</p>
+
+  <main class="container">
+    <!-- Удирдлагын самбар -->
+    <section class="panel controls" aria-label="Удирдлагын самбар">
+      <div class="row">
+        <button id="btnStart" class="primary">Эхлүүлэх ▶</button>
+        <button id="btnStep">Нэг алхам</button>
+        <button id="btnReset">Дахин эхлүүлэх</button>
+      </div>
+      <div class="row">
+        <label for="strategy">Бодлого:</label>
+        <select id="strategy">
+          <option value="FIFO">FIFO — Эхэлж орсон нь эхэлж гарна</option>
+          <option value="Largest">Хэмжээгээр — Хамгийн томыг гаргана</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="speed">Хурд:</label>
+        <input type="range" id="speed" min="0.6" max="2" step="0.1" value="1" />
+        <span id="spd">1.0×</span>
+      </div>
+      <div class="status" id="status"><b>Төлөв:</b> Бэлэн.</div>
+    </section>
+
+    <!-- Талбар -->
+    <section class="stage">
+      <div class="banner" id="banner">
+        <span class="tag">Солилцоо</span>
+        <span id="bOut">OUT: —</span>
+        <span>⟷</span>
+        <span id="bIn">IN: —</span>
+      </div>
+
+      <div class="grid">
+        <div class="ram">
+          <div class="title">RAM <span id="cap">0/4</span></div>
+          <div class="ram-slots" id="ram"></div>
+          <div class="summary">Нийт: <b id="sumAll">0</b> • RAM: <b id="sumRam">0</b> • Диск: <b id="sumDisk">0</b> • Дууссан: <b id="sumDone">0</b></div>
+        </div>
+
+        <div class="pipe"><div class="arrow"></div></div>
+
+        <aside class="disk">
+          <div class="title">Диск (хүлээлгийн жагсаалт)</div>
+          <div class="queue" id="disk"></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <!-- ----- Тайлбарын 6 слайд (5 хичээл + 1 quiz) ----- -->
+  <section class="slides-wrap">
+    <div class="slides" id="slides"></div>
+    <div class="snav">
+      <button id="prev">← Өмнөх</button>
+      <div class="dots" id="dots"></div>
+      <button id="next">Дараах →</button>
+    </div>
+  </section>
+
+<script>
+/* ---------- Симуляци ---------- */
+const RAM_SLOTS = 4;
+const COLORS = ["color-A","color-B","color-C","color-D","color-E","color-F"];
+function seedWorkload(){
+  // origBurst талбарыг хадгална (прогрессд ашиглана)
+  const arr = [
+    { name:"A", size:220, burst:2200 },
+    { name:"B", size:140, burst:1600 },
+    { name:"C", size:260, burst:2400 },
+    { name:"D", size:120, burst:1400 },
+    { name:"E", size:280, burst:2400 },
+    { name:"F", size:180, burst:1800 },
+  ];
+  return arr.map(p=>({...p, origBurst:p.burst}));
+}
+const S = {
+  play:false, speed:1, strategy:"FIFO",
+  ram:new Array(RAM_SLOTS).fill(null),
+  disk:[], queue:seedWorkload(),
+  running:-1, age:0, map:new Map(),
+  lastOut:null, lastIn:null, finished:0
+};
+const ramEl = document.getElementById('ram');
+const diskEl = document.getElementById('disk');
+const capEl = document.getElementById('cap');
+const stEl = document.getElementById('status');
+const banner = document.getElementById('banner');
+const bOut = document.getElementById('bOut');
+const bIn = document.getElementById('bIn');
+const spd = document.getElementById('spd');
+
+function colorOf(id){
+  if(!S.map.has(id)) S.map.set(id, COLORS[S.map.size % COLORS.length]);
+  return S.map.get(id);
+}
+function slotDiv(i){
+  const d = document.createElement('div'); d.className='slot';
+  const idx=document.createElement('div'); idx.className='slot-index'; idx.textContent='Слот '+(i+1);
+  d.appendChild(idx); return d;
+}
+function drawSlots(){ ramEl.innerHTML=''; for(let i=0;i<RAM_SLOTS;i++) ramEl.appendChild(slotDiv(i)); }
+function card(p){
+  const c=document.createElement('div'); c.className=`proc ${colorOf(p.name)}`;
+  const remain = Math.max(0,p.burst);
+  const ratio = p.origBurst ? (p.origBurst ? (p.origBurst - remain)/p.origBurst : 0) : 0;
+  const pct = Math.max(0, Math.min(1, ratio));
+  c.innerHTML = `
+    <div>
+      <div class="name">P${p.name}</div>
+      <div class="meta">${p.size}MB • ${Math.round(remain/100)/10}с</div>
+      <div class="progress"><div class="fill" style="width:${(pct*100).toFixed(0)}%"></div></div>
+    </div>
+    <span class="badge">PID ${p.name}</span>`;
+  return c;
+}
+function qrow(p){
+  const r=document.createElement('div'); r.className='qslot';
+  r.innerHTML=`<span class="badge">PID ${p.name}</span><span class="meta">${p.size}MB • ${Math.round(p.burst/100)/10}с</span>`;
+  return r;
+}
+function cap(){ capEl.textContent = `${S.ram.filter(Boolean).length}/${RAM_SLOTS}`; }
+function say(m){ stEl.innerHTML = `<b>Төлөв:</b> ${m}`; }
+
+function updateSummary(){
+  const inRam = S.ram.filter(Boolean).length;
+  const inDisk = S.disk.length;
+  const total = S.finished + inRam + inDisk + S.queue.length;
+  document.getElementById('sumAll').textContent = total;
+  document.getElementById('sumRam').textContent = inRam;
+  document.getElementById('sumDisk').textContent = inDisk;
+  document.getElementById('sumDone').textContent = S.finished;
+}
+function render(){
+  document.querySelectorAll('.slot').forEach((s,i)=>{
+    s.querySelectorAll('.proc').forEach(n=>n.remove());
+    const cell=S.ram[i]; if(!cell) return;
+    const c=card(cell.proc);
+    if(i===S.running) c.classList.add('running');
+    s.appendChild(c);
+  });
+  diskEl.innerHTML='';
+  S.disk.forEach(p=>diskEl.appendChild(qrow(p)));
+  if(S.lastOut || S.lastIn){
+    banner.classList.add('show');
+    bOut.textContent = S.lastOut ? `OUT: P${S.lastOut.name}` : 'OUT: —';
+    bIn.textContent  = S.lastIn  ? `IN: P${S.lastIn.name}`  : 'IN: —';
+  } else banner.classList.remove('show');
+  cap(); updateSummary();
+}
+
+function anyFree(){ for(let i=0;i<RAM_SLOTS;i++) if(!S.ram[i]) return i; return -1; }
+function oldest(){ let k=-1,old=Infinity; for(let i=0;i<RAM_SLOTS;i++){const c=S.ram[i]; if(c&&c.since<old){old=c.since;k=i}} return k; }
+function largest(){ let k=-1,m=-1; for(let i=0;i<RAM_SLOTS;i++){const c=S.ram[i]; if(c&&c.proc.size>m){m=c.proc.size;k=i}} return k; }
+function victim(){ return S.strategy==="Largest" ? largest() : oldest(); }
+
+function rect(el){ const r=el.getBoundingClientRect(); return {x:r.left,y:r.top,w:r.width,h:r.height}; }
+function flyClone(fromEl, toEl){
+  if(!fromEl || !toEl) return;
+  const f=rect(fromEl), t=rect(toEl);
+  const ghost=fromEl.cloneNode(true);
+  ghost.classList.add('fly');
+  ghost.style.width=f.w+'px'; ghost.style.height=f.h+'px';
+  ghost.style.transform=`translate3d(${f.x}px,${f.y}px,0) scale(1)`;
+  document.body.appendChild(ghost);
+  requestAnimationFrame(()=>{
+    ghost.style.transform=`translate3d(${t.x}px,${t.y}px,0) scale(.96)`;
+    ghost.style.opacity='.45';
+    setTimeout(()=>ghost.remove(), 850);
+  });
+}
+
+function step(){
+  // Дууссан бол чөлөөл
+  for(let i=0;i<RAM_SLOTS;i++){
+    const c=S.ram[i]; if(c && c.proc.burst<=0){ S.ram[i]=null; S.finished++; say(`P${c.proc.name} дуусч RAM-аас гарлаа.`); }
+  }
+  S.lastOut=S.lastIn=null;
+
+  // Дискт байгаа бол сул слот руу
+  let idx=anyFree();
+  if(idx>=0 && S.disk.length>0){
+    const p=S.disk.shift();
+    const toEl = document.querySelectorAll('.slot')[idx];
+    const fromEl = diskEl.querySelector('.qslot');
+    S.ram[idx]={proc:p,since:S.age++}; S.lastIn=p;
+    if(fromEl) flyClone(fromEl, toEl);
+    say(`Дискт байсан P${p.name} RAM слот ${idx+1} руу орлоо.`);
+    render(); return;
+  }
+
+  // Шинэ процесс — сул бол шууд, үгүй бол swap
+  if(S.queue.length>0){
+    const next=S.queue[0];
+    idx=anyFree();
+    if(idx>=0){
+      S.queue.shift(); S.ram[idx]={proc:next,since:S.age++}; S.lastIn=next;
+      say(`Шинэ P${next.name} RAM слот ${idx+1} руу орлоо.`); render(); return;
+    }else{
+      const v=victim(); const out=S.ram[v].proc;
+      const ramCell=document.querySelectorAll('.slot')[v];
+      S.disk.push(out);
+      flyClone(ramCell.querySelector('.proc')||ramCell, diskEl);
+      S.queue.shift(); S.ram[v]={proc:next,since:S.age++};
+      S.lastOut=out; S.lastIn=next;
+      say(`RAM дүүрсэн. ${S.strategy==='Largest'?'Хамгийн том':'FIFO'} бодлогоор OUT: P${out.name}, IN: P${next.name}.`);
+      render(); return;
+    }
+  }
+
+  // CPU цаг
+  const run=oldest(); S.running=run;
+  if(run>=0){
+    const q=600; S.ram[run].proc.burst-=q;
+    say(`CPU: P${S.ram[run].proc.name} (${q}мс-ээр буурлаа).`);
+  }
+  render();
+}
+
+function reset(){
+  S.play=false; S.speed=parseFloat(document.getElementById('speed').value)||1;
+  S.strategy=document.getElementById('strategy').value;
+  S.ram=new Array(RAM_SLOTS).fill(null);
+  S.disk=[]; S.queue=seedWorkload(); S.running=-1; S.age=0; S.map.clear();
+  S.lastOut=S.lastIn=null; S.finished=0; banner.classList.remove('show');
+  drawSlots(); diskEl.innerHTML=''; render(); say('Симуляци бэлэн.');
+}
+drawSlots(); reset();
+
+let raf=null, last=0;
+function loop(t){
+  if(!S.play){ raf=null; return; }
+  if(!last) last=t;
+  const dt=(t-last)*S.speed;
+  if(dt>650){ step(); last=t; }
+  raf=requestAnimationFrame(loop);
+}
+document.getElementById('btnStart').onclick=()=>{ 
+  S.play=!S.play; document.getElementById('btnStart').textContent=S.play?'Түр зогсоох ⏸':'Эхлүүлэх ▶';
+  if(S.play && !raf){ last=0; loop(performance.now()); }
+};
+document.getElementById('btnStep').onclick=()=>{ if(!S.play) step(); };
+document.getElementById('btnReset').onclick=()=>{ if(raf) cancelAnimationFrame(raf); raf=null; last=0; reset(); document.getElementById('btnStart').textContent='Эхлүүлэх ▶'; };
+document.getElementById('strategy').onchange=e=>{ S.strategy=e.target.value; say(`Бодлого: ${S.strategy}`); };
+document.getElementById('speed').oninput=e=>{ S.speed=parseFloat(e.target.value); spd.textContent=S.speed.toFixed(1)+'×'; };
+
+/* ---------- 5 хичээл + 1 quiz слайд ---------- */
+const slidesData = [
+  {
+    title:"1) Swapping гэж юу вэ?",
+    text:"RAM хүрэлцэхгүй үед процессын бүхлэгийг түр Disk рүү гаргаж (swap-out), хэрэгтэй үед буцаан RAM руу ачаалдаг (swap-in) санах ойн арга.",
+    svg:`<svg viewBox="0 0 320 200">
+      <rect x="20" y="30" width="120" height="140" rx="10" fill="#16325a" stroke="#2b4a7d"/>
+      <text x="80" y="22" fill="#9fb1d6" text-anchor="middle" font-size="12">RAM</text>
+      <rect x="180" y="30" width="120" height="140" rx="10" fill="#0e2244" stroke="#2b4a7d"/>
+      <text x="240" y="22" fill="#9fb1d6" text-anchor="middle" font-size="12">Disk</text>
+      <polygon points="150,100 170,90 170,110" fill="#3d6fe8"/>
+      <polygon points="170,100 190,90 190,110" fill="#47ffa8"/>
+    </svg>`
+  },
+  {
+    title:"2) Яагаад хэрэгтэй вэ?",
+    text:"RAM хурдан ч багтаамж бага. Disk удаан ч их багтаамжтай. Swapping нь олон процесс зэрэг орших боломж олгоно — гэхдээ IO ихдвэл гүйцэтгэл буурна.",
+    svg:`<svg viewBox="0 0 320 200">
+      <rect x="20" y="30" width="280" height="26" rx="6" fill="#66e3ff"/>
+      <rect x="20" y="70" width="220" height="26" rx="6" fill="#ffd166"/>
+      <rect x="20" y="110" width="100" height="26" rx="6" fill="#47ffa8"/>
+      <text x="160" y="160" fill="#9fb1d6" text-anchor="middle" font-size="12">RAM ашиглалт ↑  •  Disk IO ↑ → гүйцэтгэл ↓</text>
+    </svg>`
+  },
+  {
+    title:"3) Swap-in / Swap-out урсгал",
+    text:"RAM дүүрсэн үед бодлогоор нэг процессыг OUT болгож Disk рүү; дараагийнх нь IN болж RAM руу орно.",
+    svg:`<svg viewBox="0 0 320 200">
+      <rect x="28" y="40" width="120" height="120" rx="10" fill="#16325a"/>
+      <rect x="172" y="40" width="120" height="120" rx="10" fill="#0e2244"/>
+      <rect x="40" y="60" width="96" height="24" rx="6" fill="#ff8a7a"/>
+      <rect x="40" y="94" width="96" height="24" rx="6" fill="#66e3ff"/>
+      <rect x="184" y="78" width="96" height="24" rx="6" fill="#47ffa8"/>
+      <path d="M136 72 L168 86" stroke="#ff8a7a" stroke-width="3" />
+      <path d="M184 90 L152 104" stroke="#47ffa8" stroke-width="3" />
+      <text x="88" y="30" fill="#9fb1d6" font-size="12">OUT →</text>
+      <text x="232" y="30" fill="#9fb1d6" font-size="12">← IN</text>
+    </svg>`,
+    html:`<button id="demoSwap" class="primary">Демо үзүүлэх (2 алхам)</button>`
+  },
+  {
+    title:"4) Бодлого (Policy)",
+    text:"FIFO — RAM-д хамгийн удаан байсан процессыг гаргана. Largest — RAM дахь хамгийн том процессыг гаргана.",
+    svg:`<svg viewBox="0 0 320 200">
+      <rect x="30" y="40" width="100" height="30" rx="6" fill="#66e3ff"/><text x="80" y="60" text-anchor="middle" fill="#061e2f" font-size="12">P1</text>
+      <rect x="30" y="80" width="160" height="30" rx="6" fill="#ffd166"/><text x="110" y="100" text-anchor="middle" fill="#3a2a00" font-size="12">P2</text>
+      <rect x="30" y="120" width="130" height="30" rx="6" fill="#47ffa8"/><text x="95" y="140" text-anchor="middle" fill="#003322" font-size="12">P3</text>
+      <text x="240" y="60" fill="#9fb1d6" font-size="12">FIFO → P1</text>
+      <text x="240" y="100" fill="#9fb1d6" font-size="12">Largest → P2</text>
+    </svg>`
+  },
+  {
+    title:"5) Гүйцэтгэлийн нөлөө",
+    text:"Swapping ихдвэл CPU их хүлээнэ. Тэнцвэржүүлэлт (policy + CPU квант) сайн байх тусам дундаж хугацаа багасна.",
+    svg:`<svg viewBox="0 0 320 200">
+      <rect x="40" y="120" width="240" height="16" rx="8" fill="#2b3e66"/>
+      <rect x="40" y="120" width="160" height="16" rx="8" fill="#ff8a7a"/>
+      <text x="160" y="90" fill="#9fb1d6" text-anchor="middle" font-size="12">IO ↑  →  Хүлээлт ↑  →  Throughput ↓</text>
+    </svg>`
+  },
+  {
+    title:"6) Түргэн Quiz",
+    text:"RAM дүүрсэн үед FIFO бодлого хэрэглэвэл аль процесс эхэлж гаргах вэ?",
+    svg:`<svg viewBox="0 0 320 200">
+      <rect x="30" y="40" width="100" height="30" rx="6" fill="#66e3ff"/><text x="80" y="60" text-anchor="middle" fill="#061e2f" font-size="12">P1 (хамгийн эрт орсон)</text>
+      <rect x="30" y="90" width="160" height="30" rx="6" fill="#ffd166"/><text x="110" y="110" text-anchor="middle" fill="#3a2a00" font-size="12">P2</text>
+      <rect x="30" y="140" width="130" height="30" rx="6" fill="#47ffa8"/><text x="95" y="160" text-anchor="middle" fill="#003322" font-size="12">P3</text>
+    </svg>`,
+    html:`<div class="extra">
+      <button class="qbtn" data-ans="wrong">A) Хамгийн том процесс</button>
+      <button class="qbtn" data-ans="right">B) Хамгийн эхэнд орсон процесс</button>
+      <button class="qbtn" data-ans="wrong">C) Санамсаргүй</button>
+      <span id="qmsg" style="margin-left:10px;color:#9fb1d6"></span>
+    </div>`
+  }
+];
+
+const slidesBox = document.getElementById('slides');
+const dotsBox = document.getElementById('dots');
+let cur=0, autoTimer=null, sliding=false;
+
+function createSlideEl(i){
+  const d=document.createElement('div'); d.className='slide';
+  const s = slidesData[i];
+  d.innerHTML = `<div>${s.svg||""}</div>
+                 <div><h3>${s.title}</h3><p>${s.text}</p>${s.html||""}</div>`;
+  // attach behaviors if necessary
+  setTimeout(()=>{
+    if(i===2){ // slide #3 demo button
+      const btn=document.getElementById('demoSwap');
+      if(btn) btn.onclick=()=>{ step(); setTimeout(step, 500); };
+    }
+    if(i===5){ // quiz
+      document.querySelectorAll('.qbtn').forEach(b=>{
+        b.onclick=()=> {
+          const ok = b.dataset.ans==='right';
+          const msg = document.getElementById('qmsg');
+          msg.textContent = ok ? 'Зөв! FIFO → хамгийн эхэнд орсон.' : 'Дахин бодоорой 😉';
+          msg.style.color = ok ? '#47ffa8' : '#ff8a7a';
+        };
+      });
+    }
+  },0);
+  return d;
+}
+function renderSlidesFirst(){
+  slidesBox.innerHTML=''; dotsBox.innerHTML='';
+  const first = createSlideEl(0); first.classList.add('active'); slidesBox.appendChild(first);
+  slidesData.forEach((_,i)=>{
+    const dot=document.createElement('div'); dot.className='dot'+(i===0?' on':''); dotsBox.appendChild(dot);
+  });
+}
+function go(n){
+  if(sliding) return;
+  sliding = true;
+
+  const total=slidesData.length;
+  const prev = cur;
+  cur = (n + total) % total;
+
+  const oldEl = slidesBox.querySelector('.slide.active');
+  if(oldEl){
+    oldEl.classList.remove('active');
+    oldEl.classList.add('exit-left');
+  }
+  const newEl = createSlideEl(cur);
+  slidesBox.appendChild(newEl);
+  requestAnimationFrame(()=> newEl.classList.add('active'));
+  if(oldEl){
+    oldEl.addEventListener('transitionend', ()=>{ oldEl.remove(); sliding=false; }, {once:true});
+  } else {
+    sliding=false;
+  }
+  dotsBox.querySelectorAll('.dot').forEach((x,i)=>x.classList.toggle('on', i===cur));
+  // Slide #3 дээр очиход автоматаар 1-2 алхам тоглуулъя
+  if(cur===2){ setTimeout(()=>{ step(); setTimeout(step, 600); }, 400); }
+}
+function restartAuto(){
+  if(autoTimer) clearInterval(autoTimer);
+  autoTimer=setInterval(()=>go(cur+1), 6000);
+}
+renderSlidesFirst(); restartAuto();
+document.getElementById('prev').onclick=()=>{ go(cur-1); restartAuto(); };
+document.getElementById('next').onclick=()=>{ go(cur+1); restartAuto(); };
+
+/* keyboard shortcuts for sim */
+window.addEventListener('keydown',e=>{
+  if(e.code==='Space'){ e.preventDefault(); document.getElementById('btnStart').click(); }
+  if(e.key==='n' || e.key==='N'){ document.getElementById('btnStep').click(); }
+  if(e.key==='r' || e.key==='R'){ document.getElementById('btnReset').click(); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Санах Ойн Хяналтын Тест - Монгол Ухаан</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gradient);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .mongol-title {
+            font-size: 2.5em;
+            color: var(--primary);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: var(--secondary);
+            font-size: 1.2em;
+        }
+
+        .btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-danger {
+            background: var(--accent);
+        }
+
+        .options-container {
+            display: grid;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .option {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .option:hover {
+            background: #d5dbdb;
+            transform: translateX(10px);
+        }
+
+        .option.selected {
+            border-color: var(--secondary);
+            background: #d6eaf8;
+        }
+
+        .option.correct {
+            border-color: var(--success);
+            background: #d5f4e6;
+        }
+
+        .option.incorrect {
+            border-color: var(--accent);
+            background: #fadbd8;
+        }
+
+        .progress-container {
+            background: var(--light);
+            border-radius: 10px;
+            height: 20px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: var(--secondary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .result-card {
+            text-align: center;
+            display: none;
+        }
+
+        .score-display {
+            font-size: 4em;
+            color: var(--secondary);
+            margin: 20px 0;
+        }
+
+        .fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--secondary);
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .menu-item {
+            background: var(--light);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            background: var(--secondary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .explanation {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid var(--secondary);
+        }
+
+        .timer {
+            font-size: 1.2em;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Дэлгэрэнгүй үр дүнгийн хэсэг */
+        .detailed-results {
+            text-align: left;
+            margin: 30px 0;
+        }
+
+        .result-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .result-item.correct {
+            border-left: 5px solid var(--success);
+        }
+
+        .result-item.incorrect {
+            border-left: 5px solid var(--accent);
+        }
+
+        .result-question {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .result-answer {
+            margin: 5px 0;
+        }
+
+        .material-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .material-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+        }
+
+        .material-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Хугацааны лимит */
+        .time-warning {
+            color: var(--accent);
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Монгол бичгийн стиль */
+        .mongol-pattern {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.1"><text x="50" y="50" font-family="Arial" font-size="20" text-anchor="middle" fill="%232c3e50">ᠮᠣᠩᠭᠣᠯ</text></svg>');
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="mongol-pattern"></div>
+    <div class="container">
+        <!-- Үндсэн цэс -->
+        <div id="mainMenu" class="card">
+            <div class="header">
+                <h1 class="mongol-title">Санах ойн хяналт</h1>
+                <p class="subtitle">Санах ойн хяналтын аргуудын интерактив тест</p>
+            </div>
+            
+            <div class="menu-grid">
+                <div class="menu-item" onclick="startTest()">
+                    <div class="icon">🎯</div>
+                    <h3>Тест эхлүүлэх</h3>
+                    <p>7 асуултаас бүрдсэн тест</p>
+                </div>
+                <div class="menu-item" onclick="showAbout()">
+                    <div class="icon">ℹ️</div>
+                    <h3>Тестийн тухай</h3>
+                    <p>Дэлгэрэнгүй мэдээлэл</p>
+                </div>
+                <div class="menu-item" onclick="showMaterials()">
+                    <div class="icon">📚</div>
+                    <h3>Шалгалтанд бэлдэх</h3>
+                    <p>Нэмэлт унших материал</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Тестийн хэсэг -->
+        <div id="testSection" class="card" style="display: none;">
+            <div class="header">
+                <h2>АСУУЛТ <span id="currentQuestion">1</span>/7</h2>
+                <div class="timer">
+                    ⏰ Хугацаа: <span id="timer">10:00</span>
+                    <span id="timeWarning" style="display: none;" class="time-warning"> - Яараарай!</span>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <h3 id="questionText" style="margin: 20px 0; font-size: 1.3em;"></h3>
+            
+            <div class="options-container" id="optionsContainer">
+                <!-- Сонголтууд энд динамикаар нэмэгдэнэ -->
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn" onclick="nextQuestion()" id="nextBtn" disabled>Дараагийн асуулт</button>
+            </div>
+        </div>
+
+        <!-- Үр дүнгийн хэсэг -->
+        <div id="resultSection" class="card result-card">
+            <div class="header">
+                <h1 class="mongol-title">Тестийн дүн</h1>
+                <p class="subtitle">Таны тестийн үр дүн</p>
+            </div>
+            
+            <div class="score-display" id="finalScore">0%</div>
+            
+            <div class="explanation">
+                <h3>🎓 Таны мэдлэгийн түвшин</h3>
+                <p id="levelDescription"></p>
+                <p id="timeResult" style="margin-top: 10px;"></p>
+            </div>
+
+            <!-- Дэлгэрэнгүй үр дүн -->
+            <div class="detailed-results" id="detailedResults">
+                <!-- Дэлгэрэнгүй үр дүн энд динамикаар нэмэгдэнэ -->
+            </div>
+
+            <!-- Нэмэлт материал -->
+            <div class="material-section">
+                <h3>📚 Сургалтын материал</h3>
+                <div class="material-item">
+                    <h4>Санах ойн хяналтын аргуудын тухай</h4>
+                    <p>Санах ойн хяналтын аргууд нь процессор санах ойгоос өгөгдөл авах, бичих үед ашиглагддаг хаягийн тодорхойлох аргууд юм. Үндсэн 7 арга байдаг:</p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Түргэн хяналтын арга</strong> - Хаяг нь зааврын хэсэгт шууд байрладаг</li>
+                        <li><strong>Шууд хяналтын арга</strong> - Хаяг нь зааврын бүрэлдэхүүн хэсэг болдог</li>
+                        <li><strong>Индексэн хяналтын арга</strong> - Хаягийг индекс регистрийн утгад нэмж тооцдог</li>
+                        <li><strong>Регистрэн хяналтын арга</strong> - Хаяг нь тусгайлан зориулсан регистр дотор байрладаг</li>
+                        <li><strong>Ундеэн хяналтын арга</strong> - Хаягийг тусгай заавраар дамжуулан тодорхойлдог</li>
+                        <li><strong>Харилцааны хяналтын арга</strong> - Харилцааны регистр ашиглан хаягийг тодорхойлдог</li>
+                        <li><strong>Шууд бус хяналтын арга</strong> - Хаяг нь регистр дотор байрладаг</li>
+                    </ul>
+                </div>
+                <div class="material-item">
+                    <h4>Чухал ойлголтууд</h4>
+                    <p><strong>Санах ойн хаяг</strong> - Өгөгдөл хадгалагдаж байгаа байршил</p>
+                    <p><strong>Регистр</strong> - Процессорын доторх жижиг, хурдан санах ой</p>
+                    <p><strong>Индекс регистр</strong> - Хаягийн тооцоонд ашиглагддаг тусгай регистр</p>
+                </div>
+            </div>
+            
+            <div style="margin: 30px 0;">
+                <button class="btn btn-success" onclick="restartTest()">Дахин эхлүүлэх</button>
+                <button class="btn" onclick="showMainMenu()">Үндсэн цэс</button>
+            </div>
+        </div>
+
+        <!-- Тухай хэсэг -->
+        <div id="aboutSection" class="card" style="display: none;">
+            <div class="header">
+                <h2>Тестийн тухай</h2>
+            </div>
+            
+            <div class="explanation">
+                <h3>📚 Шалгалтын сэдвүүд:</h3>
+                <ul style="list-style-position: inside; margin: 15px 0;">
+                    <li>Түргэн хяналтын арга</li>
+                    <li>Шууд хяналтын арга</li>
+                    <li>Индексэн хяналтын арга</li>
+                    <li>Регистрэн хяналтын арга</li>
+                    <li>Ундеэн хяналтын арга</li>
+                    <li>Харилцааны хяналтын арга</li>
+                    <li>Шууд бус хяналтын арга</li>
+                </ul>
+            </div>
+            
+            <button class="btn" onclick="showMainMenu()">Буцах</button>
+        </div>
+
+        <!-- Сургалтын материал хэсэг -->
+        <div id="materialsSection" class="card" style="display: none;">
+            <div class="header">
+                <h2>📚 Шалгалтанд бэлдэх</h2>
+            </div>
+            
+            <div class="material-section">
+                <div class="material-item">
+                    <h3>Санах ойн хяналтын аргууд</h3>
+                    <p><strong>Түргэн хяналтын арга:</strong> Энэ аргад санах ойн хаяг нь зааврын хэсэгт шууд байрладаг. Энэ нь хамгийн энгийн бөгөөд хурдан арга юм.</p>
+                    
+                    <p><strong>Шууд хяналтын арга:</strong> Хаяг нь зааврын бүрэлдэхүүн хэсэг болдог. Энэ нь тогтмол хаяг ашиглахад тохиромжтой.</p>
+                    
+                    <p><strong>Индексэн хяналтын арга:</strong> Энэ аргад хаягийг индекс регистрийн утгад нэмж тооцдог. Энэ нь массив болон жагсаалттай ажиллахад тохиромжтой.</p>
+                    
+                    <p><strong>Регистрэн хяналтын арга:</strong> Хаяг нь тусгайлан зориулсан регистр дотор байрладаг. Энэ нь маш хурдан боловч хязгаарлагдмал багтаамжтай.</p>
+                    
+                    <p><strong>Ундеэн хяналтын арга:</strong> Хаягийг тусгай заавраар дамжуулан тодорхойлдог. Энэ нь нарийн төвөгтэй хаягийн тооцоонд ашиглагддаг.</p>
+                    
+                    <p><strong>Харилцааны хяналтын арга:</strong> Харилцааны регистр ашиглан хаягийг тодорхойлдог. Энэ нь харьцангуй хаяглалтад ашиглагддаг.</p>
+                    
+                    <p><strong>Шууд бус хяналтын арга:</strong> Хаяг нь регистр дотор байрладаг. Энэ нь зааврын уртыг багасгахад тусалдаг.</p>
+                </div>
+                
+                <div class="material-item">
+                    <h3>Чухал нэр томьёо</h3>
+                    <p><strong>Санах ойн хаяг:</strong> Өгөгдөл хадгалагдаж байгаа санах ойн нэгжийн байршил</p>
+                    <p><strong>Регистр:</strong> Процессорын дотор байрлах, маш хурдан хандаж болох жижиг санах ой</p>
+                    <p><strong>Индекс регистр:</strong> Хаягийн тооцоонд ашиглагддаг тусгай зориулалтын регистр</p>
+                    <p><strong>Заавар:</strong> Процессорт гүйцэтгэх үйлдлийг заадаг командууд</p>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="showMainMenu()">Буцах</button>
+        </div>
+    </div>
+
+    <script>
+        // Тестийн өгөгдөл - 4 сонголттой асуултууд
+        const questions = [
+            {
+                question: "Түргэн хяналтын аргад санах ойн хаягийг шууд тодорхойлдог хэсэг нь ______ дотор байдаг.",
+                options: [
+                    "а. регистрийн дугаарын",
+                    "б. зааврын хэсэгт", 
+                    "в. программын тоолуурын",
+                    "г. индекс регистр дотор"
+                ],
+                answer: "б",
+                fullAnswer: "зааврын хэсэгт",
+                explanation: "Түргэн хяналтын аргад хаяг нь зааврын хэсэгт шууд байрладаг"
+            },
+            {
+                question: "Шууд хяналтын аргад санах ойн хаяг нь ______ хэсэгт байдаг.",
+                options: [
+                    "а. регистрийн дугаарын",
+                    "б. зааврын хэсэгт",
+                    "в. программын тоолуурын", 
+                    "г. тусгай регистр дотор"
+                ],
+                answer: "б",
+                fullAnswer: "зааврын хэсэгт",
+                explanation: "Шууд хяналтын аргад хаяг нь зааврын бүрэлдэхүүн хэсэг болдог"
+            },
+            {
+                question: "Индексэн хяналтын аргад санах ойн хаягийг индекс регистрийн утгад ______ гаргаж авдаг.",
+                options: [
+                    "а. үржүүлэх замаар",
+                    "б. хуваах замаар", 
+                    "в. нэмэх замаар",
+                    "г. хасах замаар"
+                ],
+                answer: "в",
+                fullAnswer: "нэмэх замаар",
+                explanation: "Индексэн хяналтын аргад хаягийг индекс регистрийн утгад нэмж тооцдог"
+            },
+            {
+                question: "Регистрэн хяналтын аргад санах ойн хаяг нь ______ дотор байдаг.",
+                options: [
+                    "а. регистр дотор",
+                    "б. зааврын хэсэгт",
+                    "в. программын тоолуурын",
+                    "г. санах ойн тусгай хэсэгт"
+                ],
+                answer: "а",
+                fullAnswer: "регистр дотор",
+                explanation: "Регистрэн хяналтын аргад хаяг нь тусгайлан зориулсан регистр дотор байрладаг"
+            },
+            {
+                question: "Үндсэн хяналтын аргад санах ойн хаягийг ______ ашиглан тодорхойлдог.",
+                options: [
+                    "а. регистр ашиглан",
+                    "б. тусгай заавар ашиглан",
+                    "в. программын тоолуур ашиглан",
+                    "г. индекс регистр ашиглан"
+                ],
+                answer: "б",
+                fullAnswer: "тусгай заавар ашиглан",
+                explanation: "Үндсэн хяналтын аргад хаягийг тусгай заавраар дамжуулан тодорхойлдог"
+            },
+            {
+                question: "Харилцааны хяналтын аргад санах ойн хаягийг ______ ашиглан тодорхойлдог.",
+                options: [
+                    "а. зааврын хэсэг ашиглан",
+                    "б. программын тоолуур ашиглан",
+                    "в. харилцааны регистр ашиглан",
+                    "г. индекс регистр ашиглан"
+                ],
+                answer: "в",
+                fullAnswer: "харилцааны регистр ашиглан",
+                explanation: "Харилцааны хяналтын аргад харилцааны регистр ашиглан хаягийг тодорхойлдог"
+            },
+            {
+                question: "Шууд бус хяналтын аргад санах ойн хаяг нь ______ дотор байдаг.",
+                options: [
+                    "а. регистр дотор",
+                    "б. зааврын хэсэгт",
+                    "в. программын тоолуурын",
+                    "г. санах ойн тусгай хэсэгт"
+                ],
+                answer: "а",
+                fullAnswer: "регистр дотор",
+                explanation: "Шууд бус хяналтын аргад хаяг нь регистр дотор байрладаг"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = [];
+        let startTime;
+        let timerInterval;
+        let timeLimit = 600; // 10 минут секундээр
+        let timeLeft = timeLimit;
+
+        // Цэсүүдийг харуулах/нуух
+        function showSection(sectionId) {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('testSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('aboutSection').style.display = 'none';
+            document.getElementById('materialsSection').style.display = 'none';
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        function showMainMenu() {
+            showSection('mainMenu');
+        }
+
+        function showAbout() {
+            showSection('aboutSection');
+        }
+
+        function showMaterials() {
+            showSection('materialsSection');
+        }
+
+        // Тест эхлүүлэх
+        function startTest() {
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            timeLeft = timeLimit;
+            startTime = new Date();
+            showSection('testSection');
+            loadQuestion();
+            startTimer();
+        }
+
+        // Хугацааны тоолуур
+        function startTimer() {
+            clearInterval(timerInterval);
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert('Хугацаа дууслаа! Тестийн үр дүнг харуулна.');
+                    showResults();
+                } else if (timeLeft <= 60) {
+                    document.getElementById('timeWarning').style.display = 'inline';
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const seconds = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+        }
+
+        // Асуулт ачаалах
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            
+            // Прогресс барыг шинэчлэх
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            // Сонголтуудыг үүсгэх
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            document.getElementById('nextBtn').disabled = true;
+        }
+
+        // Сонголт сонгох
+        function selectOption(optionIndex) {
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[optionIndex].classList.add('selected');
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        // Дараагийн асуулт
+        function nextQuestion() {
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) return;
+            
+            const selectedAnswer = selectedOption.textContent.charAt(0);
+            const correctAnswer = questions[currentQuestionIndex].answer;
+            const selectedFullAnswer = selectedOption.textContent.substring(3); // "а. " гэх үсгийг хасах
+            
+            userAnswers.push({
+                question: questions[currentQuestionIndex].question,
+                selected: selectedAnswer,
+                selectedFull: selectedFullAnswer,
+                correct: correctAnswer,
+                correctFull: questions[currentQuestionIndex].fullAnswer,
+                explanation: questions[currentQuestionIndex].explanation,
+                isCorrect: selectedAnswer === correctAnswer
+            });
+            
+            if (selectedAnswer === correctAnswer) {
+                score++;
+            }
+            
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // Үр дүнг харуулах
+        function showResults() {
+            clearInterval(timerInterval);
+            showSection('resultSection');
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('finalScore').textContent = `${percentage}%`;
+            
+            let levelDescription = '';
+            if (percentage >= 90) {
+                levelDescription = '🎉 МАШ САЙН! Та санах ойн хяналтын аргуудыг гүнзгий ойлгосон!';
+                createFireworks();
+            } else if (percentage >= 70) {
+                levelDescription = '👍 САЙН! Та үндсэн ойлголтуудыг сайн эзэмшсэн!';
+            } else if (percentage >= 50) {
+                levelDescription = '💪 ХАНГАЛТТАЙ! Давтан судлахад тустай!';
+            } else {
+                levelDescription = '📚 ДАХИН ОРОЛДОНО УУ! Нэмэлт судалгаа хэрэгтэй!';
+            }
+            
+            document.getElementById('levelDescription').textContent = levelDescription;
+            
+            // Хугацааны үр дүнг харуулах
+            const timeUsed = timeLimit - timeLeft;
+            const minutesUsed = Math.floor(timeUsed / 60);
+            const secondsUsed = timeUsed % 60;
+            document.getElementById('timeResult').textContent = 
+                `Тест өгөхөд ${minutesUsed} минут ${secondsUsed} секунд зарцуулсан`;
+            
+            // Дэлгэрэнгүй үр дүнг харуулах
+            showDetailedResults();
+        }
+
+        // Дэлгэрэнгүй үр дүнг харуулах
+        function showDetailedResults() {
+            const detailedResults = document.getElementById('detailedResults');
+            detailedResults.innerHTML = '<h3>📋 Дэлгэрэнгүй үр дүн:</h3>';
+            
+            userAnswers.forEach((answer, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = `result-item ${answer.isCorrect ? 'correct' : 'incorrect'}`;
+                
+                const statusIcon = answer.isCorrect ? '✅' : '❌';
+                const statusText = answer.isCorrect ? 'ЗӨВ' : 'БУРУУ';
+                
+                resultItem.innerHTML = `
+                    <div class="result-question">${statusIcon} Асуулт ${index + 1}: ${answer.question}</div>
+                    <div class="result-answer"><strong>Таны хариулт:</strong> ${answer.selected} (${answer.selectedFull}) - ${statusText}</div>
+                    <div class="result-answer"><strong>Зөв хариулт:</strong> ${answer.correct} (${answer.correctFull})</div>
+                    <div class="result-answer"><strong>Тайлбар:</strong> ${answer.explanation}</div>
+                `;
+                
+                detailedResults.appendChild(resultItem);
+            });
+        }
+
+        // Галын үзэгдэл үүсгэх
+        function createFireworks() {
+            const fireworks = document.createElement('div');
+            fireworks.className = 'fireworks';
+            document.body.appendChild(fireworks);
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.background = getRandomColor();
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                fireworks.appendChild(confetti);
+            }
+            
+            setTimeout(() => {
+                fireworks.remove();
+            }, 3000);
+        }
+
+        function getRandomColor() {
+            const colors = ['#3498db', '#e74c3c', '#27ae60', '#f39c12', '#9b59b6'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Тест дахин эхлүүлэх
+        function restartTest() {
+            startTest();
+        }
+
+        // Эхлээд үндсэн цэсийг харуулах
+        showMainMenu();
+    </script>
+</body>
+</html>
