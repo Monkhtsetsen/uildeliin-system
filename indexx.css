@@ -1,0 +1,84 @@
+/* --- Section 2: linked allocation layout --- */
+.linked-layout{
+  display:flex;
+  flex-wrap:wrap;           /* дэлгэц жижиг бол доошоо ороод явна */
+  gap:24px;
+  margin-top:18px;
+  align-items:stretch;
+}
+
+/* зүүн тал – блокуудын жагсаалт */
+.block-col{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  flex:1 1 0;              /* өргөнийг flex-ээр share-лана */
+  min-width:260px;
+  padding:10px 12px 10px 16px;
+  border-radius:14px;
+  background:radial-gradient(circle at top left,#0f172a,#020617);
+  border:1px solid rgba(148,163,184,.35);
+  /* scroll алга – өндөр хязгаар тавиагүй */
+}
+
+/* мөр бүр: индекс + блок */
+.link-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  line-height:1;
+}
+
+.link-idx{
+  width:32px;
+  text-align:right;
+  color:#6b7280;
+  font-variant-numeric:tabular-nums;
+}
+
+.link-block-wrapper{
+  flex:1;
+}
+
+/* баруун тал – файл эхлэх блокуудын тайлбар */
+.file-starts{
+  flex:1 1 0;
+  min-width:260px;
+  font-size:13px;
+  color:#e5e7eb;
+  background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(30,64,175,.45));
+  border-radius:14px;
+  padding:12px 14px;
+  border:1px solid rgba(148,163,184,.45);
+  box-shadow:0 18px 35px rgba(15,23,42,.65);
+}
+
+/* traverse үед highlight хийх */
+.block.hl{
+  box-shadow:0 0 0 2px #f97316 inset,0 0 14px rgba(248,113,113,.45);
+  transform:scale(1.05);
+}
+
+/* файл сонгох select – section-ийн control дээр гоё харагдана */
+#fileSelect2{
+  width:180px;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,.6);
+  background:rgba(15,23,42,.95);
+  color:#e5e7eb;
+  font-size:13px;
+  outline:none;
+  transition:border-color .2s, box-shadow .2s, background .2s;
+}
+
+#fileSelect2:focus{
+  border-color:#38bdf8;
+  box-shadow:0 0 0 1px rgba(56,189,248,.6);
+  background:#020617;
+}
+
+#fileSelect2:hover{
+  border-color:rgba(191,219,254,.9);
+}

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <title>Лабораторийн ажил 11</title>
+  <link rel="stylesheet" href="/indexx.css">
+  <style>
+    :root{
+      color-scheme: dark;
+    }
+    body{
+      background:#020617;
+      color:#e5eefc;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      margin:0;
+      padding:24px;
+    }
+    h1,h2,h3{margin:0;}
+    main{
+      max-width:1000px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:24px;
+    }
+    section{
+      background:#0b1120;
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,.35);
+      padding:20px 24px 24px;
+      box-shadow:0 18px 40px rgba(0,0,0,.55);
+    }
+    .section-title{
+      font-size:20px;
+      margin-bottom:4px;
+    }
+    .section-sub{
+      font-size:14px;
+      color:#9ca3af;
+      margin-bottom:16px;
+    }
+
+    /* --- Disk panel --- */
+    .panel{
+      background:#020617;
+      border-radius:16px;
+      border:1px solid rgba(30,64,175,.7);
+      padding:18px 20px;
+    }
+    .panel h3{
+      font-size:16px;
+      margin-bottom:6px;
+    }
+    .panel small{
+      color:#9ca3af;
+    }
+
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:12px 0 14px;
+      align-items:flex-end;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      font-size:13px;
+    }
+    .field input{
+      background:#020617;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      padding:6px 10px;
+      color:#e5eefc;
+      min-width:80px;
+    }
+    .field input[type="number"]{
+      width:90px;
+    }
+    button{
+      border:none;
+      padding:7px 13px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      white-space:nowrap;
+    }
+    button.primary{ background:#22c55e; color:#022c22; }
+    button.secondary{ background:#1d4ed8; color:#eff6ff; }
+    button.outline{
+      background:transparent;
+      color:#e5eefc;
+      border:1px solid rgba(148,163,184,.8);
+    }
+    button:disabled{
+      opacity:.4;
+      cursor:default;
+    }
+
+    .disk{
+      display:grid;
+      grid-template-columns: repeat(40, minmax(0,1fr));
+      gap:2px;
+      margin:12px 0 4px;
+    }
+    .block{
+      height:20px;
+      border-radius:4px;
+      border:1px solid rgba(15,23,42,.9);
+      font-size:9px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-sizing:border-box;
+      user-select:none;
+      transition:background .12s ease-out, transform .12s ease-out;
+    }
+    .block.free{
+      background:#4e5059;
+      color:#64748b;
+    }
+
+    .legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:8px;
+      font-size:12px;
+    }
+    .legend-item{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(15,23,42,.9);
+      border:1px solid rgba(148,163,184,.5);
+    }
+    .legend-swatch{
+      width:14px;
+      height:14px;
+      border-radius:4px;
+    }
+
+    .explain{
+      margin-top:8px;
+      font-size:13px;
+      color:#cbd5f5;
+      line-height:1.6;
+    }
+    .step-label{
+      font-weight:700;
+      color:#93c5fd;
+      margin-bottom:2px;
+    }
+    .small{
+      font-size:12px;
+      color:#94a3b8;
+      margin-top:4px;
+    }
+
+    /* Section 2 placeholder */
+    .placeholder{
+      padding:12px 14px;
+      border-radius:12px;
+      background:rgba(15,23,42,.85);
+      border:1px dashed rgba(148,163,184,.6);
+      font-size:14px;
+      color:#cbd5f5;
+    }
+  </style>
+</head>
+<body>
+<main>
+
+  <!-- ========== SECTION 1 – БОДЛОГО 1 ========== -->
+  <section id="task1">
+    <div class="section-title">Бодлого 1 – Үргэлжилсэн хуваарилалтын симуляци</div>
+    <div class="section-sub">
+      40 блоктой диск дээр файлуудыг үргэлжилсэн байдлаар хадгалахыг
+      симуляцилж, фрагментаци хэрхэн үүсэж байгааг харах.
+    </div>
+
+    <div class="panel">
+      <h3>Дискний загвар</h3>
+
+      <div class="controls">
+        <div class="field">
+          <label for="fileName">Файлын нэр</label>
+          <input id="fileName" placeholder="A" maxlength="1">
+        </div>
+        <div class="field">
+          <label for="fileSize">Хэмжээ</label>
+          <input id="fileSize" type="number" min="1" max="40" value="4">
+        </div>
+        <button id="btnAdd" class="primary">Add</button>
+        <button id="btnDelete" class="secondary">Delete файл</button>
+        <button id="btnExample" class="outline">Жишээ тохиргоо</button>
+        <button id="btnReset1" class="outline">Диск Reset</button>
+      </div>
+
+      <div id="disk" class="disk"></div>
+      <div class="small">Блок бүр 1 нэгж хадгалах зай гэж үзнэ (нийт 40 блок).</div>
+
+      <div class="explain" id="explain1"></div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:#f97316;"></div>File A
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:#0ea5e9;"></div>File B
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:#22c55e;"></div>File C
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:#eab308;"></div>File D
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:#a855f7;"></div>File E
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:#ef4444;"></div>File F
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:#38bdf8;"></div>File G
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:#4e5059;border:1px solid #64748b;"></div>
+          Чөлөөт блок
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 2 – БОДЛОГО 2 (Linked list) ========== -->
+  <section id="task2">
+    <div class="section-title">Бодлого 2 – Холбоост жагсаалттай хуваарилалт</div>
+    <div class="section-sub">
+      A – 6 блок, B – 5 блок, C – 3 блок, D – 7 блок, E – 6 блок, E – 2 блок файлуудыг
+      санах ойд <b>linked list</b> ашиглан байрлуулж харуулна.
+    </div>
+
+    <div class="panel">
+      <h3>Дискний загвар</h3>
+      <small>
+        Зүүн баганад physical block-ууд, хайрцаг доторх тоо нь дараагийн блокийн индекс.
+        <code>-1</code> бол тухайн файлын сүүлийн блок.
+      </small>
+
+      <div class="controls">
+        <button id="btnExample2" class="primary">Жишээ байрлуулах</button>
+
+        <div class="field">
+          <label for="fileSelect2">Файл унших</label>
+            <select id="fileSelect2">
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E (6 блок)</option>
+            <option value="E2">E (2 блок)</option>
+            </select>
+        </div>
+        <button id="btnTraverse2" class="secondary">Traverse хийх</button>
+
+        <button id="btnReset2" class="outline">Reset</button>
+      </div>
+
+      <div class="linked-layout">
+        <!-- зүүн тал: блок бүр -->
+        <div class="block-col" id="disk2"></div>
+        <!-- баруун тал: файл бүрийн эхлэх блок -->
+        <div class="file-starts" id="fileStarts2"></div>
+      </div>
+
+      <div class="explain" id="explain2"></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // =============== COMMON STATE FOR SECTION 1 ===============
+  const TOTAL_BLOCKS = 40;
+  let disk = new Array(TOTAL_BLOCKS).fill(null);   // null = free
+  let busy = false;                                // animation lock
+
+  // Өнгийн mapping – A..G тусдаа, бусад нь default
+  const colorMap = {
+    A: "#f97316",
+    B: "#0ea5e9",
+    C: "#22c55e",
+    D: "#eab308",
+    E: "#a855f7",
+    F: "#ef4444",
+    G: "#38bdf8",
+    default: "#4ade80"
+  };
+
+  const diskEl = document.getElementById("disk");
+  const explain1 = document.getElementById("explain1");
+  const inputName = document.getElementById("fileName");
+  const inputSize = document.getElementById("fileSize");
+  const btnAdd = document.getElementById("btnAdd");
+  const btnDelete = document.getElementById("btnDelete");
+  const btnExample = document.getElementById("btnExample");
+  const btnReset1 = document.getElementById("btnReset1");
+
+  const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+
+  function renderDisk() {
+    diskEl.innerHTML = "";
+    disk.forEach((cell, idx) => {
+      const div = document.createElement("div");
+      div.classList.add("block");
+      if (cell === null) {
+        div.classList.add("free");
+      } else {
+        const color = colorMap[cell] || colorMap.default;
+        div.style.background = color;
+        div.style.color = "#020617";
+        div.style.transform = "scale(1.02)";
+        setTimeout(() => { div.style.transform = "scale(1)"; }, 80);
+        div.textContent = cell;
+      }
+      diskEl.appendChild(div);
+    });
+  }
+
+  // contiguous free segment-ийн эхлэлийг буцаана, байхгүй бол -1
+  function findFreeRun(size) {
+    let runStart = -1;
+    let runLen = 0;
+    for (let i = 0; i < TOTAL_BLOCKS; i++) {
+      if (disk[i] === null) {
+        if (runStart === -1) runStart = i;
+        runLen++;
+        if (runLen === size) return runStart;
+      } else {
+        runStart = -1;
+        runLen = 0;
+      }
+    }
+    return -1;
+  }
+
+  async function allocateFileAnimated(name, size) {
+    if (busy) return;
+    const upper = name.toUpperCase();
+    const start = findFreeRun(size);
+    if (start === -1) {
+      explain1.innerHTML =
+        `<div class="step-label">Add амжилтгүй</div>` +
+        `Нийт чөлөөт блок хангалттай байж болох ч <b>${size}</b> үргэлжилсэн блокын ` +
+        `нэг хэсэг олдсонгүй. Contiguous allocation-ы сул тал.`;
+      return;
+    }
+
+    busy = true;
+    for (let j = 0; j < size; j++) {
+      disk[start + j] = upper;
+      renderDisk();
+      await sleep(120); // delay – блок бүрийг нэг нэгээр нь бөглөж байна
+    }
+    busy = false;
+
+    explain1.innerHTML =
+      `<div class="step-label">${upper} файлыг амжилттай байрлууллаа</div>` +
+      `Файл <b>${size}</b> блок эзэлж, диск дээр <b>${start}</b>-р индэксээс эхэлсэн ` +
+      `үргэлжилсэн зайд хадгалагдлаа.`;
+  }
+
+  function freeFile(name) {
+    const upper = name.toUpperCase();
+    let removed = false;
+    for (let i = 0; i < TOTAL_BLOCKS; i++) {
+      if (disk[i] === upper) {
+        disk[i] = null;
+        removed = true;
+      }
+    }
+    renderDisk();
+    if (removed) {
+      explain1.innerHTML =
+        `<div class="step-label">${upper} файлыг устгалаа</div>` +
+        `Тухайн файл эзэлж байсан блокууд чөлөөт болсон тул тасалдсан чөлөөт зай ` +
+        `үүсэж болно.`;
+    } else {
+      explain1.innerHTML =
+        `<div class="step-label">Файл олдсонгүй</div>` +
+        `${upper} нэртэй файл одоогийн диск дээр алга байна.`;
+    }
+  }
+
+  function resetDisk() {
+    if (busy) return;
+    disk.fill(null);
+    renderDisk();
+    explain1.innerHTML =
+      '';
+  }
+
+  function exampleScenario() {
+    if (busy) return;
+    // лабораторийн бодлогын жишээ: A-6, B-5, C-3, D-7, E-6, F-6, G-3
+    disk.fill(null);
+    const defs = [
+      ["A", 6],
+      ["B", 5],
+      ["C", 3],
+      ["D", 7],
+      ["E", 6],
+      ["E", 2]
+    ];
+    let ptr = 0;
+    for (const [name, size] of defs) {
+      for (let j = 0; j < size && ptr < TOTAL_BLOCKS; j++, ptr++) {
+        disk[ptr] = name;
+      }
+    }
+    renderDisk();
+    explain1.innerHTML =
+      '<div class="step-label">Жишээ тохиргоо</div>' +
+      'A-6, B-5, C-3, D-7, E-6, E-2 файлуудыг дискний эхнээс эхэлж дарааллаар нь ' +
+      'байршуулсан байдал. ';
+  }
+
+  // =============== EVENT LISTENERS ===============
+  btnAdd.addEventListener("click", async () => {
+    const name = (inputName.value || "A").trim();
+    const size = Number(inputSize.value || 0);
+    if (!name || name.length !== 1 || !/[A-Za-z]/.test(name)) {
+      alert("Файлын нэрийг ганц латин үсгээр оруул (A, B, C гэх мэт).");
+      return;
+    }
+    if (!size || size < 1 || size > TOTAL_BLOCKS) {
+      alert("Хэмжээг 1–40 хооронд бүхэл тоогоор оруул.");
+      return;
+    }
+    await allocateFileAnimated(name, size);
+  });
+
+  btnDelete.addEventListener("click", () => {
+    const name = (inputName.value || "A").trim();
+    if (!name) return;
+    freeFile(name);
+  });
+
+  btnExample.addEventListener("click", exampleScenario);
+  btnReset1.addEventListener("click", resetDisk);
+
+  // эхний дүрслэл
+  resetDisk();
+</script>
+<script src="indexx.js"></script>
+</body>
+</html>
